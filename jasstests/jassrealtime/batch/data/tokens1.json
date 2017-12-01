@@ -1,0 +1,5 @@
+{"data": [{"annotationId":"t1","_documentID":"doc1","_corpusID":"corptest","schemaType":"token", "word": "Les","offsets": [{"begin":0, "end":3 }], "length": 3, "category": "DET:ART"},
+{"annotationId":"t2","_documentID":"doc1","_corpusID":"corptest","schemaType":"token", "word": "algorithmes","offsets": [{"begin":4, "end":15 }],"length": 11, "category": "NOM"},
+{"_documentID":"doc1","_corpusID":"corptest","schemaType":"token", "word": "de", "offsets": [{"begin":28, "end":30 },{"begin":16, "end":18 }], "length": 2,"category": "PRP"},
+{"_documentID":"doc1","_corpusID":"corptest","schemaType":"token", "word": "colonies", "offsets": [{"begin":19, "end":27 }], "length": 8,"category": "NOM"},
+{"_documentID":"doc1","_corpusID":"corptest","schemaType":"token", "word": "fourmis","offsets": [{"begin":31, "end":38 }], "length": 7, "category": "NOM"}]}

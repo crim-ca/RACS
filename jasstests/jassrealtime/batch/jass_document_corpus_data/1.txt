@@ -1,0 +1,166 @@
+ 
+ 
+ | date prédécouverte         
+ | prédécouvreur             Charles Messier
+ | désignations              aucune
+ | satellite de              Soleil
+ | époque                      (JJ 2453200,5)
+| nombre d'observations  7829
+| arc d'observation  68635 jours
+| incertitude  0
+ | demi-grand axe            414739470.69436745043
+ | demi-grand axe ua         2.7723621249
+ | périhélie                 319.358 
+ | périhélie ua              2.135
+ | aphélie                   510.077 
+ | aphélie ua                3.410
+ | excentricité              0.231
+ | période de révolution     1685.927
+ | période de révolution ua  4,62 a
+ | inclinaison               34.852
+ | nœud ascendant            173.166
+ | argument du périhélie     310.529
+ | anomalie moyenne          346.022
+ | vitesse orbitale          17.65
+ | Tisserand                 3,043
+ | dimensions                [(582 × 556 × 500) ± 18] km   (545 ± 18) km (diamètre moyen)
+ | masse                     (2.11 ± 0.26) 
+ | masse volumique           (2490 + 600 - 400) 
+ | gravité                   0.16
+ | vitesse de libération     0.35
+ | période de rotation       0.32555
+ | spectre                   B
+ | magnitude                 4.13
+ | albédo                    0,14
+ | température               ~ 164
+ | origine nom               Pallas
+}}
+
+Pallas (du grec ancien  ), officiellement (2) Pallas, est le troisième plus grand objet de la ceinture principale d'astéroïdes du Système solaire, après la planète naine Cérès et l’astéroïde Vesta. C'est le second astéroïde découvert. Il le fut fortuitement le   par Heinrich Olbers, alors que l'astronome tentait de retrouver Cérès à l'aide des prédictions orbitales de Carl Friedrich Gauss. Charles Messier avait été cependant le premier à l'observer en 1779, quand il suivait la trajectoire d'une comète, mais il prit l'objet pour une simple étoile de  .
+
+Pallas contient environ 7 % de la masse totale de la ceinture d'astéroïdes.  
+À l'instar de Cérès, Junon et Vesta, il fut considéré comme une planète jusqu'à ce que la découverte de nombreux autres astéroïdes conduise à sa reclassification. Comme celle de Pluton, l'orbite de Pallas est très fortement inclinée ( ) par rapport au plan de la ceinture d'astéroïdes principale, ce qui rend l'astéroïde difficilement accessible par engin spatial.  
+Sa surface est constituée de silicates, son spectre étant similaire à celui des météorites de chondrites carbonées.
+
+ Nom 
+
+L'astéroïde est nommé d'après Pallas Athéna, une épiclèse d'Athéna   .
+Dans certaines versions du mythe, Athéna a tué son amie Pallas, puis dans le deuil, adopte son nom .
+Il existe plusieurs personnages masculins de ce nom dans la mythologie grecque, mais on a donné des noms exclusivement féminins aux premiers astéroïdes découverts.
+
+En grec, au contraire de (1) Cérès, (3) Junon et (4) Vesta, l'astéroïde garde le même nom, celui-ci étant déjà grec. Presque toutes les autres langues utilisent une variante de Pallas : en italien Pallade, en russe Pallada, en espagnol Palas, en arabe Bālās. La seule est exception est le chinois, le nommant « étoile de la déesse de la sagesse » (智神星 zhìshénxīng). Ceci contraste avec le nom chinois de la déesse Pallas, dérivé du grec : 帕拉斯 (pàlāsī).
+
+Les météorites pallasites ne sont pas reliées à l'astéroïde Pallas, mais sont nommées d'après le naturaliste allemand Peter Simon Pallas. L'élément chimique palladium (numéro atomique 46) est nommé d'après l'astéroïde, lequel a été découvert quelque peu avant l'élément .
+
+Les premiers astéroïdes découverts possèdent un symbole astronomique et celui de Pallas est  ou .
+
+ Histoire de l'observation 
+
+ Découverte 
+
+En 1801, l'astronome Giuseppe Piazzi découvrit un astéroïde qu'il prit initialement pour une comète. Peu après, il annonça la découverte de l'objet dont le mouvement lent et uniforme ne correspondait pas à celui des comètes et suggéra qu'il faisait partie d'un nouveau type d'objet. Cet objet fut perdu pendant quelques mois alors qu'il passait derrière le soleil, puis retrouvé quelques mois plus tard par Baron von Zach and Heinrich W. M. Olbers grâce à un calcul de réduction d'orbite effectué par Friedrich Gauss. Cet objet fut nommé Cérès est le premier astéroïde découvert.
+
+Quelques mois plus tard, Olbers chercha à localiser Cérès quand il constata la présence d'un objet mobile dans la région où Cérès était censé se trouver. C'était l'astéroïde Pallas qui passait fortuitement près de Cérès. La découverte de cet objet provoqua l'intérêt de la communauté scientifique. Avant la découverte de Cérès, les astronomes spéculaient la présence d'une planète entre les orbites de Mars et celle de Jupiter. La découverte d'une seconde planète les surprit .
+
+ Pré-découverte 
+ 
+
+Charles Messier observe Pallas le 6 avril 1779, 23 ans avant sa découverte, note sa position et pense qu'il s'agit d'une étoile .
+
+ Poursuite des observations 
+
+L'orbite de Pallas fut calculée par Gauss, qui trouva une période de 4,6 années similaire à la période de Cérès. Cependant, Pallas a une inclinaison orbitale élevée par rapport au plan de l'écliptique .
+
+En 1917, l'astronome japonais Kiyotsugu Hirayama commença à étudier le mouvement des astéroïdes. En rangeant les astéroïdes selon leur mouvement orbital moyen, inclinaison et excentricité, il découvrit plusieurs groupes distincts. Dans un article ultérieur, il reporta la découverte d'un groupe de trois astéroïdes associés à Pallas qui devint la famille Pallas du nom du plus grand membre du groupe . Depuis 1994, plus de dix membres de cette famille ont été découverts ; ses membres ont un demi-grand axe compris entre 2,50 et 2,82 UA et une inclinaison entre   et  ) . L'existence de cette famille a finalement été confirmée en 2002 par comparaison de leur spectre .
+
+Des recherches menées par l'astronome amateur belge René Bourtembourg ont montré que l'astéroïde avait été observé pour la première fois par Charles Messier le   alors qu'il suivait la trajectoire de la comète de Bode . Sur la carte du ciel dessinée par Messier montrant la trajectoire de la comète, l'astronome représente 138 étoiles dont il a lui-même mesuré la position. René Bourtembourg, grâce à un programme informatique capable de retrouver les positions précises d'astres sur des milliers d'années, découvre que l'une des étoiles représentées par Messier (de magnitude 7) est en fait l'astéroïde Pallas. Charles Messier, concentré sur l'observation de la comète, n'a pas prêté d'attention particulière à cet astre d'aspect banal et manqué ainsi la découverte d'un nouveau corps du Système solaire. 
+
+En  , le télescope spatial Hubble produit de nouvelles données de forme, grandeur et surface grâce à l'équipe de la mission Dawn qui a obtenu du temps d'observation d'Hubble ; Pallas était alors à son plus proche de la Terre, ce qui n'a lieu que tous les 20 ans. Des données permettant des comparaisons avec Cérès et Vesta ont ainsi été collectées   .
+
+ Exploration 
+
+
+Comme celle de Pluton, l'orbite de Pallas est très fortement inclinée ( ) par rapport au plan de la ceinture d'astéroïdes principale, ce qui rend l'astéroïde difficilement accessible par engin spatial .
+De fait, Pallas n'a pas encore été visité par un tel engin, comme la sonde Dawn qui a exploré (4) Vesta et (1) Cérès avec succès. L'orbite de Pallas croise l'écliptique en   mais, vu l'importante inclinaison de l'orbite de Pallas, il n'est pas possible que Dawn suive celle-ci .
+Une mission vers Pallas plus élaborée qu'un survol nécessiterait un engin spatial de conception différente .
+
+Dans une ébauche de la définition de planète de 2006 de l'Union astronomique internationale, Pallas était parmi les « planètes candidates », mais ne s'est finalement pas qualifiée, n'ayant pas nettoyé le voisinage de son orbite   .
+S'il se trouve, dans le futur, que la surface de Pallas a été formée par équilibre hydrostatique, il est possible que sa classification soit changée pour celle d'une planète naine.
+
+ Caractéristiques 
+
+ Volume, masse et géologie 
+
+
+Pallas contient environ 7 % de la masse totale de la ceinture d'astéroïdes .
+
+À tour de rôle, Vesta et Pallas ont porté le titre de deuxième plus grand astéroïde . 
+Dans les faits, Pallas est légèrement plus important en volume, mais est par contre significativement moins massif : Pallas a 22&amp;nbsp;% de la masse de Cérès et 0,3&amp;nbsp;% de celle de la Lune.
+
+La surface de l'astéroïde est très peu connue. Les images de 2007 de Hubble, de résolution de  , montrent des variations de pixel à pixel, mais l'albédo de 12 % rend ces caractéristiques à peine détectables. En lumière visible et en infrarouges, on obtient peu de variation, mais en ultraviolet, d'importantes caractéristiques sont possibles vers 285°, c'est-à-dire 75° de longitude ouest.
+
+On pense que Pallas a eu une période de différenciation planétaire , ce qui indique qu'elle serait une protoplanète. Durant la phase de formation des planètes du Système solaire, certains objets ont grossi par accrétion, tandis que d'autres ont été détruits par des collisions avec d'autres. Pallas et Vesta sont des survivants probables de ce stage primaire de formation planétaire .
+
+ Composition 
+
+
+D'après les observations spectroscopiques, le premier composant de la surface de Pallas est un silicate faible en fer et en eau. Des exemples de tels minéraux sont l'olivine et le pyroxène, lesquels entrent dans la composition des météorites chondres (CM) .
+La composition de la surface palladienne est semblable à celle de la chondrite carbonée Renazzo (CR), lesquelles sont encore plus faibles en minéraux hydratés que celles du type CM . 
+La météorite Renazzo, découverte en Italie en 1824, est l'une des météorites les plus primitives qui soient connues .
+
+ Magnitude 
+Comparativement à Vesta, Pallas est plus loin de la Terre et a un plus petit albédo, donc il apparaît moins brillant. Même (7) Iris, qui est plus petit, apparaît plus brillant .
+La magnitude moyenne de Pallas est de +8,0, ce qui se situe dans l'intervalle observable par des jumelles 10×50, mais au contraire de Cérès et de Vesta, davantage de puissance d'observation est requise lorsque l'élongation de Pallas est à son minimum, car sa magnitude est alors de +10,6. Lors d'oppositions périhéliques, Pallas peut atteindre une magnitude de +6,4, ce qui est près de la visibilité à l’œil nu .
+
+Fin  , Pallas a eu une magnitude (précédemment calculée) de 6,96 .
+
+ Orbite 
+
+
+
+Les paramètres d'orbite de Pallas sont inhabituels, pour un objet de sa masse. Son orbite a une forte inclinaison et est assez excentrique, bien que se trouvant à la même distance du Soleil que le centre de la ceinture d'astéroïdes. Sa rotation semble être prograde  .
+
+De plus l'inclinaison de l'axe de Pallas est très élevée, 78±13° ou 65±12°. Selon des données de courbe de lumière ambigües, le pôle pointe soit vers les coordonnées écliptiques (β,&amp;nbsp;λ)  (−12°,&amp;nbsp;35°) ou (43°,&amp;nbsp;193°) avec une incertitude de 10° .
+Les données de 2007 du télescope Hubble de même que les observations de 2003 à 2005 du télescope Keck favorisent la première solution
+    .
+Autrement dit, à tous les étés et hivers palladiens, de larges portions de la surface sont constamment ensoleillées ou constamment plongées dans la nuit, pour une durée de temps de l'ordre d'une année terrestre.
+
+ Quasi-résonances 
+
+Pallas est en quasi-résonance 1:1 avec (1) Cérès .
+Il est aussi, avec Jupiter, en quasi-résonance 18:7, avec une période de  , et en quasi-résonance 5:2, avec une période de   .
+
+ Transits de planètes, vus de Pallas 
+Vues depuis Pallas, Mercure, Vénus, Mars et la Terre sont à l'occasion en transit astronomique, c'est-à-dire que ces planètes passent devant le Soleil. Ce fut le cas de la Terre en 1968 et 1998, la prochaine fois sera en 2224. Pour Mercure, la dernière fois était en 2009. Les dernières et prochaines fois pour Vénus se situent respectivement en 1677 et 2123. Pour Mars, elles auront lieu en 1597 et 2759 .
+
+ Notes et références 
+ 
+ 
+
+ Voir aussi 
+ 
+ Articles connexes 
+* Astéroïde
+* Ceinture d'astéroïdes
+* Liste des planètes mineures (1-1000)
+* Cérès  
+* Junon
+* Vesta
+* Liste des plus grands astéroïdes de la ceinture principale
+
+ Liens externes ===
+*  
+
+ 
+ 
+ 
+
+ 
+
+Catégorie:Astéroïde de la ceinture principale
+Catégorie:Objet céleste prédécouvert en 1779
+Catégorie:Objet céleste découvert en 1802
+Catégorie:Objet céleste nommé d'après un personnage de la mythologie grecque
+Catégorie:Astéroïde de type B
+Catégorie:Groupe de Pallas
+p

@@ -1,0 +1,16 @@
+version: "2"
+
+services:
+  es_instance:
+    image:  elasticsearch:2.4.1
+    expose:
+      - 9300    # Port for JAVA clients using native transport protocol
+      - 9200                  # Port for RESTFul API
+    ports:
+      - "9300:9300"
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+
+volumes:
+  es_data:

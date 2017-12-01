@@ -1,0 +1,40 @@
+version: "2"
+
+services:
+  jass_real_time:
+    build: .
+    expose:
+      - 7888
+    ports:
+      - "7888:8888"
+    environment:
+      - ES_HOST=es_instance
+      - JASS_ENV=jassdev
+      - FILE_STORAGE_DATA_URL=http://localhost:6999
+      - JASS_ROOT_URL=http://localhost:7888
+      # Directory on local machine jass share with file_server_instance
+      # If there file_storage_shared volume, this variable should point on the
+      # directory bound to this volume.
+      - JASS_SHARED_LOCAL_FOLDER=/var/jass_fs_data
+      - JASS_TMP_UPLOAD_FOLDER=/tmp
+      - JASS_ALLOW_CORS=True
+      - JASS_REBUILD_ENV=True
+      - JASS_NB_CORES=4
+      - JASS_MANAGE_ENV=False
+      - JASS_EXPOSE_SWAGGER=True
+    depends_on:
+     - es_instance
+
+  es_instance:
+    image:  elasticsearch:2.4.1
+    expose:
+      - 9300    # Port for JAVA clients using native transport protocol
+      - 9200                  # Port for RESTFul API
+    ports:
+      - "9300:9300"
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+
+volumes:
+  es_data:

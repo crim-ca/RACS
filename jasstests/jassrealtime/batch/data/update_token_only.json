@@ -1,0 +1,1 @@
+{"data": [{"annotationId":"t1","_documentID":"doc1","_corpusID":"corptest","schemaType":"token", "word": "Les","offsets": [{"begin":0, "end":3 }], "length": 3, "category": "UPDATED"}]}

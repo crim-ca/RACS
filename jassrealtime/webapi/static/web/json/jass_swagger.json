@@ -1,0 +1,2236 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "2.5.8",
+    "title": "JASS",
+    "description": "Annotation Storage"
+  },
+  "paths": {
+    "/rebuildenv": {
+      "post": {
+        "tags": [
+          "env"
+        ],
+        "summary": "Recreates and existing environment",
+        "description": "Recreates an existing environment by deleting everything in this environment(Corpuses,Schemas ...) and recreating. The environement is defined by the jass instance ",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Empty body",
+            "required": false,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/corpora": {
+      "post": {
+        "tags": [
+          "corpus"
+        ],
+        "summary": "Add a corpus",
+        "description": "Creates a document corpus for given env. A document corpus contains text documents",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Corpus which will contain documents",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CorpusIn"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation. returns corpus info",
+            "schema": {
+              "$ref": "#/definitions/CorpusCreateOut"
+            }
+          },
+          "409": {
+            "description": "Corpus with the same id already exists"
+          },
+          "422": {
+            "description": "Missing required parameters or CorpusId contains invalid characters."
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "corpus"
+        ],
+        "summary": "List all corpuses",
+        "description": "List all corpuses which the user is allowed to see",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/CorpusList"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/corpora/{corpusId}": {
+      "get": {
+        "tags": [
+          "corpus"
+        ],
+        "summary": "Returns corpus metadata",
+        "description": "Returns corpus metadata.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus. Example: \"corpus1\"",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/CorpusOut"
+            }
+          },
+          "404": {
+            "description": "Specified corpus not found"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "corpus"
+        ],
+        "summary": "Updates corpus metadata",
+        "description": "Updates corpus metadata",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus. Example: \"corpus1\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CorpusUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "404": {
+            "description": "Specified corpus not found"
+          },
+          "422": {
+            "description": "Some parameters have invalid value (Ex: attempting to delete a language)"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "corpus"
+        ],
+        "summary": "Deletes a corpus and all its documents,buckets and annotations",
+        "description": "Deletes a corpus and all its documents,buckets and annotations",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus. Example: \"corpus1\"",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "404": {
+            "description": "Specified corpus not found"
+          }
+        }
+      }
+    },
+    "/corpora/{corpusId}/structure": {
+      "get": {
+        "tags": [
+          "corpus"
+        ],
+        "summary": "Get corpus structure",
+        "description": "For a given corpus, list its buckets and their corresponding schema types",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus. Example: \"corpus1\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "includeSchemaJson",
+            "description": "If true, includes the historic JSON schemas instead of just the type.",
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/CorpusStructure"
+            }
+          },
+          "404": {
+            "description": "Specified corpus not found"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/batch/corpora/{corpusId}/documents": {
+      "get": {
+        "tags": [
+          "batch",
+          "annotation"
+        ],
+        "summary": "Downloads a zip of all documents from the corpus.",
+        "description": "Download a zip named docs.zip, containing one text file per document in corpus. Document ids are used as file names. This call is synchronous and may take several hours for large document corpuses.",
+        "produces": [
+          "application/zip"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Zip File",
+            "schema": {
+              "type": "file"
+            }
+          },
+          "404": {
+            "description": "Corpus with the provided id does not exist"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "batch",
+          "annotation"
+        ],
+        "summary": "Send a zip of all documents from the corpus to the supplied url.",
+        "description": "Creates a zip named zipFileName, containing one text file per document in corpus. Document ids are used as file names. Zip is then sent to via sendMethod. To send data via Multimedia Storage System, leave optional fields blank. This call is synchronous.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Parameters describing the location to which to export the file",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DocumentsExport"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "404": {
+            "description": "Corpus with the provided id does not exist"
+          },
+          "422": {
+            "description": "missing or not working destUrl, or missing zipFile"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/batch/corpora/{corpusId}/annotations": {
+      "get": {
+        "tags": [
+          "batch",
+          "annotation"
+        ],
+        "summary": "Downloads a zip of annotations from the corpus.",
+        "description": "Downloads a zip containing one json file for each combination of selected document,bucket and schema type. documentId.bucketId.schemaType.json are used as file names. This call is synchronous and may take several hours for large document corpuses.",
+        "produces": [
+          "application/zip"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "type": "string",
+            "name": "bucketIds",
+            "description": "Buckets to be searched. Should be separated by comma. If not present, all schema types will be searched. Example “bucket1,bucket2”"
+          },
+          {
+            "in": "query",
+            "type": "string",
+            "name": "schemaTypes",
+            "description": "Schema types of annotations to be searched. Should be separated by comma. If not present, all schema types will be searched. Example “token,tokenwithlemma”"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Zip File",
+            "schema": {
+              "type": "file"
+            }
+          },
+          "404": {
+            "description": "Corpus with the provided id does not exist"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "batch",
+          "annotation"
+        ],
+        "summary": "Send a zip of annotations from the corpus to the supplied url.",
+        "description": "Creates a zip named zipFileName, containing one json file for each combination of selected document,bucket and schema type. documentId.bucketId.schemaType.json are used as file names. Zip is then sent to via sendMethod. To send data via Multimedia Storage System, leave optional fields blank. This call is synchronous.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Parameters describing the location to which to export the file with some annotation search parameters",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AnnotationsExport"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "404": {
+            "description": "Corpus with the provided id does not exist"
+          },
+          "422": {
+            "description": "missing or not working destUrl, or missing zipFile"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/batch/corpora/{corpusId}/bucket/{bucketId}/annotations": {
+      "post": {
+        "tags": [
+          "batch",
+          "annotation"
+        ],
+        "summary": "Adds a batch of annotations to a given bucket.",
+        "description": "Adds a batch of annotations to a given bucket. Annotations should be stored in any number of files having the following format: {\"data\": [{annotation1,...,annotationN}]}. Note that this operation is syncronous and may potentially take hours. Thus increase connection time is recommended.",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "bucketId",
+            "description": "ID of bucket",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "file",
+            "in": "formData",
+            "description": "the attachment content",
+            "required": true,
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "422": {
+            "description": "Missing required parameters",
+            "schema": {
+              "$ref": "#/definitions/BatchAnnotationErrors"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/corpora/{corpusId}/documentIds": {
+      "get": {
+        "tags": [
+          "corpus",
+          "document"
+        ],
+        "summary": "Get the ids of all the documents of a corpus",
+        "description": "For a given corpus, list the ids of all its documents",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus. Example: \"corpus1\"",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "ids": {
+                  "description": "Document ids",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Specified corpus not found"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/corpora/{corpusId}/documents": {
+      "post": {
+        "tags": [
+          "document"
+        ],
+        "summary": "Add a document to a corpus",
+        "description": "Adds a document to corpus. Specified language must corresponds to the corpus language.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Document Contents",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DocumentIn"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation. returns document id",
+            "schema": {
+              "$ref": "#/definitions/Id"
+            }
+          },
+          "409": {
+            "description": "Document with the same id already exists"
+          },
+          "422": {
+            "description": "Missing required parameters"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "document"
+        ],
+        "summary": "Get text documents of a corpus with mandatory paging. A sorting field can be optionally specified. Matching filters for each field can also be optionally specified. The nature of the match depends on the analyser of the field. E.G. A field \"not_analyzed\" will only return exact matches.",
+        "description": "For a given corpus, list its documents",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus. Example: \"corpus1\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "description": "zero-based starting index.",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "description": "Number of documents to retrieve",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "filterTitle",
+            "description": "Title filter",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "filterSource",
+            "description": "Source filter",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "filterJoin",
+            "description": "Filter join (must be \"and\" or \"or\"). Defaults to \"and\".",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "and",
+              "or"
+            ]
+          },
+          {
+            "in": "query",
+            "name": "sortBy",
+            "description": "Specify field to sort by.",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "id",
+              "title",
+              "source"
+            ]
+          },
+          {
+            "in": "query",
+            "name": "sortOrder",
+            "description": "Sort order. \"asc\"ending or \"desc\"ending. Defaults to ascending.",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/Documents"
+            }
+          },
+          "404": {
+            "description": "Specified corpus not found"
+          },
+          "422": {
+            "description": "Invalid 'from' or 'size' parameter"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/corpora/{corpusId}/documents/{documentId}": {
+      "get": {
+        "tags": [
+          "document"
+        ],
+        "summary": "Get a text document",
+        "description": "For given corpus, retrieve a text document by id",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "documentId",
+            "description": "ID of document.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/Document"
+            }
+          },
+          "404": {
+            "description": "Specified corpus or document not found"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "document"
+        ],
+        "summary": "Delete a text document",
+        "description": "For given corpus, delete a text document by id",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "documentId",
+            "description": "ID of document.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "404": {
+            "description": "Specified corpus or document not found"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/corpora/{corpusId}/buckets": {
+      "post": {
+        "tags": [
+          "bucket"
+        ],
+        "summary": "Add a bucket (or annotation group)",
+        "description": "Creates a new bucket(annotation group) for given corpus. A bucket is used to regroup annotation, and can be assigned security permissions. An annotation can only exist inside a bucket. Currently limited to document_surface. Example input: For  jasspp,corpus1 : {\"id\":\"bucket1\",\"name\":\"Anton Bucket\"}",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus that needs to be fetched. Example: \"corpus1\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Bucket which will contain annotations",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BucketIn"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation. returns bucket id",
+            "schema": {
+              "$ref": "#/definitions/Id"
+            }
+          },
+          "409": {
+            "description": "Bucket with the same id already exists"
+          },
+          "422": {
+            "description": "Corpus does not exists, or bucketId contains invalid characters."
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/corpora/{corpusId}/buckets/{bucketId}": {
+      "delete": {
+        "tags": [
+          "bucket"
+        ],
+        "summary": "Deletes a bucket and all its annotations (or annotation group)",
+        "description": "For a given corpus deletes a bucket and all its associated annotations.",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus containing one or more buckets. Example: \"corpus1\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "bucketId",
+            "description": "ID of bucket that needs to be deleted. Example: \"bucket1\"",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "404": {
+            "description": "Specified corpus or bucket not found"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/corpora/{corpusId}/buckets/{bucketId}/schemas": {
+      "post": {
+        "tags": [
+          "bucket"
+        ],
+        "summary": "Bind a new schema to the bucket (annotation group)",
+        "description": "Create a new json schema which will be used to validate annotations. Schema Validation is not supported ATM. Here are the elements currently supported for json schema. If a jsonSchema is already bound with the same schemaType, the creation will be refused. Example for  jasspp,corpus1,bucket1: {\"$schema\": \"http://json-schema.org/draft-04/schema#\",\"targetType\": \"document_surface1d\",\"schemaType\": \"doc_offset\",\"type\": \"object\",\"required\": [\"schemaType\",\"_corpusID\",\"_documentID\",\"offsets\"],\"properties\": {\"schemaType\": {\"type\": \"string\",\"description\": \"Schema type\",\"searchable\": true,\"searchModes\": [\"basic\"],\"locked\": true},\"_documentID\": {\"type\": \"string\",\"description\": \"Internal document GUID\",\"searchable\": true,\"searchModes\": [\"basic\"],\"locked\": true},\"_corpusID\": {\"type\": \"string\",\"description\": \"Internal Corpus GUID\",\"searchable\": true,\"searchModes\": [\"basic\"],\"locked\": true},\"offsets\": {\"searchable\": true,\"locked\": true,\"type\": \"array\",\"minItems\": 1,\"items\": {\"type\": \"object\",\"properties\": {\"begin\": { \"type\": \"integer\", \"minimum\": 0},\"end\": { \"type\": \"integer\", \"minimum\": 0}}}}}}",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "bucketId",
+            "description": "ID of bucket",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Schema describing annotations in a particular bucket",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation."
+          },
+          "403": {
+            "description": "A schema with the same schemaType is already bound to the bucket."
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "bucket"
+        ],
+        "summary": "Modify a schema already bound to the bucket (annotation group)",
+        "description": "Modify a json schema bound to the bucket.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus that needs to be fetched. Example: \"corpus1\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "bucketId",
+            "description": "ID of bucket that needs to be fetched. Example: \"corpus1\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Schema describing annotations in a particular bucket",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation."
+          },
+          "404": {
+            "description": "There is no schema with the specified schemaType currently bound to the bucket."
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/corpora/{corpusId}/buckets/{bucketId}/schemas/{schemaType}": {
+      "delete": {
+        "tags": [
+          "bucket"
+        ],
+        "summary": "Deletes schemaType, its associated schema and all associated annotations",
+        "description": "Deletes schemaType, its associated schema and all associated annotations.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus that needs to be fetched. Example: \"corpus1\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "bucketId",
+            "description": "ID of bucket that needs to be fetched. Example: \"corpus1\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "schemaType",
+            "description": "Type of the schema to delete\"",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation."
+          },
+          "404": {
+            "description": "Corpus or Bucket with the provided Ids do not exist. Or there is no schema with the specified schemaType currently bound to the bucket."
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/corpora/{corpusId}/buckets/{bucketId}/annotations": {
+      "post": {
+        "tags": [
+          "annotation"
+        ],
+        "summary": "Creates an annotation inside a bucket",
+        "description": "Creates an annotation inside a bucket. The field \"schemaType\" must be present inside the annotation, to link it to its corresponding schema in the bucket.  Example: for  jasspp,corpus1,bucket1 :{\"annotationId\":\"anno1\",\"schemaType\": \"doc_offset\",\"_documentID\": \"abc123\",\"_corpusID\" : \"corp1\",\"offsets\" : [{\"begin\" :1 , \"end\": 2},{\"begin\" :3 , \"end\": 4}]}",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus that needs to be fetched. Example: \"corpus1\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "bucketId",
+            "description": "ID of bucket that needs to be fetched. Example: \"bucket1\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Annotations content",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AnnotationIn"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation.",
+            "schema": {
+              "$ref": "#/definitions/Id"
+            }
+          },
+          "404": {
+            "description": "Specified bucket not found"
+          },
+          "409": {
+            "description": "Annotation with the same id already exists"
+          },
+          "422": {
+            "description": "Annotation misses required fields"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "annotation"
+        ],
+        "summary": "Update Annotation",
+        "description": "Updates the json content of the annotation. Sent fields will be updated. Absent fields are not removed (and cannot be removed via this endpoint.) It is prohibited to change the schemaType or bucketId. Note that update is not instantaneous (it may take 1 second to update the annotation in storage). Example Input: For  jasspp,corpus1,bucket1,anno1 and type:token : {\"annotationId\":\"anno1\",\"schemaType\": \"doc_offset\",\"offsets\" : [{\"begin\" :1 , \"end\": 2}]}",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus that needs to be fetched. Example: \"corpus1\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "bucketId",
+            "description": "ID of bucket that needs to be fetched. Example: \"bucket1\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Annotation content. Must contain \"schemaType\"",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AnnotationUp"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation."
+          },
+          "404": {
+            "description": "Annotation with provided id does not exist or bucket not found"
+          },
+          "422": {
+            "description": "Annotation misses required fields"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "annotation"
+        ],
+        "summary": "Delete bucket annotation for specified schema types",
+        "description": "Delete all bucket annotations for specified schema types",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "bucketId",
+            "description": "ID of bucket",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "schemaTypes",
+            "description": "List of schemaTypes separated by comma.",
+            "required": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "csv"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation."
+          },
+          "404": {
+            "description": "Specified bucket not found"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/corpora/{corpusId}/buckets/{bucketId}/annotationCount": {
+      "get": {
+        "tags": [
+          "annotation"
+        ],
+        "summary": "Get bucket annotation count per specified schema types",
+        "description": "Get bucket annotation count per specified schema types. If a specified schema type is not associated to the bucket, it will not have an entry in the response.",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "bucketId",
+            "description": "ID of bucket",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "schemaTypes",
+            "description": "List of schemaTypes separated by comma",
+            "required": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "csv"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation.",
+            "schema": {
+              "$ref": "#/definitions/AnnotationSchemaCount"
+            }
+          },
+          "404": {
+            "description": "Specified bucket not found"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/corpora/{corpusId}/buckets/{bucketId}/annotations/{annotationId}": {
+      "get": {
+        "tags": [
+          "annotation"
+        ],
+        "summary": "Get an annotation by id",
+        "description": "Returns an annotation with a given annotation id. Example input: For  jasspp,corpus1,bucket1,anno1 and schemaType: doc_offset",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus that needs to be fetched. Example: \"corpus1\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "bucketId",
+            "description": "ID of bucket that needs to be fetched. Example: \"bucket1\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "annotationId",
+            "description": "Id of the annotation we want to get. Example: anno1",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "schemaType",
+            "description": "annotation schemaType in the bucket",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation.",
+            "schema": {
+              "$ref": "#/definitions/AnnotationGet"
+            },
+            "examples": {
+              "annotationId": "anno1",
+              "schemaType": "doc_offset",
+              "_documentID": "abc123",
+              "_corpusID": "corp1",
+              "offsets": [
+                {
+                  "begin": 1,
+                  "end": 2
+                },
+                {
+                  "begin": 3,
+                  "end": 4
+                }
+              ]
+            }
+          },
+          "404": {
+            "description": "Annotation with provided id/schemaType does not exist or bucket not found"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "annotation"
+        ],
+        "summary": "Delete Annotation",
+        "description": "Deletes an annotation. Example Input: For  jasspp,corpus1,bucket1,anno1 and schemaType:doc_offset : should return 204",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus that needs to be fetched. Example: \"corpus1\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "bucketId",
+            "description": "ID of bucket that needs to be fetched. Example: \"bucket1\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "annotationId",
+            "description": "Id of the annotation we want to delete. Example: anno1",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "schemaType",
+            "description": "annotation type in the bucket. ",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation."
+          },
+          "404": {
+            "description": "Annotation with provided id does not exist or bucket not found"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/annosearch/corpora/{corpusId}/documents/{documentId}": {
+      "get": {
+        "tags": [
+          "search"
+        ],
+        "summary": "Search for annotations in corpus for a given document",
+        "description": "Search API for annotations for a given document all buckets inside a corpus. If document does not exist, nothing will be returned.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus that needs to be fetched. Example: \"corptest\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "documentId",
+            "description": "ID of the document for which we want to get annotations. Example: \"doc1\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "schemaTypes",
+            "description": "List of schemaTypes to search for each bucket. Format: bucketId:schemaType",
+            "required": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offsetBegin",
+            "description": "If specified, will return annotations with offset, fitting between offsetBegin and offsetEnd. offsetBegin and offsetEnd bounds are included. Example: assuming offsetBegin: 5 and offsetEnd: 10, the following annotations will be included (first var begin,second var end for annotation offset variable)) : [1,5],[3,6],[5,10],[6,8],[7,10]],[7,11],[10,30]",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "offsetEnd",
+            "description": "If specified, will return annotations with offset, fitting between offsetBegin and offsetEnd. offsetBegin and offsetEnd bounds are included. Example: assuming offsetBegin: 5 and offsetEnd: 10, the following annotations will be included (first var begin,second var end for annotation offset variable)) : [1,5],[3,6],[5,10],[6,8],[7,10]],[7,11],[10,30]",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation. Will return annotations grouped by corpus,bucket,schema. Will only return if there is data inside (will not return for example schema: {\"corptest\": {\"bucket1\":{\"sentence\": []}. If there is no annotations found will return {}",
+            "schema": {
+              "$ref": "#/definitions/SearchAnnotationDoc"
+            },
+            "examples": {
+              "corptest": {
+                "bucket1": {
+                  "sentence": [
+                    {
+                      "annotationId": "randomguid",
+                      "_documentID": "doc1",
+                      "_corpusID": "corpus1",
+                      "schemaType": "sentence",
+                      "sentence": "Les algorithmes de colonies de fourmis sont des algorithmes inspirés du comportement des fourmis."
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid bucketIds or if there is no bucketIds/schemaTypes at all."
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/annosearch/corpora/{corpusId}/bucket/{bucketId}/schemaType/{schemaType}": {
+      "get": {
+        "tags": [
+          "search"
+        ],
+        "summary": "Search for annotations in corpus for a given bucket and schemaType",
+        "description": "Search API for annotations for specified corpus, bucket and schemaType.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus that needs to be fetched. Example: \"corptest\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "bucketId",
+            "description": "ID of bucket",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "schemaType",
+            "description": "schemaType to search bucket",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "description": "zero-based starting index.",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "description": "Number of documents to retrieve",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "filters",
+            "description": "List of filters separated by commas. Format: title:friday,source:tgif.md. NB filters are implement with ElasticSearch Match queries.",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "csv"
+          },
+          {
+            "in": "query",
+            "name": "sortBy",
+            "description": "Specify field to sort by.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "sortOrder",
+            "description": "Sort order. \"asc\"ending or \"desc\"ending. Defaults to ascending.",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          },
+          {
+            "in": "query",
+            "name": "filterJoin",
+            "description": "Filter join (must be \"and\" or \"or\"). Defaults to \"and\".",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "and",
+              "or"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation.",
+            "schema": {
+              "$ref": "#/definitions/SearchAnnotations"
+            }
+          },
+          "422": {
+            "description": "Invalid bucketId. Or if there is no bucketIds/schemaTypes at all."
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/annosearch/corpora/{corpusId}": {
+      "get": {
+        "tags": [
+          "search"
+        ],
+        "summary": "Search for annotations in corpus for given documents",
+        "description": "Search API for annotations for given documents all buckets inside a corpus. If document does not exist, nothing will be returned.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corpusId",
+            "description": "ID of corpus that needs to be fetched. Example: \"corptest\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "documentIds",
+            "description": "List of document ids separated by comma for which we want to get annotations. If not specified, all documents of the corpus",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "csv"
+          },
+          {
+            "in": "query",
+            "name": "schemaTypes",
+            "description": "List of schemaTypes to search for each bucket. Format: bucketId:schemaType",
+            "required": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "csv"
+          },
+          {
+            "in": "query",
+            "name": "offsetBegin",
+            "description": "If specified, will return annotations with offset, fitting between offsetBegin and offsetEnd. offsetBegin and offsetEnd bounds are included. Example: assuming offsetBegin: 5 and offsetEnd: 10, the following annotations will be included (first var begin,second var end for annotation offset variable)) : [1,5],[3,6],[5,10],[6,8],[7,10]],[7,11],[10,30]",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "offsetEnd",
+            "description": "If specified, will return annotations with offset, fitting between offsetBegin and offsetEnd. offsetBegin and offsetEnd bounds are included. Example: assuming offsetBegin: 5 and offsetEnd: 10, the following annotations will be included (first var begin,second var end for annotation offset variable)) : [1,5],[3,6],[5,10],[6,8],[7,10]],[7,11],[10,30]",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation. Will return annotations grouped by corpus,bucket,schema. Will only return if there is data inside (will not return for example schema: {\"corptest\": {\"bucket1\":{\"sentence\": []}. If there is no annotations found will return {}",
+            "schema": {
+              "$ref": "#/definitions/SearchAnnotationDoc"
+            },
+            "examples": {
+              "corptest": {
+                "bucket1": {
+                  "sentence": [
+                    {
+                      "annotationId": "randomguid",
+                      "_documentID": "doc1",
+                      "_corpusID": "corpus1",
+                      "schemaType": "sentence",
+                      "sentence": "Les algorithmes de colonies de fourmis sont des algorithmes inspirés du comportement des fourmis."
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid bucketIds or if there is no bucketIds/schemaTypes at all."
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/annosearch/documents": {
+      "get": {
+        "tags": [
+          "search"
+        ],
+        "summary": "Search for metadata document annotations given corpus ids",
+        "description": "Search API for metadata document annotations given corpus ids.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "corpusIds",
+            "description": "List of corpus ids separated by comma for which we want to get annotations.",
+            "required": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "csv"
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "description": "zero-based starting index.",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "description": "Number of documents to retrieve",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "filters",
+            "description": "List of filters separated by commas. Format: title:friday,source:tgif.md. NB filters are implement with ElasticSearch Match queries.",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "csv"
+          },
+          {
+            "in": "query",
+            "name": "sortBy",
+            "description": "Specify field to sort by.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "sortOrder",
+            "description": "Sort order. \"asc\"ending or \"desc\"ending. Defaults to ascending.",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          },
+          {
+            "in": "query",
+            "name": "filterJoin",
+            "description": "Filter join (must be \"and\" or \"or\"). Defaults to \"and\".",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "and",
+              "or"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation. If there is no annotations found will return {}",
+            "schema": {
+              "$ref": "#/definitions/SearchAnnotations"
+            }
+          },
+          "422": {
+            "description": "Invalid parameters."
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "Id": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "description": "Id of an element",
+          "type": "string"
+        }
+      }
+    },
+    "AnnotationsExport": {
+      "type": "object",
+      "required": [
+        "zipFileName",
+        "destUrl"
+      ],
+      "properties": {
+        "zipFileName": {
+          "description": "Name to use for the zip file",
+          "type": "string"
+        },
+        "destUrl": {
+          "description": "Url to which send a zip of all corpus documents",
+          "type": "string"
+        },
+        "bucketIds": {
+          "description": "Schema types of annotations to be searched. Should be separated by comma. If none present, all schema types will be searched. Example \"bucket1,bucket2\"",
+          "type": "string"
+        },
+        "schemaTypes": {
+          "description": "Schema types of annotations to be searched. Should be separated by comma. If none present, all schema types will be searched. Example: \"token,tokenwithlemma\"",
+          "type": "string"
+        },
+        "isSendPut": {
+          "description": "If true uses put instead of post to send data. Default: true",
+          "type": "boolean"
+        },
+        "isMultipart": {
+          "description": "Specify if the file need to be sent as multipart/form-data data. If false, application/x-www-form-urlencoded. Default: false",
+          "type": "boolean"
+        },
+        "multipartFieldName": {
+          "description": "Name of the field to use when sending form as multipart data. Default: \"\"",
+          "type": "string"
+        }
+      },
+      "example": {
+        "zipFileName": "test.zip",
+        "destUrl": "www.test.com",
+        "bucketIds": "bucket1,bucket2",
+        "schemaTypes": "token,tokenWithLemma",
+        "isSendPut": true,
+        "isMultipart": false,
+        "multipartFieldName": ""
+      }
+    },
+    "CorpusUpdate": {
+      "type": "object",
+      "properties": {
+        "languages": {
+          "type": "array",
+          "description": "Languages for the analyzer of all the documents of the corpus.",
+          "items": {
+            "type": "string",
+            "description": "Language of documents in the corpus. As of version 0.2 it is only possible to add languages. Attempting to remove a language will throw an exception. Language format: ISO 639-1. Example: fr_FR"
+          }
+        }
+      },
+      "example": {
+        "languages": [
+          "en_EN",
+          "fr_FR"
+        ]
+      }
+    },
+    "CorpusInProps": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "User defined ID. If not present the system will generate an id from the name(or combine it with GUID).Must be uniquer per env. Must be alphanumeric, _- lowercase.",
+          "type": "string"
+        }
+      }
+    },
+    "CorpusIn": {
+      "required": [
+        "languages"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/CorpusUpdate"
+        },
+        {
+          "$ref": "#/definitions/CorpusInProps"
+        }
+      ],
+      "example": {
+        "id": "corpus1",
+        "languages": [
+          "fr_FR"
+        ]
+      }
+    },
+    "CorpusOutProps": {
+      "type": "object",
+      "properties": {
+        "modificationDate": {
+          "description": "Date when corpus metadata was last updated. UTC",
+          "type": "string",
+          "format": "date"
+        },
+        "documentCount": {
+          "description": "Number of documents in the corpus",
+          "type": "integer"
+        }
+      }
+    },
+    "CorpusOut": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/CorpusIn"
+        },
+        {
+          "$ref": "#/definitions/CorpusOutProps"
+        }
+      ],
+      "example": {
+        "id": "corpus1",
+        "modificationDate": "2016-11-30T22:29:06Z",
+        "documentCount": 0,
+        "languages": [
+          "fr_FR"
+        ]
+      }
+    },
+    "CorpusCreateOut": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "User defined ID. If not present the system will generate an id from the name(or combine it with GUID).Must be uniquer per env.",
+          "type": "string"
+        }
+      },
+      "example": {
+        "id": "corptest"
+      }
+    },
+    "CorpusList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "description": "Corpus Information",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CorpusOut"
+          }
+        }
+      }
+    },
+    "CorpusStructure": {
+      "type": "object",
+      "required": [
+        "buckets"
+      ],
+      "properties": {
+        "buckets": {
+          "description": "Buckets.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StructureBucket"
+          }
+        }
+      }
+    },
+    "Document": {
+      "type": "object",
+      "required": [
+        "language"
+      ],
+      "properties": {
+        "id": {
+          "description": "Document ID",
+          "type": "string"
+        },
+        "source": {
+          "description": "Document provenance",
+          "type": "string"
+        },
+        "title": {
+          "description": "Title of the document to be used as needed by the platform",
+          "type": "string"
+        },
+        "text": {
+          "type": "string",
+          "description": "Text of the document. UTF-8"
+        },
+        "language": {
+          "type": "string",
+          "description": "Language format: ISO 639-1"
+        }
+      },
+      "example": {
+        "id": "doc1",
+        "title": "Last Friday Night",
+        "source": "http://havetobefound.com",
+        "text": "What a nice night of coding it has been",
+        "language": "fr_FR"
+      }
+    },
+    "DocumentsExport": {
+      "type": "object",
+      "required": [
+        "zipFileName",
+        "destUrl"
+      ],
+      "properties": {
+        "zipFileName": {
+          "description": "Name to use for the zip file",
+          "type": "string"
+        },
+        "destUrl": {
+          "description": "Url to which send a zip of all corpus documents",
+          "type": "string"
+        },
+        "isSendPut": {
+          "description": "If true uses put instead of post to send data. Default: true",
+          "type": "boolean"
+        },
+        "isMultipart": {
+          "description": "Specify if the file need to be sent as multipart/form-data data. If false, application/x-www-form-urlencoded. Default: false",
+          "type": "boolean"
+        },
+        "multipartFieldName": {
+          "description": "Name of the field to use when sending form as multipart data. Default: \"\"",
+          "type": "string"
+        }
+      },
+      "example": {
+        "zipFileName": "test.zip",
+        "destUrl": "www.test.com",
+        "isSendPut": true,
+        "isMultipart": false,
+        "multipartFieldName": ""
+      }
+    },
+    "DocumentIn": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/Document"
+        }
+      ]
+    },
+    "DocumentLight": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Document ID",
+          "type": "string"
+        },
+        "source": {
+          "description": "Document provenance",
+          "type": "string"
+        },
+        "title": {
+          "description": "Title of the document to be used as needed by the platform",
+          "type": "string"
+        }
+      }
+    },
+    "Documents": {
+      "type": "object",
+      "properties": {
+        "documents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DocumentLight"
+          }
+        }
+      }
+    },
+    "BatchAnnotationError": {
+      "type": "object",
+      "properties": {
+        "errorType": {
+          "type": "string",
+          "description": "Describes the type of error. Currently 2 types are available: annotation and other. Annotation errors englobe all possible annotation errors: Missing fields,duplicate ids, bad structure, failure to index the annotation... Other are erros unrelated to annotation. Example may include badly formatted zip or json file."
+        },
+        "_documentID": {
+          "type": "string",
+          "description": "For annotation errors id of the document of the faulty annotation (if available)"
+        },
+        "annotation": {
+          "type": "object",
+          "description": "For annotation errors, the faulty annotation"
+        },
+        "message": {
+          "type": "string",
+          "description": "Error message"
+        }
+      }
+    },
+    "BatchAnnotationErrors": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BatchAnnotationError"
+          }
+        },
+        "totalErrorsCount": {
+          "type": "integer",
+          "description": "Total number of errors found (since the number of returned errors is limited)"
+        }
+      }
+    },
+    "BucketIn": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "User defined ID. If not present the system will generate a GUID. Must be unique per env. Must be alphanumeric, _- lowercase.",
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name used to describe the bucket"
+        }
+      }
+    },
+    "StructureBucket": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Bucket ID.",
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "description": "Bucket Name."
+        },
+        "schemas": {
+          "type": "array",
+          "description": "bucket schema types",
+          "items": {
+            "$ref": "#/definitions/StructureSchema"
+          }
+        }
+      }
+    },
+    "StructureSchema": {
+      "type": "object",
+      "properties": {
+        "schemaType": {
+          "description": "schemaType of the schema",
+          "type": "string"
+        },
+        "jsonSchema": {
+          "type": "string",
+          "description": "The JSON Schema itself."
+        }
+      }
+    },
+    "AnnotationUp": {
+      "description": "Annotation to update. The fields to update should be included with the required fields.",
+      "type": "object",
+      "required": [
+        "annotationId",
+        "schemaType"
+      ],
+      "properties": {
+        "annotationId": {
+          "type": "string",
+          "description": "User defined ID. If not present the system will generate a GUID. This field is unique for an annotation of a given schemaType in a bucket."
+        },
+        "schemaType": {
+          "type": "string",
+          "description": "Type of schema in the bucket which describes this annotation"
+        }
+      }
+    },
+    "AnnotationGet": {
+      "description": "Returned annotation. Additional fields depends on schema",
+      "type": "object",
+      "required": [
+        "annotationId",
+        "schemaType"
+      ],
+      "properties": {
+        "annotationId": {
+          "type": "string",
+          "description": "User defined ID. If not present the system will generate a GUID. This field is unique for an annotation of a given schemaType in a bucket."
+        },
+        "schemaType": {
+          "type": "string",
+          "description": "Type of schema in the bucket which describes this annotation"
+        }
+      }
+    },
+    "SearchAnnotationDoc": {
+      "description": "Returned annotation. Additional fields depends on schema. Since the schema is dynamic, i will write as example. {corpusId : {bucketId : { schemaType: [annotation1,annotationN]}}}. Annotation is same as annotationGet",
+      "type": "object"
+    },
+    "SearchAnnotations": {
+      "description": "Returned annotations.",
+      "type": "object",
+      "properties": {
+        "count": {
+          "description": "count of all results excluding pagination.",
+          "type": "integer"
+        },
+        "annotations": {
+          "description": "annotations",
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      "example": {
+        "count": 99,
+        "annotations": [
+          {},
+          {}
+        ]
+      }
+    },
+    "AnnotationIn": {
+      "description": "Annotation to add to the system. Additional fields depends on schema",
+      "type": "object",
+      "required": [
+        "schemaType"
+      ],
+      "properties": {
+        "annotationId": {
+          "type": "string",
+          "description": "User defined ID. If not present the system will generate a GUID. This field is unique for an annotation of a given schemaType in a bucket."
+        },
+        "schemaType": {
+          "type": "string",
+          "description": "Type of schema in the bucket which describes this annotation"
+        }
+      }
+    },
+    "AnnotationSchemaCount": {
+      "description": "count of annotations per schema type. Schema type is the key and value is count.",
+      "type": "object",
+      "example": {
+        "namedEntity": 99,
+        "place": 12
+      }
+    }
+  },
+  "securityDefinitions": {
+    "api_key": {
+      "type": "apiKey",
+      "name": "jwtToken",
+      "in": "header"
+    }
+  }
+}

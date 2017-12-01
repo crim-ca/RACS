@@ -1,0 +1,1 @@
+{"data": [{"_documentID":"doc1","_corpusID":"corptest","schemaType":"token", "word": "des","offsets": [{"begin":44, "end":47 }], "length": 3, "category": "PRP:det"},{"_documentID":"doc1","_corpusID":"corptest","schemaType":"token", "word": "algorithmes","offsets": [{"begin":48, "end":59 }], "length": 11, "category": "NOM"}]}
