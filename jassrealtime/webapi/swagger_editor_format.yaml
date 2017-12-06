@@ -3,8 +3,8 @@
 # Code completion support is available so start typing for available options.
 swagger: '2.0'
 info:
-  version: "2.5.8"
-  title: JASS
+  version: "2.5.9"
+  title: RACS
   description: Annotation Storage
 
 paths:
@@ -14,7 +14,7 @@ paths:
       tags:
         - env
       summary: Recreates and existing environment
-      description: 'Recreates an existing environment by deleting everything in this environment(Corpuses,Schemas ...) and recreating. The environement is defined by the jass instance '
+      description: 'Recreates an existing environment by deleting everything in this environment(Corpora,Schemas ...) and recreating. The environment is defined by the RACS instance '
       consumes:
         - application/json
       produces:
@@ -62,8 +62,8 @@ paths:
     get:
       tags:
         - corpus
-      summary: List all corpuses
-      description: 'List all corpuses which the user is allowed to see'
+      summary: List all corpora
+      description: 'List all corpora which the user is allowed to see'
       produces:
         - application/json
       responses:
@@ -185,7 +185,7 @@ paths:
         - batch
         - annotation
       summary: Downloads a zip of all documents from the corpus.
-      description: 'Download a zip named docs.zip, containing one text file per document in corpus. Document ids are used as file names. This call is synchronous and may take several hours for large document corpuses.'
+      description: 'Download a zip named docs.zip, containing one text file per document in corpus. Document ids are used as file names. This call is synchronous and may take several hours for large document corpora.'
       produces:
         - application/zip
       parameters:
@@ -247,7 +247,7 @@ paths:
         - batch
         - annotation
       summary: Downloads a zip of annotations from the corpus.
-      description: 'Downloads a zip containing one json file for each combination of selected document,bucket and schema type. documentId.bucketId.schemaType.json are used as file names. This call is synchronous and may take several hours for large document corpuses.'
+      description: 'Downloads a zip containing one json file for each combination of selected document,bucket and schema type. documentId.bucketId.schemaType.json are used as file names. This call is synchronous and may take several hours for large document corpora.'
       produces:
         - application/zip
       parameters:
@@ -316,7 +316,7 @@ paths:
         - batch
         - annotation
       summary: Adds a batch of annotations to a given bucket.
-      description: 'Adds a batch of annotations to a given bucket. Annotations should be stored in any number of files having the following format: {"data": [{annotation1,...,annotationN}]}. Note that this operation is syncronous and may potentially take hours. Thus increase connection time is recommended.'
+      description: 'Adds a batch of annotations to a given bucket. Annotations should be stored in any number of files having the following format: {"data": [{annotation1,...,annotationN}]}. Note that this operation is synchronous and may potentially take hours. Thus increase connection time is recommended.'
       consumes:
         - multipart/form-data
       produces:
@@ -545,7 +545,7 @@ paths:
       tags:
         - bucket
       summary: Add a bucket (or annotation group)
-      description: 'Creates a new bucket(annotation group) for given corpus. A bucket is used to regroup annotation, and can be assigned security permissions. An annotation can only exist inside a bucket. Currently limited to document_surface. Example input: For  jasspp,corpus1 : {"id":"bucket1","name":"Anton Bucket"}'
+      description: 'Creates a new bucket(annotation group) for given corpus. A bucket is used to regroup annotation, and can be assigned security permissions. An annotation can only exist inside a bucket. Currently limited to document_surface. Example input: For corpus1 : {"id":"bucket1","name":"Anton Bucket"}'
       consumes:
         - application/json
       produces:
@@ -607,7 +607,7 @@ paths:
       tags:
         - bucket
       summary: Bind a new schema to the bucket (annotation group)
-      description: 'Create a new json schema which will be used to validate annotations. Schema Validation is not supported ATM. Here are the elements currently supported for json schema. If a jsonSchema is already bound with the same schemaType, the creation will be refused. Example for  jasspp,corpus1,bucket1: {"$schema": "http://json-schema.org/draft-04/schema#","targetType": "document_surface1d","schemaType": "doc_offset","type": "object","required": ["schemaType","_corpusID","_documentID","offsets"],"properties": {"schemaType": {"type": "string","description": "Schema type","searchable": true,"searchModes": ["basic"],"locked": true},"_documentID": {"type": "string","description": "Internal document GUID","searchable": true,"searchModes": ["basic"],"locked": true},"_corpusID": {"type": "string","description": "Internal Corpus GUID","searchable": true,"searchModes": ["basic"],"locked": true},"offsets": {"searchable": true,"locked": true,"type": "array","minItems": 1,"items": {"type": "object","properties": {"begin": { "type": "integer", "minimum": 0},"end": { "type": "integer", "minimum": 0}}}}}}'
+      description: 'Create a new json schema which will be used to validate annotations. Schema Validation is not supported ATM. Here are the elements currently supported for json schema. If a jsonSchema is already bound with the same schemaType, the creation will be refused. Example for corpus1,bucket1: {"$schema": "http://json-schema.org/draft-04/schema#","targetType": "document_surface1d","schemaType": "doc_offset","type": "object","required": ["schemaType","_corpusID","_documentID","offsets"],"properties": {"schemaType": {"type": "string","description": "Schema type","searchable": true,"searchModes": ["basic"],"locked": true},"_documentID": {"type": "string","description": "Internal document GUID","searchable": true,"searchModes": ["basic"],"locked": true},"_corpusID": {"type": "string","description": "Internal Corpus GUID","searchable": true,"searchModes": ["basic"],"locked": true},"offsets": {"searchable": true,"locked": true,"type": "array","minItems": 1,"items": {"type": "object","properties": {"begin": { "type": "integer", "minimum": 0},"end": { "type": "integer", "minimum": 0}}}}}}'
       consumes:
         - application/json
       produces:
@@ -713,7 +713,7 @@ paths:
       tags:
         - annotation
       summary: Creates an annotation inside a bucket
-      description: 'Creates an annotation inside a bucket. The field "schemaType" must be present inside the annotation, to link it to its corresponding schema in the bucket.  Example: for  jasspp,corpus1,bucket1 :{"annotationId":"anno1","schemaType": "doc_offset","_documentID": "abc123","_corpusID" : "corp1","offsets" : [{"begin" :1 , "end": 2},{"begin" :3 , "end": 4}]}'
+      description: 'Creates an annotation inside a bucket. The field "schemaType" must be present inside the annotation, to link it to its corresponding schema in the bucket.  Example: for corpus1,bucket1 :{"annotationId":"anno1","schemaType": "doc_offset","_documentID": "abc123","_corpusID" : "corp1","offsets" : [{"begin" :1 , "end": 2},{"begin" :3 , "end": 4}]}'
       consumes:
         - application/json
       produces:
@@ -753,7 +753,7 @@ paths:
       tags:
         - annotation
       summary: Update Annotation
-      description: 'Updates the json content of the annotation. Sent fields will be updated. Absent fields are not removed (and cannot be removed via this endpoint.) It is prohibited to change the schemaType or bucketId. Note that update is not instantaneous (it may take 1 second to update the annotation in storage). Example Input: For  jasspp,corpus1,bucket1,anno1 and type:token : {"annotationId":"anno1","schemaType": "doc_offset","offsets" : [{"begin" :1 , "end": 2}]}'
+      description: 'Updates the json content of the annotation. Sent fields will be updated. Absent fields are not removed (and cannot be removed via this endpoint.) It is prohibited to change the schemaType or bucketId. Note that update is not instantaneous (it may take 1 second to update the annotation in storage). Example Input: For corpus1,bucket1,anno1 and type:token : {"annotationId":"anno1","schemaType": "doc_offset","offsets" : [{"begin" :1 , "end": 2}]}'
       consumes:
         - application/json
       produces:
@@ -860,7 +860,7 @@ paths:
       tags:
         - annotation
       summary: Get an annotation by id
-      description: 'Returns an annotation with a given annotation id. Example input: For  jasspp,corpus1,bucket1,anno1 and schemaType: doc_offset'
+      description: 'Returns an annotation with a given annotation id. Example input: For corpus1,bucket1,anno1 and schemaType: doc_offset'
       consumes:
         - application/json
       produces:
@@ -901,7 +901,7 @@ paths:
       tags:
         - annotation
       summary: Delete Annotation
-      description: 'Deletes an annotation. Example Input: For  jasspp,corpus1,bucket1,anno1 and schemaType:doc_offset : should return 204'
+      description: 'Deletes an annotation. Example Input: For corpus1,bucket1,anno1 and schemaType:doc_offset : should return 204'
       consumes:
         - application/json
       produces:
@@ -1257,6 +1257,13 @@ definitions:
   CorpusIn:
     required: ["languages"]
     type: object
+    properties:
+      languages:
+        type: array
+        description: "Languages for the analyzer of all the documents of the corpus."
+        items:
+          type: string
+          description: 'Language of documents in the corpus. As of version 0.2 it is only possible to add languages. Attempting to remove a language will throw an exception. Language format: ISO 639-1. Example: fr_FR'
     allOf:
       - $ref: '#/definitions/CorpusUpdate'
       - $ref: '#/definitions/CorpusInProps'

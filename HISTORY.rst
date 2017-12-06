@@ -3,6 +3,10 @@
 History
 =======
 
+2.5.9
+---------------------
+* Change historic JASS name to RACS in Swagger API
+
 2.5.8
 ---------------------
 * Add possibility to expose or not the Swagger endpoint via an environment variable.
