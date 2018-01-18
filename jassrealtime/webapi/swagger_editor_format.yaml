@@ -3,7 +3,7 @@
 # Code completion support is available so start typing for available options.
 swagger: '2.0'
 info:
-  version: "2.5.9"
+  version: "2.6.0"
   title: RACS
   description: Annotation Storage
 
@@ -419,7 +419,7 @@ paths:
     get:
       tags:
         - document
-      summary: 'Get text documents of a corpus with mandatory paging. A sorting field can be optionally specified. Matching filters for each field can also be optionally specified. The nature of the match depends on the analyser of the field. E.G. A field "not_analyzed" will only return exact matches.'
+      summary: 'Get text documents of a corpus with mandatory paging. A sorting field can be optionally specified. Matching filters for each field can also be optionally specified. The nature of the match depends on the analyser of the field. E.G. A field not flagged searchable will only return exact matches.'
       description: 'For a given corpus, list its documents'
       produces:
         - application/json

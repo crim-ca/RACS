@@ -17,31 +17,25 @@ BUCKET_BINDING_INDEX_MAPPING = {
         "default": {
             "properties": {
                 "jsonSchemaId": {
-                    "type": "string",
-                    "index": "not_analyzed"
+                    "type": "keyword",
                 },
                 "jsonSchemaHash": {
-                    "type": "string",
-                    "index": "not_analyzed"
+                    "type": "keyword",
                 },
                 "esHash": {
-                    "type": "string",
-                    "index": "not_analyzed"
+                    "type": "keyword",
                 },
                 "docType": {
-                    "type": "string",
-                    "index": "not_analyzed"
+                    "type": "keyword",
                 },
                 "bucketId": {
-                    "type": "string",
-                    "index": "not_analyzed"
+                    "type": "keyword",
                 },
                 "corpusId": {
-                    "type": "string",
-                    "index": "not_analyzed"
+                    "type": "keyword",
                 },
-                "targetType": {"type": "string", "index": "not_analyzed"},
-                "target": {"type": "string", "index": "not_analyzed", "index": "no"},
+                "targetType": {"type": "keyword"},
+                "target": {"type": "keyword", "index": "false"},
 
             }
         }
@@ -52,9 +46,9 @@ BUCKET_MAPPING = {
     "mappings": {
         "default": {
             "properties": {
-                "name": {"type": "string"},
-                "corpusId": {"type": "string", "index": "not_analyzed"},
-                "bucketId": {"type": "string", "index": "not_analyzed"},
+                "name": {"type": "text"},
+                "corpusId": {"type": "keyword"},
+                "bucketId": {"type": "keyword"},
             }
         }
     }
@@ -439,7 +433,7 @@ class Bucket:
 
     def delete_annotations(self, schemaType: string):
         """
-        Delets all annotations with a given schema
+        Deletes all annotations with a given schema
         :return:
         """
         self.dd.empty_doc_type(schemaType)

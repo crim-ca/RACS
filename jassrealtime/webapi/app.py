@@ -127,7 +127,7 @@ def set_up_environnement():
 
 
 if __name__ == "__main__":
-    server =  HTTPServer(make_app())
+    server = HTTPServer(make_app())
     server.bind(8888)
     server.start(get_nb_cores())
     tornado.ioloop.IOLoop.current().start()

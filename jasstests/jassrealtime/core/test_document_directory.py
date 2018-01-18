@@ -89,7 +89,7 @@ class MyTestCase(unittest.TestCase):
         body1 = {"name": "anton", "age": 666}
         mapping1 = {
             "properties": {
-                "name": {"type": "string"},
+                "name": {"type": "text"},
                 "age": {"type": "integer"}
             }
         }
@@ -97,8 +97,8 @@ class MyTestCase(unittest.TestCase):
         body2 = {"name": "anton", "age": "I AM A RETARD"}
         mapping2 = {
             "properties": {
-                "name": {"type": "string"},
-                "age": {"type": "string"}
+                "name": {"type": "text"},
+                "age": {"type": "text"}
             }
         }
         time.sleep(1)
@@ -110,7 +110,7 @@ class MyTestCase(unittest.TestCase):
         body1 = {"name": "anton", "age": 666}
         mapping1 = {
             "properties": {
-                "name": {"type": "string"},
+                "name": {"type": "text"},
                 "age": {"type": "integer"}
             }
         }
@@ -118,7 +118,7 @@ class MyTestCase(unittest.TestCase):
         body2 = {"name": "anton", "age": 777}
         mapping2 = {
             "properties": {
-                "name": {"type": "string"},
+                "name": {"type": "text"},
                 "age": {"type": "integer"}
             }
         }
@@ -130,7 +130,7 @@ class MyTestCase(unittest.TestCase):
         dd = self.masterList.create_document_directory("docs")
         mapping1 = {
             "properties": {
-                "name": {"type": "string"},
+                "name": {"type": "text"},
                 "age": {"type": "integer"}
             }
         }
@@ -167,10 +167,9 @@ class MyTestCase(unittest.TestCase):
             "properties": {
                 "age": {
                     "type": "integer",
-                    "index": "not_analyzed"
                 },
                 "name": {
-                    "type": "string",
+                    "type": "text",
                 }
             }
         }
@@ -195,18 +194,16 @@ class MyTestCase(unittest.TestCase):
         propertiesMyTermMapping = {
             "properties": {
                 "myterm": {
-                    "type": "string",
-                    "index": "not_analyzed"
+                    "type": "keyword",
                 },
                 "age": {
-                    "type": "integer",
-                    "index": "not_analyzed"
+                    "type": "keyword",
                 },
                 "location": {
-                    "type": "string",
+                    "type": "text",
                 },
                 "name": {
-                    "type": "string",
+                    "type": "text",
                 }
             }
         }
@@ -254,18 +251,16 @@ class MyTestCase(unittest.TestCase):
         propertiesMyTermMapping = {
             "properties": {
                 "myterm": {
-                    "type": "string",
-                    "index": "not_analyzed"
+                    "type": "keyword",
                 },
                 "age": {
-                    "type": "integer",
-                    "index": "not_analyzed"
+                    "type": "keyword",
                 },
                 "location": {
-                    "type": "string",
+                    "type": "text",
                 },
                 "name": {
-                    "type": "string",
+                    "type": "text",
                 }
             }
         }
@@ -324,7 +319,7 @@ class MyTestCase(unittest.TestCase):
         dd = self.masterList.create_document_directory("docs")
         mapping1 = {
             "properties": {
-                "name": {"type": "string"},
+                "name": {"type": "text"},
                 "age": {"type": "integer"}
             }
         }
@@ -352,7 +347,7 @@ class MyTestCase(unittest.TestCase):
         dd = self.masterList.create_document_directory("docs")
         mapping1 = {
             "properties": {
-                "name": {"type": "string"},
+                "name": {"type": "text"},
                 "age": {"type": "integer"}
             }
         }

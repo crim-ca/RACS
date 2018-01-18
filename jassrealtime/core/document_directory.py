@@ -9,7 +9,7 @@ from typing import List
 from jassrealtime.core.utils import gen_uuid
 from .schema_list import *
 from .esutils import *
-from .settings_utils import get_scan_scroll_duration,get_number_of_replicas,get_number_of_shards,\
+from .settings_utils import get_scan_scroll_duration, get_number_of_replicas, get_number_of_shards, \
     get_nb_documents_per_scan_scroll
 
 ANALYSIS_FILTER = {
@@ -115,6 +115,7 @@ class CriticalDeleteIndexFailIndexNameTooShort(DocumentDirectoryException):
     """
     pass
 
+
 class DocumentDirectoryList:
     """
     Responsible for managing a list of document directories. Contains a list of all document directories
@@ -159,7 +160,7 @@ class DocumentDirectoryList:
         body["settings"]["index"] = {"number_of_shards": get_number_of_shards(),
                                      "number_of_replicas": get_number_of_replicas()}
         if check_index_name_valid_for_create(masterList.masterDirectoryIndex, masterList.envId, ""):
-            es.indices.create(masterList.masterDirectoryIndex,body=body)
+            es.indices.create(masterList.masterDirectoryIndex, body=body)
         else:
             logger.log("Invalid master directory name {0}".format(masterList.masterDirectoryIndex))
             raise DocumentDirectoryException(
@@ -200,7 +201,8 @@ class DocumentDirectoryList:
         query = {"query": {"match_all": {}}}
 
         es_wait_ready()
-        esresult = helpers.scan(es, query=query, doc_type=self.directoryDocType, index=self.masterDirectoryIndex,scroll=get_scan_scroll_duration(),size=get_nb_documents_per_scan_scroll())
+        esresult = helpers.scan(es, query=query, doc_type=self.directoryDocType, index=self.masterDirectoryIndex,
+                                scroll=get_scan_scroll_duration(), size=get_nb_documents_per_scan_scroll())
         directoryList = []
         for directory in esresult:
             source = directory["_source"]
@@ -260,7 +262,7 @@ class DocumentDirectoryList:
         es_wait_ready()
         setting_body = {"settings": {}}
         setting_body["settings"]["index"] = {"number_of_shards": get_number_of_shards(),
-                                     "number_of_replicas": get_number_of_replicas()}
+                                             "number_of_replicas": get_number_of_replicas()}
         if addDefaultType:
             defaultDataIndex = self.envId + self.classPrefix + id + self.indexDataSuffix + self.indexDefaultTypeSuffix
             typeIndex = self.envId + self.classPrefix + id + self.indexTypeSuffix
@@ -268,9 +270,9 @@ class DocumentDirectoryList:
             if check_index_name_valid_for_create(defaultDataIndex, self.envId, self.classPrefix) and \
                     check_index_name_valid_for_create(typeIndex, self.envId, self.classPrefix):
                 es_wait_ready()
-                es.indices.create(defaultDataIndex,body=setting_body)
+                es.indices.create(defaultDataIndex, body=setting_body)
                 es_wait_ready()
-                es.indices.create(typeIndex,body=setting_body)
+                es.indices.create(typeIndex, body=setting_body)
             else:
                 logger.error("One of the indexes is invalid {0},{1},{2}".format(id, defaultDataIndex, typeIndex))
                 raise ESInvalidIndexName(
@@ -283,7 +285,7 @@ class DocumentDirectoryList:
             es.create(index=self.masterDirectoryIndex, doc_type=self.directoryDocType, id=id, body=body)
             if check_index_name_valid_for_create(typeIndex, self.envId, self.classPrefix):
                 es_wait_ready()
-                es.indices.create(typeIndex,body=setting_body)
+                es.indices.create(typeIndex, body=setting_body)
             else:
                 logger.error("One of the indexes is invalid {0},{1}".format(id, typeIndex))
                 raise ESInvalidIndexName(
@@ -417,12 +419,12 @@ class DocumentsDirectory:
         indexNamesStr = ""
         if docTypes:
             s = Search(using=es, index=self.typeIndex, doc_type="directory_type").query("ids", values=docTypes)
-            s = s.params(scroll=get_scan_scroll_duration(),size=get_nb_documents_per_scan_scroll())
+            s = s.params(scroll=get_scan_scroll_duration(), size=get_nb_documents_per_scan_scroll())
 
-            indexNamesQuery = s.fields(["indexName"])
+            indexNamesQuery = s.source(["indexName"])
             indexNamesArr = []
             for indexNamePart in indexNamesQuery.scan():
-                indexNamesArr.append(indexNamePart["indexName"][0])
+                indexNamesArr.append(indexNamePart["indexName"])
             indexNamesStr = ','.join(indexNamesArr)
         else:
             indexNamesStr = self.dataIndexPrefix + "*"
@@ -437,15 +439,15 @@ class DocumentsDirectory:
         es = get_es_conn()
 
         s = Search(using=es, index=self.typeIndex, doc_type="directory_type")
-        s = s.params(scroll=get_scan_scroll_duration(),size=get_nb_documents_per_scan_scroll())
-        indexNamesQuery = s.fields(["indexName"])
+        s = s.params(scroll=get_scan_scroll_duration(), size=get_nb_documents_per_scan_scroll())
+        indexNamesQuery = s.source(["indexName"])
         indicesPerDocType = {}
         for res in indexNamesQuery.scan():
-            indicesPerDocType[res.meta.id] = res["indexName"][0]
+            indicesPerDocType[res.meta.id] = res["indexName"]
 
         return indicesPerDocType
 
-    def empty_doc_type(self,docType:str):
+    def empty_doc_type(self, docType: str):
         """
         Removes all documents for a specific doc type.
         :param docType:
@@ -463,9 +465,9 @@ class DocumentsDirectory:
         # get index settings
         settings = es.indices.get_settings(index=index)
         mappings = es.indices.get_mapping(index=index, doc_type=docType)
-        body = {"settings": settings[index]['settings'],"mappings" : mappings[index]["mappings"]}
+        body = {"settings": settings[index]['settings'], "mappings": mappings[index]["mappings"]}
 
-        #delete index
+        # delete index
         self.delete_doc_type(docType)
 
         es_wait_ready()
@@ -476,7 +478,7 @@ class DocumentsDirectory:
         # remap index.
         es.create(index=self.typeIndex, doc_type="directory_type", id=docType, body={"indexName": index})
 
-    def delete_doc_type(self,docType):
+    def delete_doc_type(self, docType):
         """
         Removes doc type and all its associated documents
         :param docType:
@@ -497,7 +499,7 @@ class DocumentsDirectory:
         es.delete(index=self.typeIndex, doc_type="directory_type", id=docType)
 
     def small_search(self, docTypes: List = ["default"], matchFields: dict = {}, termFields: dict = {},
-                     returnFields: List = None, filterMatch={}, filterTerms={},useScan = True):
+                     returnFields: List = None, filterMatch={}, filterTerms={}, useScan=True):
         """
         Search used to retrieve a reasonable amount of documents (All docs stored in memory, no streaming).
 
@@ -520,7 +522,7 @@ class DocumentsDirectory:
         indexNamesStr = self.get_indices(docTypes)
         if indexNamesStr:
             return multi_indexes_small_search(indexNamesStr, matchFields, termFields, returnFields, filterMatch,
-                                              filterTerms,useScan)
+                                              filterTerms, useScan)
         else:
             return {}
 
@@ -601,7 +603,9 @@ class DocumentsDirectory:
             es.create(index=self.typeIndex, doc_type="directory_type", id=docType, body={"indexName": indexName})
 
             body = {"settings": {}}
-            body["settings"]["index"] = {"max_result_window": MAX_RESULT_WINDOW,"number_of_shards":get_number_of_shards(),"number_of_replicas":get_number_of_replicas()}
+            body["settings"]["index"] = {"max_result_window": MAX_RESULT_WINDOW,
+                                         "number_of_shards": get_number_of_shards(),
+                                         "number_of_replicas": get_number_of_replicas()}
             body["settings"]["analysis"] = ANALYSIS
             if allowDynamicFields:
                 es.indices.create(indexName, body=body)
@@ -698,5 +702,5 @@ class DocumentsDirectory:
                 raise DocumentAlreadyExistsException()
             except exceptions.TransportError as te:
                 if ("error" in te.info) and ("type" in te.info["error"]) and (
-                            te.info["error"]["type"] == "strict_dynamic_mapping_exception"):
+                        te.info["error"]["type"] == "strict_dynamic_mapping_exception"):
                     raise DocumentDoesNotRespectSchemaException("Document id: {0}".format(id))
