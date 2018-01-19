@@ -113,7 +113,7 @@ class MyTestCase(unittest.TestCase):
         time.sleep(2)  # just to be sure es had time to make deletions.
 
         es = get_es_conn()
-        aliases = es.indices.get_aliases().keys()
+        aliases = es.indices.get_alias().keys()
         # Check if any indices exist with corpus 1 index
 
         self.assertFalse(any(corpusId in s for s in aliases))

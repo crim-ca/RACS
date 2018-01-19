@@ -4,7 +4,7 @@ from elasticsearch import helpers, exceptions
 from elasticsearch_dsl import Search, Q
 import time
 import traceback
-from typing import List
+from typing import List, Dict
 
 from jassrealtime.core.utils import gen_uuid
 from .schema_list import *
@@ -346,6 +346,11 @@ class DocumentDirectoryList:
         return DocumentsDirectory(id, None, self)
 
 
+def remove_non_settable_fields(fields: List[str], collection: Dict[str, str]) -> None:
+    for field in fields:
+        if field in collection:
+            del collection[field]
+
 class DocumentsDirectory:
     """
     This class represents a virtual directory of documents. A document in this context is any json object
@@ -473,6 +478,8 @@ class DocumentsDirectory:
         es_wait_ready()
 
         # recreate index
+        # Remove non settable fields (if they are present, it causes an unknown setting exception)
+        remove_non_settable_fields(["creation_date", "provided_name", "uuid", "version"], body['settings']['index'])
         es.indices.create(index, body=body)
 
         # remap index.

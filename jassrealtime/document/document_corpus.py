@@ -437,7 +437,7 @@ class DocumentCorpus():
         es = get_es_conn()
         search = Search(using=es, index=self.dd.get_indices(self.languages))
         search = search[fromIndex:fromIndex + size]
-        search = search.fields(["title", "language", "source"])
+        search = search.source(["title", "language", "source"])
 
         if sortBy:
             search = search.sort(make_sort_field(sortBy, sortOrder))
