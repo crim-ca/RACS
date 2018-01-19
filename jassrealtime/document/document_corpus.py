@@ -329,8 +329,7 @@ class DocumentCorpus():
     def addPropertyIfExists(document, hit, propertyName):
         values = getattr(hit, propertyName, None)
         if values and len(values) > 0:
-            # For some reason, the search returns an array of a single value when fields are specified in the search
-            document[propertyName] = values[0]
+            document[propertyName] = values
 
     @staticmethod
     def mapDocument(hit: dict):
@@ -461,7 +460,7 @@ class DocumentCorpus():
         """
         es = get_es_conn()
         search = Search(using=es, index=self.dd.get_indices(self.languages))
-        search = search.fields(["_id"])
+        search = search.source(["_id"])
         search = search.params(scroll=get_scan_scroll_duration(),size=get_nb_documents_per_scan_scroll())
         #  Only 10 hits if don't use scan.
         documentIds = [hit.meta.id for hit in search.scan()]

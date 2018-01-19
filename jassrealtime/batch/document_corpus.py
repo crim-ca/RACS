@@ -37,7 +37,7 @@ class DocumentCorpus:
         es = get_es_conn()
         corpus = get_master_document_corpus_list(self.envId, self.authorization).get_corpus(self.corpusId)
         search = Search(using=es, index=corpus.dd.get_indices(corpus.languages))
-        search = search.fields(["text"])
+        search = search.source(["text"])
         search = search.params(scroll=get_scan_scroll_duration(),size=get_nb_documents_per_scan_scroll())
 
         start = time.time()
@@ -79,7 +79,7 @@ class DocumentCorpus:
         es = get_es_conn()
         corpus = get_master_document_corpus_list(self.envId, self.authorization).get_corpus(self.corpusId)
         search = Search(using=es, index=corpus.dd.get_indices(corpus.languages))
-        search = search.fields(["text"])
+        search = search.source(["text"])
         search = search.params(scroll=get_scan_scroll_duration(),size=get_nb_documents_per_scan_scroll())
 
         start = time.time()

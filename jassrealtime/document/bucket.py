@@ -424,10 +424,10 @@ class Bucket:
             for binding in schemasBindings:
                 schemaInfo = schemasList.get_json_schema_info(binding["jsonSchemaId"])
                 result["data"].append(
-                    {"schemaType": binding["docType"][0], "jsonSchema": json.dumps(schemaInfo["jsonSchema"])})
+                    {"schemaType": binding["docType"], "jsonSchema": json.dumps(schemaInfo["jsonSchema"])})
         else:
             for binding in schemasBindings:
-                result["data"].append({"schemaType": binding["docType"][0]})
+                result["data"].append({"schemaType": binding["docType"]})
 
         return result
 
