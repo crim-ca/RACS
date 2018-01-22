@@ -186,16 +186,7 @@ docs/.DS_Store
 docs/__pycache__/
 jass.egg-info/
 jassrealtime/.DS_Store
-jassrealtime/__pycache__/
-jassrealtime/batch/__pycache__/
-jassrealtime/core/__pycache__/
-jassrealtime/document/__pycache__/
-jassrealtime/search/__pycache__/
-jassrealtime/security/__pycache__/
-jassrealtime/webapi/__pycache__/
-jassrealtime/webapi/batch_handlers/__pycache__/
-jassrealtime/webapi/handlers/__pycache__/
 jassrealtime/webapi/static/web/.DS_Store
 jasstests/.DS_Store
-jasstests/jassrealtime/__pycache__/
 jasstests/jassrealtime/core/__pycache__/
+!/jassrealtime/webapi/static/web/swagger/lib/

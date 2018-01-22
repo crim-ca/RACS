@@ -3,6 +3,11 @@
 History
 =======
 
+2.6.0
+---------------------
+* Elasticsearch 2.4.1 -> 6.1.2
+* Alpine image 3.4 -> 3.7 to use Python 3.6
+
 2.5.9
 ---------------------
 * Change historic JASS name to RACS in Swagger API

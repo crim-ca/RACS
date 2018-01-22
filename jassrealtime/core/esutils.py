@@ -165,7 +165,7 @@ def get_multi_indexes_small_search_query(indices: str, matchFields: dict = {}, t
         s.query = Q('bool', must=normalParts)
 
     if returnFields is not None:
-        s = s.fields(returnFields)
+        s = s.source(returnFields)
 
     return s
 

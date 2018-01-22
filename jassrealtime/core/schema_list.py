@@ -19,22 +19,20 @@ MASTER_JSON_SCHEMA_INDEX_ES_MAPPING = {
         "default": {
             "properties": {
                 "jsonSchemaHash": {
-                    "type": "string",
-                    "index": "not_analyzed"
+                    "type": "keyword",
                 },
                 "esHash": {
-                    "type": "string",
-                    "index": "not_analyzed"
+                    "type": "keyword",
                 },
                 "jsonSchema": {
-                    "type": "string",
-                    "index": "no"
+                    "type": "keyword",
+                    "index": "false"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "text"
                 },
                 "description": {
-                    "type": "string"
+                    "type": "text"
                 }
             }
         }
@@ -46,14 +44,15 @@ MASTER_ES_SCHEMA_INDEX_MAPPING = {
         "default": {
             "properties": {
                 "esSchema": {
-                    "type": "string",
-                    "index": "no"
+                    "type": "keyword",
+                    "index": "false"
                 }
             }
         }
     }
 }
 
+# Note: string -> text or keyword depending on the searchMode
 JSON_SCHEMA_TYPE_TO_ES_TYPE = {"boolean": "boolean", "long": "long", "integer": "long", "number": "double",
                                "string": "string"}
 
@@ -464,6 +463,10 @@ class SchemaList:
             if not item["searchable"]:  # searchable IS present, but value is considered false
                 mapping = self.mapping_field_not_indexed(field_type)
             else:
+                # Only string properties can have a searchMode. Other types are just indexed as is.
+                if field_type != "string":
+                    return self.mapping_field_non_string_indexed(field_type)
+
                 if "searchModes" not in item:
                     raise SchemaBindingInvalid("searchModes missing for field " + key)
                 else:
@@ -474,7 +477,7 @@ class SchemaList:
 
                     # Special case: default index
                     language = item.get("language")
-                    mapping = self.mapping_field_index(search_modes[0], field_type, language)
+                    mapping = self.mapping_field_index_with_search_mode(search_modes[0], language)
 
                     # Subsequent cases: index names will be appended with the corresponding searchMode.
                     # E.g. title.edge
@@ -482,13 +485,9 @@ class SchemaList:
                     if subsequent_indices:
                         mapping["fields"] = {}
                         for search_mode in subsequent_indices:
-                            sub_mapping = self.mapping_field_index(search_mode, field_type, language)
+                            sub_mapping = self.mapping_field_index_with_search_mode(search_mode, language)
                             mapping["fields"][search_mode] = sub_mapping
         return mapping
-
-    @staticmethod
-    def make_not_indexed(key, properties):
-        properties["properties"][key]["index"] = "no"
 
     def add_es_schema(self, esProperties: dict):
         """
@@ -523,22 +522,24 @@ class SchemaList:
             raise EsSchemaDoesntExist(esHash)
 
     @staticmethod
-    def mapping_field_index(search_mode: str, field_type: str, language: str) -> dict:
-        mapping = {"type": field_type}
+    def mapping_field_index_with_search_mode(search_mode: str, language: str) -> dict:
+        # Note: Search modes are only permitted for (originally) string properties.
+        mapping = {"type": "text"}  # unless noop
 
         if search_mode == "noop":
-            mapping["index"] = "not_analyzed"
+            mapping["type"] = "keyword"
+            mapping["index"] = "true"
         elif search_mode == "basic":
             mapping["analyzer"] = "standard"
         elif search_mode == "edge":
-            mapping["index"] = "analyzed"
+            mapping["index"] = "true"
             mapping["analyzer"] = "autocomplete"
             mapping["search_analyzer"] = "autocomplete_search"
         elif search_mode == "path":
-            mapping["index"] = "analyzed"
+            mapping["index"] = "true"
             mapping["analyzer"] = "path_analyzer"
         elif search_mode == "ngram":
-            mapping["index"] = "analyzed"
+            mapping["index"] = "true"
             mapping["analyzer"] = "ngram_filter_analyzer"
         elif search_mode == "language":
             if not language:
@@ -551,4 +552,11 @@ class SchemaList:
 
     @staticmethod
     def mapping_field_not_indexed(field_type: str) -> dict:
-        return {"index": "no", "type": field_type}
+        if field_type == "string":
+            field_type = "keyword"
+
+        return {"index": "false", "type": field_type}
+
+    @staticmethod
+    def mapping_field_non_string_indexed(field_type: str) -> dict:
+        return {"index": "true", "type": field_type}

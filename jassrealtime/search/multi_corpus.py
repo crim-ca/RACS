@@ -4,7 +4,7 @@ from typing import List
 from jassrealtime.core.esutils import get_es_conn
 from jassrealtime.core.settings_utils import get_settings, get_env_id
 from jassrealtime.document.document_corpus import make_sort_field, make_es_filters
-from jassrealtime.search.document import map_search_result
+from jassrealtime.search.document import map_search_hit
 
 
 def get_metadata_for_documents(corpusIds, schemaType, fromIndex, size, sortBy, sortOrder, filters,
@@ -41,7 +41,7 @@ def get_metadata_for_documents(corpusIds, schemaType, fromIndex, size, sortBy, s
 
     count = search.count()
 
-    annotations = [map_search_result(result) for result in search]
+    annotations = [map_search_hit(hit) for hit in search]
 
     return count, annotations
 

@@ -55,7 +55,7 @@ Prerequisites
 
 -  pip (latest)
 
--  Python 3.5.x
+-  Python 3.6.x
 
 -  Docker 1.11+ (Untested for earlier versions)
 

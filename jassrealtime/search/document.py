@@ -3,8 +3,8 @@
 # This module regroup all searching functions used by API.
 # The reason search is externalised from the definition of classes itself is that
 # search is specific to the application using it. It is thus much simpler to override it later on.
-from elasticsearch_dsl import Search, A
-from elasticsearch_dsl.result import Result
+from elasticsearch_dsl import Search
+from elasticsearch_dsl.response import Hit
 
 from jassrealtime.document.document_corpus import make_sort_field, make_es_filters
 from ..document.interval import Interval
@@ -14,20 +14,24 @@ from typing import List
 from ..core.esutils import get_multi_indexes_small_search_query, get_es_conn
 from elasticsearch import helpers
 from .utils import add_offset_to_query, replaceFieldNames, deleteField
-from ..core.settings_utils import get_scan_scroll_duration,get_nb_documents_per_scan_scroll
+from ..core.settings_utils import get_scan_scroll_duration, get_nb_documents_per_scan_scroll
+
 
 class GeneralSearchInfo:
     pass
 
 
-def map_search_result(result: Result):
-    annotation = result.__dict__['_d_']
-    annotation["id"] = result.meta.id
+# Hit used to be called Result http://elasticsearch-dsl.readthedocs.io/en/latest/Changelog.html#id8
+def map_search_hit(hit: Hit):
+    annotation = hit.__dict__['_d_']
+    annotation["id"] = hit.meta.id
     return annotation
 
 
 class DocumentSearch:
-    def search_annotations_for_one_type(self, bucketId: str, schemaType: str, fromIndex: int, size: int, sortBy: str=None, sortOrder: str=None, filters: str=None, filterJoin: str=None):
+    def search_annotations_for_one_type(self, bucketId: str, schemaType: str, fromIndex: int, size: int,
+                                        sortBy: str = None, sortOrder: str = None, filters: str = None,
+                                        filterJoin: str = None):
         """
         Search annotation of corpus for one schemaType of one bucket.
         This endpoint exists to facilitate getting a list of documents of a corpus from the metadata document annotation.
@@ -73,7 +77,7 @@ class DocumentSearch:
 
         count = search.count()
 
-        annotations = [map_search_result(result) for result in search]
+        annotations = [map_search_hit(hit) for hit in search]
 
         return count, annotations
 
@@ -192,7 +196,8 @@ class DocumentSearch:
                 annotations = []
 
                 es = get_es_conn()
-                scanPointer = helpers.scan(es, query=esSearchData, index=indices,scroll=get_scan_scroll_duration(),size=get_nb_documents_per_scan_scroll())
+                scanPointer = helpers.scan(es, query=esSearchData, index=indices, scroll=get_scan_scroll_duration(),
+                                           size=get_nb_documents_per_scan_scroll())
                 for annoRes in scanPointer:
                     # Convert result to dictionary
                     annotation = {}

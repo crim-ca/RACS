@@ -9,13 +9,13 @@ from jassrealtime.core.utils import gen_uuid
 from .esutils import *
 from ..security.base_authorization import *
 from .master_factory_list import create_all_lists_for_env
-from .settings_utils import get_number_of_replicas,get_number_of_shards
+from .settings_utils import get_number_of_replicas, get_number_of_shards
 
 ENV_MAPPING = {
     "mappings": {
         "default": {
             "properties": {
-                "name": {"type": "string"},
+                "name": {"type": "keyword"},
             }
         }
     }
@@ -44,11 +44,11 @@ class EnvList:
         envIndex = sett['MASTER_ENV_ID']
         if not es.indices.exists(index=envIndex):
             body = ENV_MAPPING
-            body["settings"]={}
+            body["settings"] = {}
             body["settings"]["index"] = {"number_of_shards": get_number_of_shards(),
                                          "number_of_replicas": get_number_of_replicas()}
 
-            es.indices.create(index=envIndex,body=body)
+            es.indices.create(index=envIndex, body=body)
 
     def __init__(self, sett: dict, authorization: BaseAuthorization):
         self.masterenvId = sett['MASTER_ENV_ID']

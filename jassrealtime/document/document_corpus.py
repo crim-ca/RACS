@@ -3,8 +3,7 @@
 # pagination is a hard problem
 # http://blog.salsify.com/engineering/efficient-pagination-in-sql-and-elasticsearch
 # https://abhishek376.wordpress.com/2014/04/05/elasticsearch-sorting-and-paging-nested-documents/
-
-from elasticsearch_dsl.result import Result
+from elasticsearch_dsl.response import Hit
 
 from .bucket import *
 from .document_sub_corpus import *
@@ -46,7 +45,7 @@ CORPUS_DOCUMENT_COUNT = 'documentCount'
 # list of default properties
 CORPUS_LIST_PROPERTIES_MAPPING = {
     "properties": {
-        LANGUAGES_FIELD: {"type": "string"},
+        LANGUAGES_FIELD: {"type": "keyword"},
         # when the corpus was modified. UTC
         MODIFICATION_DATE_FIELD: {
             "type": "date",
@@ -59,19 +58,16 @@ LANGUAGE_MAPPINGS = {
     "french": {
         "properties": {
             "language": {
-                "type": "string",
-                "index": "not_analyzed"
+                "type": "keyword"
             },
             "title": {
-                "type": "string",
-                "index": "not_analyzed"
+                "type": "keyword"
             },
             "source": {
-                "type": "string",
-                "index": "not_analyzed"
+                "type": "keyword"
             },
             "text": {
-                "type": "string",
+                "type": "text",
                 "analyzer": "french"
             },
         }
@@ -79,19 +75,16 @@ LANGUAGE_MAPPINGS = {
     "english": {
         "properties": {
             "language": {
-                "type": "string",
-                "index": "not_analyzed"
+                "type": "keyword",
             },
             "title": {
-                "type": "string",
-                "index": "not_analyzed"
+                "type": "keyword",
             },
             "source": {
-                "type": "string",
-                "index": "not_analyzed"
+                "type": "keyword",
             },
             "text": {
-                "type": "string",
+                "type": "text",
                 "analyzer": "english"
             }
         }
@@ -333,20 +326,19 @@ class DocumentCorpus():
     """
 
     @staticmethod
-    def addPropertyIfExists(document, result, propertyName):
-        values = getattr(result, propertyName, None)
+    def addPropertyIfExists(document, hit, propertyName):
+        values = getattr(hit, propertyName, None)
         if values and len(values) > 0:
-            # For some reason, the search returns an array of a single value when fields are specified in the search
-            document[propertyName] = values[0]
+            document[propertyName] = values
 
     @staticmethod
-    def mapDocument(result: dict):
+    def mapDocument(hit: dict):
         document = {
-            "id": result.get("id"),
-            "title": result.get("title"),
-            "text": result.get("text"),
-            "source": result.get("source"),
-            "language": result.get("language")
+            "id": hit.get("id"),
+            "title": hit.get("title"),
+            "text": hit.get("text"),
+            "source": hit.get("source"),
+            "language": hit.get("language")
         }
         return document
 
@@ -413,11 +405,11 @@ class DocumentCorpus():
 
         return id
 
-    def mapDocumentResult(self, result: Result):
-        document = {"id": result.meta.id}
-        self.addPropertyIfExists(document, result, 'title')
-        self.addPropertyIfExists(document, result, 'language')
-        self.addPropertyIfExists(document, result, 'source')
+    def mapDocumentHit(self, hit: Hit):
+        document = {"id": hit.meta.id}
+        self.addPropertyIfExists(document, hit, 'title')
+        self.addPropertyIfExists(document, hit, 'language')
+        self.addPropertyIfExists(document, hit, 'source')
 
         return document
 
@@ -444,7 +436,7 @@ class DocumentCorpus():
         es = get_es_conn()
         search = Search(using=es, index=self.dd.get_indices(self.languages))
         search = search[fromIndex:fromIndex + size]
-        search = search.fields(["title", "language", "source"])
+        search = search.source(["title", "language", "source"])
 
         if sortBy:
             search = search.sort(make_sort_field(sortBy, sortOrder))
@@ -458,7 +450,7 @@ class DocumentCorpus():
 
         search.execute()
 
-        documents = [self.mapDocumentResult(result) for result in search]
+        documents = [self.mapDocumentHit(hit) for hit in search]
 
         return documents
 
@@ -468,10 +460,10 @@ class DocumentCorpus():
         """
         es = get_es_conn()
         search = Search(using=es, index=self.dd.get_indices(self.languages))
-        search = search.fields(["_id"])
+        search = search.source(["_id"])
         search = search.params(scroll=get_scan_scroll_duration(),size=get_nb_documents_per_scan_scroll())
-        #  Only 10 results if don't use scan.
-        documentIds = [result.meta.id for result in search.scan()]
+        #  Only 10 hits if don't use scan.
+        documentIds = [hit.meta.id for hit in search.scan()]
 
         return documentIds
 

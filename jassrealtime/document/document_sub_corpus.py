@@ -23,14 +23,14 @@ class SubCorpusNotFoundException(DocumentSubCorpusException):
 
 SUB_CORPUS_LIST_PROPERTIES_MAPPING = {
     "properties": {
-        "name": {"type": "string"}
+        "name": {"type": "text"}
     }
 }
 
 SUB_CORPUS_MAPPING = {
     "properties": {
-        "name": {"type": "string"},
-        "corpusId": {"type": "string", "index": "not_analyzed"}
+        "name": {"type": "text"},
+        "corpusId": {"type": "keyword"}
     }
 }
 
