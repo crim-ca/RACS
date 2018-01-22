@@ -97,17 +97,12 @@ class MyTestCase(unittest.TestCase):
 
     def test_delete_corpus(self):
         corpus = self.documentCorpusList.create_corpus(languages=["english"])
-        subCorpus1 = corpus.create_sub_corpus("Sub corpus 1")
-        subCorpus2 = corpus.create_sub_corpus("Sub corpus 2")
-        subCorpus3 = corpus.create_sub_corpus("Sub corpus 3")
         corpus.add_text_document("Doc 1", "10", "english")
         corpus.add_text_document("Doc 2", "20", "english")
 
         corpus2 = self.documentCorpusList.create_corpus()
-        subCorpus21 = corpus2.create_sub_corpus("Sub corpus 2.1")
         corpus2.add_text_document("Doc 1", "10", "english")
         corpusId = corpus.id
-        corpus2.id = corpus.id
 
         self.documentCorpusList.delete_corpus(corpusId)
         time.sleep(2)  # just to be sure es had time to make deletions.
@@ -118,6 +113,8 @@ class MyTestCase(unittest.TestCase):
 
         self.assertFalse(any(corpusId in s for s in aliases))
 
+    """
+    # SUB CORPUS NOT IN API, so NOT TESTED
     def test_add_document_sub_corpus(self):
         corpus = self.documentCorpusList.create_corpus(languages=["english", "french"])
         subCorpus1 = corpus.create_sub_corpus("Sub corpus 1")
@@ -165,6 +162,8 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(2, len(corpus.get_all_sub_corpuses()))
         self.assertEqual(0, len(corpus2.get_all_sub_corpuses()))
         self.assertRaises(SubCorpusNotFoundException, corpus2.delete_sub_corpus, subCorpus21.id)
+
+    """
 
     # buckets
     def test_create_bucket(self):
