@@ -60,7 +60,10 @@ handlers = [
         (r"/annosearch/corpora/{0}/documents/{0}".format(idsStruct), DocumentSearchHandler),
         (r"/annosearch/corpora/{0}".format(idsStruct), DocumentFolderSearchHandler),
         (r"/annosearch/corpora/{0}/bucket/{0}/schemaType/{0}".format(idsStruct), SingleTypeDocumentSearchHandler),
-        (r"/annosearch/documents".format(idsStruct), DocumentMetadataSearchHandler),
+        (r"/annosearch/documents", DocumentMetadataSearchHandler),
+        # (r"/docsearch/text", DocumentSearchByTextHandler),
+        # (r"/docsearch/anno", DocumentSearchByAnnotationsHandler),
+        # (r"/docsearch/annotext", DocumentSearchByTextAndAnnotationsHandler),
         (r"/batch/corpora/{0}/documents".format(idsStruct), BatchDocumentsHandler),
         (r"/batch/corpora/{0}/annotations".format(idsStruct), BatchAnnotationsDownloadHandler),
         (r"/batch/corpora/{0}/bucket/{0}/annotations".format(idsStruct), BatchAnnotationsUploadHandler)
