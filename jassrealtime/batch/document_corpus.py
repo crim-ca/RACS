@@ -44,7 +44,7 @@ class DocumentCorpus:
         count = 0
         logger.info("Adding documents to zip: {0}".format(self.corpusId))
         for result in search.scan():
-            self.tmpFileStorage.add_utf8_file(result.text[0], str(result.meta.id) + ".txt")
+            self.tmpFileStorage.add_utf8_file(result.text, str(result.meta.id) + ".txt")
             count +=1
             if count % NB_OF_DOCUMENTS_TO_ADD_BEFORE_LOGGING == 0:
                 end = time.time()
