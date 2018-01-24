@@ -3,6 +3,10 @@
 History
 =======
 
+2.6.1
+---------------------
+* Bugfix get documents zip
+
 2.6.0
 ---------------------
 * Elasticsearch 2.4.1 -> 6.1.2

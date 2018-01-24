@@ -1,4 +1,4 @@
-import json,os
+import json, os
 import traceback
 from http import HTTPStatus
 
@@ -24,7 +24,7 @@ class BatchDocumentsHandler(BaseHandler):
             documentCorpus = DocumentCorpus(envId, authorization, corpusId)
             zipPath = documentCorpus.get_documents_zip()
             zipName = os.path.basename(zipPath)
-            self.send_zip_file_with_get(zipPath,zipName)
+            self.send_zip_file_with_get(zipPath, zipName)
             documentCorpus.clear_temporary_files()
 
         except CorpusNotFoundException:
@@ -60,9 +60,9 @@ class BatchDocumentsHandler(BaseHandler):
                 return
 
             documentCorpus = DocumentCorpus(envId, authorization, corpusId)
-            documentCorpus.upload_documents(destUrl, zipFileName,isSendPut,isMultipart,multipartFieldName)
+            documentCorpus.upload_documents(destUrl, zipFileName, isSendPut, isMultipart, multipartFieldName)
 
-            self.write_and_set_status({},HTTPStatus.OK)
+            self.write_and_set_status({}, HTTPStatus.OK)
         except CorpusNotFoundException:
             self.write_and_set_status({MESSAGE: "Specified corpus not found"},
                                       HTTPStatus.NOT_FOUND)
