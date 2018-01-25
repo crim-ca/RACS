@@ -75,7 +75,7 @@ class DocumentSubCorpusList():
 
         :return:
         """
-        subCorpusIds = self.dd.small_search(returnFields=[],useScan=False)
+        subCorpusIds = self.dd.small_search(returnFields=[], useScan=False)
         # delete all corpuses
         for metadata in subCorpusIds:
             self.delete_sub_corpus(metadata["id"])
@@ -157,7 +157,7 @@ class DocumentSubCorpusList():
         :return:
         """
         res = []
-        subCorpusInfoArr = self.dd.small_search(termFields={"corpusId": corpusId},useScan=False)
+        subCorpusInfoArr = self.dd.small_search(termFields={"corpusId": corpusId}, useScan=False)
         for subCorpusInfo in subCorpusInfoArr:
             try:
                 self.authorization.can_read_document_sub_corpus(corpusId, subCorpusInfo["id"])

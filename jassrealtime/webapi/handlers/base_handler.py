@@ -31,7 +31,7 @@ class BaseHandler(RequestHandler):
 
         return json.loads(body.decode("utf-8"))
 
-    def send_zip_file_with_get(self,localFilePath:str,downloadFileName:str = 'default.zip'):
+    def send_zip_file_with_get(self, localFilePath: str, downloadFileName: str = 'default.zip'):
         """
         Sends a local zip file, via get request
         :param localFilePath:

@@ -1,4 +1,4 @@
-import os, errno,zipfile,json
+import os, errno, zipfile, json
 from uuid import uuid1
 from enum import Enum, unique
 from ..core.esutils import get_settings
@@ -7,11 +7,11 @@ from ..core.utils import utf8_json_dump
 
 UNCOMPRESSED_FLUSH_FILE_SIZE = 1000000000
 
+
 class TmpFileStorage:
     """
     This class is used to abstract a file storage system used by Jass,
     """
-
 
     def __init__(self, zipFileName: str = None):
         """
@@ -33,11 +33,11 @@ class TmpFileStorage:
         self.close()
 
         self.zipPath = os.path.join(self.tmpDirPath, self.zipFileName)
-        zf = zipfile.ZipFile(self.zipPath, "w",compression=zipfile.ZIP_DEFLATED,allowZip64=True)
+        zf = zipfile.ZipFile(self.zipPath, "w", compression=zipfile.ZIP_DEFLATED, allowZip64=True)
         zf.close()
         self.fileSizeNotSaved = 0
 
-    def add_json_file(self,jsonData:dict,workFileName:str):
+    def add_json_file(self, jsonData: dict, workFileName: str):
         """
         Creates a new file and adds it to zip.
 
@@ -46,7 +46,7 @@ class TmpFileStorage:
         """
         self._open_zip()
         data = utf8_json_dump(jsonData)
-        self.zf.writestr(workFileName,data)
+        self.zf.writestr(workFileName, data)
         self._flush(len(data))
 
     def add_utf8_file(self, data: str, workFileName: str):
@@ -62,9 +62,9 @@ class TmpFileStorage:
 
     def _open_zip(self):
         if not self.zf:
-            self.zf = zipfile.ZipFile(self.zipPath, "a",compression=zipfile.ZIP_DEFLATED,allowZip64=True)
+            self.zf = zipfile.ZipFile(self.zipPath, "a", compression=zipfile.ZIP_DEFLATED, allowZip64=True)
 
-    def _flush(self,fileSize = -1):
+    def _flush(self, fileSize=-1):
         if fileSize != -1:
             self.fileSizeNotSaved += fileSize
             if self.fileSizeNotSaved > UNCOMPRESSED_FLUSH_FILE_SIZE:

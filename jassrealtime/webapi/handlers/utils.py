@@ -4,6 +4,7 @@ from tornado.web import RequestHandler
 from jassrealtime.core.settings_utils import get_jass_allow_cors
 from jassrealtime.core.esutils import string_to_id
 
+
 def missing_fields_message(entity: Dict, requiredFields: List):
     """
     Returns a message if requiredFields are missing in entity

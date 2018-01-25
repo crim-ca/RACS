@@ -282,7 +282,6 @@ class MyTestCase(unittest.TestCase):
         readAnno = bucket1.get_annotation(annoId, docType)
         time.sleep(0.1)
 
-
     def test_update_annotation(self):
         corpus = self.documentCorpusList.create_corpus()
         bucket1 = corpus.create_bucket("bucket1")

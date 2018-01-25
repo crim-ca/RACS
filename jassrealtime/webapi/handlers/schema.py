@@ -10,6 +10,7 @@ from jassrealtime.security.security_selector import get_autorisation
 from jassrealtime.webapi.handlers.parameter_names import *
 from jassrealtime.core.settings_utils import get_env_id
 
+
 class SchemaHandler(BaseHandler):
     def post(self):
         try:
@@ -30,7 +31,7 @@ class SchemaHandler(BaseHandler):
                 return
 
             id = get_schema_list(envId, authorization).add_json_schema(body["jsonSchema"],
-                                                                          schemaName, schemaDescription, schemaId)
+                                                                       schemaName, schemaDescription, schemaId)
             self.write_and_set_status({"id": id},
                                       HTTPStatus.OK)
         except JsonSchemaAlreadyExistsException:

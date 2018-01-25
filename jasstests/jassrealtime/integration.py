@@ -7,7 +7,7 @@ from jassrealtime.document.bucket import *
 import asyncio
 import concurrent.futures
 import requests
-from random import random,shuffle
+from random import random, shuffle
 import time
 
 """
@@ -17,8 +17,6 @@ This integration assumes app_test.py server is running on port 8889
 
 
 class MyTestCase(unittest.TestCase):
-
-
     """
     TODO: NOT WORKING NEED FIX
     def test_create_env_corpus_document_bucket_annotation(self):
@@ -61,15 +59,18 @@ class MyTestCase(unittest.TestCase):
         with concurrent.futures.ThreadPoolExecutor(max_workers=get_nb_cores()) as executor:
             loop = asyncio.get_event_loop()
             futures = [loop.run_in_executor(
-                    executor,
-                    requests.get,
-                    'http://localhost:8889/test/longrunningrequest/{0}'.format(random())
-                ) for i in range(get_nb_cores()-1)]
+                executor,
+                requests.get,
+                'http://localhost:8889/test/longrunningrequest/{0}'.format(random())
+            ) for i in range(get_nb_cores() - 1)]
             for response in await asyncio.gather(*futures):
-                times = response.content.decode("utf-8") .split(',')
-                self.assertTrue(float(times[3]) < 8,"Time to execute {0} should be less then 8 seconds".format(times[3]))
+                times = response.content.decode("utf-8").split(',')
+                self.assertTrue(float(times[3]) < 8,
+                                "Time to execute {0} should be less then 8 seconds".format(times[3]))
                 timeSinceStart = float(times[2]) - start
-                self.assertTrue(timeSinceStart < 10,"Time to execute {0} should be less then 10 seconds from start of processes".format(timeSinceStart))
+                self.assertTrue(timeSinceStart < 10,
+                                "Time to execute {0} should be less then 10 seconds from start of processes".format(
+                                    timeSinceStart))
 
     async def _test_mix_running_request_long_first_async(self):
         start = time.time()

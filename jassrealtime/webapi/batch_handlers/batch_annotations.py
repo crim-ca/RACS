@@ -68,7 +68,7 @@ class BatchAnnotationsDownloadHandler(BaseHandler):
         try:
             envId = get_env_id()
             authorization = get_autorisation(envId, None, None)
-            schemaTypesStr = self.get_query_argument("schemaTypes",None)
+            schemaTypesStr = self.get_query_argument("schemaTypes", None)
             bucketIdsStr = self.get_query_argument("bucketIds", None)
             schemaTypes = []
             bucketIds = []
@@ -78,7 +78,7 @@ class BatchAnnotationsDownloadHandler(BaseHandler):
                 bucketIds = bucketIdsStr.split(",")
 
             batchCorpus = Corpus(envId, authorization, corpusId)
-            zipPath = batchCorpus.create_tmp_annotations_zip(bucketIds,schemaTypes)
+            zipPath = batchCorpus.create_tmp_annotations_zip(bucketIds, schemaTypes)
             self.send_zip_file_with_get(zipPath, os.path.basename(zipPath))
             batchCorpus.clear_temporary_files()
         except CorpusNotFoundException:

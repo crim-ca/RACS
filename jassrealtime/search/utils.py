@@ -1,6 +1,7 @@
 from typing import List
 from ..document.interval import Interval
 
+
 def add_offset_to_query(esSearchData: dict, offsets: List[Interval]):
     """
     modifies esSearchData to include nested object query
@@ -39,14 +40,15 @@ def add_offset_to_query(esSearchData: dict, offsets: List[Interval]):
             ]}}
         ]
         if "match_all" in esSearchData["query"]:
-            esSearchData["query"]["bool"] = {"filter" : [nestedQuery]}
+            esSearchData["query"]["bool"] = {"filter": [nestedQuery]}
             del esSearchData["query"]["match_all"]
         else:
             if not "filter" in esSearchData["query"]["bool"]:
                 esSearchData["query"]["bool"]["filter"] = []
             esSearchData["query"]["bool"]["filter"].append(nestedQuery)
 
-def replaceFieldNames(data:List,originalName:str,newName:str):
+
+def replaceFieldNames(data: List, originalName: str, newName: str):
     """
     Replace
     :param data:
@@ -57,6 +59,7 @@ def replaceFieldNames(data:List,originalName:str,newName:str):
     for item in data:
         item[newName] = item.pop(originalName)
 
-def deleteField(data:list,fieldName:str):
+
+def deleteField(data: list, fieldName: str):
     for item in data:
         del item[fieldName]

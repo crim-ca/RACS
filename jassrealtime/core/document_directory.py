@@ -351,6 +351,7 @@ def remove_non_settable_fields(fields: List[str], collection: Dict[str, str]) ->
         if field in collection:
             del collection[field]
 
+
 class DocumentsDirectory:
     """
     This class represents a virtual directory of documents. A document in this context is any json object

@@ -10,12 +10,12 @@ _ES_HOST = os.environ.get("ES_HOST", "localhost")
 JASS_ENV = os.environ.get("JASS_ENV", "jassdev")
 FILE_STORAGE_DATA_URL = os.environ.get("FILE_STORAGE_DATA_URL", "http://localhost:6999")
 JASS_NB_CORES = os.environ.get("JASS_NB_CORES", "1");
-JASS_TMP_DIR = os.environ.get("JASS_TMP_DIR","/tmp")    # Folder used by jass to temporarely store uploaded files
-SCAN_SCROLL_DURATION = os.environ.get("SCAN_SCROLL_DURATION","15m")
-NB_DOCUMENTS_PER_SCAN_SCROLL = int(os.environ.get("SCAN_SCROLL_DURATION","1000"))
-NUMBER_OF_SHARDS = int(os.environ.get("NUMBER_OF_SHARDS","1"))
-NUMBER_OF_REPLICAS = int(os.environ.get("NUMBER_OF_REPLICAS","0"))
-JASS_EXPOSE_SWAGGER = os.environ.get("JASS_EXPOSE_SWAGGER","True")
+JASS_TMP_DIR = os.environ.get("JASS_TMP_DIR", "/tmp")  # Folder used by jass to temporarely store uploaded files
+SCAN_SCROLL_DURATION = os.environ.get("SCAN_SCROLL_DURATION", "15m")
+NB_DOCUMENTS_PER_SCAN_SCROLL = int(os.environ.get("SCAN_SCROLL_DURATION", "1000"))
+NUMBER_OF_SHARDS = int(os.environ.get("NUMBER_OF_SHARDS", "1"))
+NUMBER_OF_REPLICAS = int(os.environ.get("NUMBER_OF_REPLICAS", "0"))
+JASS_EXPOSE_SWAGGER = os.environ.get("JASS_EXPOSE_SWAGGER", "True")
 
 JASS_ALLOW_CORS = True
 if os.environ.get("JASS_ALLOW_CORS", "True") == "True":
@@ -35,12 +35,10 @@ if os.environ.get("JASS_MANAGE_ENV", "True") == "True":
 else:
     JASS_MANAGE_ENV = False
 
-
-
 _SETTINGS = {
     'SERVER_NAME': "localhost",
     'USE_ANNOTATION_AND_SCHEMA_VALIDATOR': False,
-# If true, use an external validator to validate annotations and schemas.
+    # If true, use an external validator to validate annotations and schemas.
     'ELASTIC_SEARCH': {
         'hosts': [_ES_HOST],
         "sniff_on_start": True,
@@ -92,7 +90,7 @@ _SETTINGS = {
         },
         'BATCH': {
             "MAX_ANNOTAION_BULK_SIZE": 10000000
-        # maximum size of annotations sent to elastic search bulk method. Default 10MB
+            # maximum size of annotations sent to elastic search bulk method. Default 10MB
         },
 
     },

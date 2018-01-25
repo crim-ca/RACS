@@ -1,7 +1,8 @@
 from typing import Dict
 from .base_authorization import BaseAuthorization
 
-def get_autorisation(envId:str,userToken,tokenType) -> BaseAuthorization:
+
+def get_autorisation(envId: str, userToken, tokenType) -> BaseAuthorization:
     """
     Returns an authorisation oibject necessary to acces any jass functionality
 
@@ -11,5 +12,5 @@ def get_autorisation(envId:str,userToken,tokenType) -> BaseAuthorization:
     :return:           An authorisation object. All authorisation objects subclass BaseAuthorisation.
     """
 
-    #TODO
-    return BaseAuthorization.create_authorization(envId,userToken,tokenType)
+    # TODO
+    return BaseAuthorization.create_authorization(envId, userToken, tokenType)

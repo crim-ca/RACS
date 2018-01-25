@@ -1,5 +1,6 @@
 from typing import Dict
 
+
 def get_token_info(jwtToken) -> Dict:
     """
     TODO: create implementation for JWT token
@@ -9,4 +10,4 @@ def get_token_info(jwtToken) -> Dict:
         env on which to execute the action. Optional if performaing env creation/deletion.
     """
 
-    return {"username":"test","env":"test"}
+    return {"username": "test", "env": "test"}

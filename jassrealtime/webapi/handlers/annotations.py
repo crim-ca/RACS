@@ -142,6 +142,7 @@ class AnnotationFolderHandler(BaseHandler):
             self.write_and_set_status({MESSAGE: "Internal server error", TRACE: trace},
                                       HTTPStatus.INTERNAL_SERVER_ERROR)
 
+
 class AnnotationHandler(BaseHandler):
     def get(self, corpusId, bucketId, annotationId):
         try:

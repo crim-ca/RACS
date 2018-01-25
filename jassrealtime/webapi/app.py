@@ -18,13 +18,14 @@ from jassrealtime.webapi.handlers.corpus import CorpusHandler
 from jassrealtime.webapi.handlers.env import EnvHandler, EnvFolderHandler
 from jassrealtime.webapi.handlers.rebuildenv import RebuildEnvHandler
 from jassrealtime.webapi.handlers.bucket import BucketHandler, BucketFolderHandler
-from jassrealtime.webapi.handlers.bucket_schema import BucketSchemaHandler,BucketSchemaDeleteHandler
+from jassrealtime.webapi.handlers.bucket_schema import BucketSchemaHandler, BucketSchemaDeleteHandler
 from jassrealtime.webapi.handlers.annotations import AnnotationHandler, AnnotationFolderHandler
 from jassrealtime.webapi.handlers.document import DocumentHandler, DocumentFolderHandler, DocumentIdsHandler
 from jassrealtime.webapi.handlers.structure import StructureHandler
 from jassrealtime.webapi.handlers.search import DocumentSearchHandler, DocumentFolderSearchHandler, \
     SingleTypeDocumentSearchHandler, DocumentMetadataSearchHandler
-from jassrealtime.webapi.batch_handlers.batch_annotations import BatchAnnotationsUploadHandler, BatchAnnotationsDownloadHandler
+from jassrealtime.webapi.batch_handlers.batch_annotations import BatchAnnotationsUploadHandler, \
+    BatchAnnotationsDownloadHandler
 from jassrealtime.webapi.batch_handlers.batch_documents import BatchDocumentsHandler
 
 settings = {}
@@ -44,27 +45,28 @@ else:
 # idsStruct = "(.*)"
 idsStruct = "([\w-]+)"
 handlers = [
-        (r"/corpora/{0}".format(idsStruct), CorpusHandler),
-        (r"/corpora", CorporaHandler),
-        (r"/corpora/{0}/structure".format(idsStruct), StructureHandler),
-        (r"/corpora/{0}/documentIds".format(idsStruct), DocumentIdsHandler),
-        (r"/corpora/{0}/documents/{0}".format(idsStruct), DocumentHandler),
-        (r"/corpora/{0}/documents".format(idsStruct), DocumentFolderHandler),
-        (r"/corpora/{0}/buckets".format(idsStruct), BucketHandler),
-        (r"/corpora/{0}/buckets/{0}".format(idsStruct), BucketFolderHandler),
-        (r"/corpora/{0}/buckets/{0}/schemas".format(idsStruct), BucketSchemaHandler),
-        (r"/corpora/{0}/buckets/{0}/schemas/{0}".format(idsStruct), BucketSchemaDeleteHandler),
-        (r"/corpora/{0}/buckets/{0}/annotations/{0}".format(idsStruct), AnnotationHandler),
-        (r"/corpora/{0}/buckets/{0}/annotations".format(idsStruct), AnnotationFolderHandler),
-        (r"/corpora/{0}/buckets/{0}/annotationCount".format(idsStruct), AnnotationCountHandler),
-        (r"/annosearch/corpora/{0}/documents/{0}".format(idsStruct), DocumentSearchHandler),
-        (r"/annosearch/corpora/{0}".format(idsStruct), DocumentFolderSearchHandler),
-        (r"/annosearch/corpora/{0}/bucket/{0}/schemaType/{0}".format(idsStruct), SingleTypeDocumentSearchHandler),
-        (r"/annosearch/documents".format(idsStruct), DocumentMetadataSearchHandler),
-        (r"/batch/corpora/{0}/documents".format(idsStruct), BatchDocumentsHandler),
-        (r"/batch/corpora/{0}/annotations".format(idsStruct), BatchAnnotationsDownloadHandler),
-        (r"/batch/corpora/{0}/bucket/{0}/annotations".format(idsStruct), BatchAnnotationsUploadHandler)
-    ]
+    (r"/corpora/{0}".format(idsStruct), CorpusHandler),
+    (r"/corpora", CorporaHandler),
+    (r"/corpora/{0}/structure".format(idsStruct), StructureHandler),
+    (r"/corpora/{0}/documentIds".format(idsStruct), DocumentIdsHandler),
+    (r"/corpora/{0}/documents/{0}".format(idsStruct), DocumentHandler),
+    (r"/corpora/{0}/documents".format(idsStruct), DocumentFolderHandler),
+    (r"/corpora/{0}/buckets".format(idsStruct), BucketHandler),
+    (r"/corpora/{0}/buckets/{0}".format(idsStruct), BucketFolderHandler),
+    (r"/corpora/{0}/buckets/{0}/schemas".format(idsStruct), BucketSchemaHandler),
+    (r"/corpora/{0}/buckets/{0}/schemas/{0}".format(idsStruct), BucketSchemaDeleteHandler),
+    (r"/corpora/{0}/buckets/{0}/annotations/{0}".format(idsStruct), AnnotationHandler),
+    (r"/corpora/{0}/buckets/{0}/annotations".format(idsStruct), AnnotationFolderHandler),
+    (r"/corpora/{0}/buckets/{0}/annotationCount".format(idsStruct), AnnotationCountHandler),
+    (r"/annosearch/corpora/{0}/documents/{0}".format(idsStruct), DocumentSearchHandler),
+    (r"/annosearch/corpora/{0}".format(idsStruct), DocumentFolderSearchHandler),
+    (r"/annosearch/corpora/{0}/bucket/{0}/schemaType/{0}".format(idsStruct), SingleTypeDocumentSearchHandler),
+    (r"/annosearch/documents".format(idsStruct), DocumentMetadataSearchHandler),
+    (r"/batch/corpora/{0}/documents".format(idsStruct), BatchDocumentsHandler),
+    (r"/batch/corpora/{0}/annotations".format(idsStruct), BatchAnnotationsDownloadHandler),
+    (r"/batch/corpora/{0}/bucket/{0}/annotations".format(idsStruct), BatchAnnotationsUploadHandler)
+]
+
 
 def make_app():
     setup_logging()

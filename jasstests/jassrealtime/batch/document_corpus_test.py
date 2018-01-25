@@ -51,10 +51,9 @@ class MyTestCase(unittest.TestCase):
             with open(filePath, 'r', encoding="utf8") as f:
                 id = os.path.basename(filePath)
                 contents = f.read()
-                self.contentById[str(id)+ ".txt"] = contents
+                self.contentById[str(id) + ".txt"] = contents
                 corpus.add_text_document(contents, filePath, "en_US", id)
         time.sleep(1)
-
 
         # def test_upload_documents(self):
         #    # note you need to manually run test server for this test to pass
@@ -85,7 +84,7 @@ class MyTestCase(unittest.TestCase):
                             params={"filename": uploadFileName})
         swift_url_info = json.loads(resp.text)
         documentCorpus = DocumentCorpus(self.envId, self.authorization, "corpus1")
-        documentCorpus.upload_documents(swift_url_info["upload_url"], uploadFileName,True, False)
+        documentCorpus.upload_documents(swift_url_info["upload_url"], uploadFileName, True, False)
         time.sleep(2)
         # getting the file we uploaded
         response = requests.get("http://services-leads.vesta.crim.ca/multimedia_storage/v1_7/get/"

@@ -99,7 +99,8 @@ class MyTestCase(unittest.TestCase):
 
         corpus = get_master_document_corpus_list(self.envId, self.authorization).create_corpus("corpus1")
         bucket1 = corpus.create_bucket("bucket1")
-        schema_id = get_schema_list(self.envId, self.authorization).add_json_schema_as_hash(schema, False, nestedFields=["offsets"])
+        schema_id = get_schema_list(self.envId, self.authorization).add_json_schema_as_hash(schema, False,
+                                                                                            nestedFields=["offsets"])
         time.sleep(1)
 
         bucket1.add_or_update_schema_to_bucket(schema_id, "schema1", TargetType("document"), {})

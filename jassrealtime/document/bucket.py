@@ -10,7 +10,7 @@ from elasticsearch_dsl import Search, Q
 from ..core.document_directory import *
 from ..core.master_factory_list import get_master_document_directory_list, get_schema_list
 from ..core.esutils import multi_indexes_small_search
-from ..core.settings_utils import get_number_of_replicas,get_number_of_shards
+from ..core.settings_utils import get_number_of_replicas, get_number_of_shards
 
 BUCKET_BINDING_INDEX_MAPPING = {
     "mappings": {
@@ -77,6 +77,7 @@ class InvalidSearchParameterException(BucketException):
 
 class InvalidCharactersInBucketId(BucketException):
     pass
+
 
 class SchemaTypeNotFoundException(BucketException):
     pass
@@ -335,7 +336,7 @@ class Bucket:
         self.corpusId = corpusId
         self.bucketBindingIndex = bucketBindingIndex
 
-    def get_binding_id(self,docType:str):
+    def get_binding_id(self, docType: str):
         """
         Returns a unique binding id used to bind a schema to a doctype
         :param : Doc type
@@ -404,7 +405,6 @@ class Bucket:
 
         except exceptions.NotFoundError:
             raise SchemaTypeNotFoundException("Schema to delete not found {0}".format(docType))
-
 
     def get_schemas_info(self, includeJson=False, useScan=False):
         """

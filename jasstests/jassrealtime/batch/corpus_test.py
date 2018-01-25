@@ -1,16 +1,15 @@
 import unittest
-import os,shutil,glob
+import os, shutil, glob
 
 from jassrealtime.core.settings_utils import get_settings, set_setting_path
 from jassrealtime.document.document_corpus import *
 from jassrealtime.security.security_selector import get_autorisation
 from jassrealtime.document.bucket import *
-from jassrealtime.core.master_factory_list import get_schema_list, get_env_list,\
-    get_master_document_corpus_list, get_schema_list,get_master_bucket_list
+from jassrealtime.core.master_factory_list import get_schema_list, get_env_list, \
+    get_master_document_corpus_list, get_schema_list, get_master_bucket_list
 from jassrealtime.core.env import EnvAlreadyExistWithSameIdException
 from jassrealtime.batch.corpus import *
 from jassrealtime.batch.tmp_file_storage import TmpFileStorage
-
 
 SCHEMA_NORMAL = {
     "$schema": "http://json-schema.org/draft-04/schema#",
@@ -125,7 +124,8 @@ SCHEMA_OFFSETS = {
     }
 }
 
-JASS_TEST_DATA_PATH = os.path.join("/tmp","jass_test_data")
+JASS_TEST_DATA_PATH = os.path.join("/tmp", "jass_test_data")
+
 
 class MyTestCase(unittest.TestCase):
     @classmethod
@@ -158,17 +158,17 @@ class MyTestCase(unittest.TestCase):
         finally:
             pass
 
-    def get_zip_file_path(self,zipFileName:str):
-        return os.path.join(JASS_TEST_DATA_PATH,zipFileName)
+    def get_zip_file_path(self, zipFileName: str):
+        return os.path.join(JASS_TEST_DATA_PATH, zipFileName)
 
     def set_up_corpus(self):
         corpus = get_master_document_corpus_list(self.envId, self.authorization).create_corpus("corpus1")
         time.sleep(1)
-        bucket1 = corpus.create_bucket("bucket1","bucket1")
+        bucket1 = corpus.create_bucket("bucket1", "bucket1")
         setting = get_settings()
-        self.schemaList = get_schema_list(self.envId,self.authorization)
+        self.schemaList = get_schema_list(self.envId, self.authorization)
         schemaNormalId = self.schemaList.add_json_schema_as_hash(SCHEMA_NORMAL)
-        schemaOffsetsId = self.schemaList.add_json_schema_as_hash(SCHEMA_OFFSETS,False,nestedFields=["offsets"])
+        schemaOffsetsId = self.schemaList.add_json_schema_as_hash(SCHEMA_OFFSETS, False, nestedFields=["offsets"])
         time.sleep(1)
         bucket1.add_or_update_schema_to_bucket(schemaNormalId, "sentence", TargetType.document_surface1d, {})
         bucket1.add_or_update_schema_to_bucket(schemaOffsetsId, "token", TargetType.document_surface1d, {})
@@ -177,8 +177,8 @@ class MyTestCase(unittest.TestCase):
     def test_add_annotations(self):
         self.set_up_corpus()
         batchCorpus = Corpus(self.envId, self.authorization, "corpus1")
-        errors = batchCorpus.add_annotations("bucket1",self.get_zip_file_path("all_in_one.zip"))
-        self.assertFalse(errors,str(errors))
+        errors = batchCorpus.add_annotations("bucket1", self.get_zip_file_path("all_in_one.zip"))
+        self.assertFalse(errors, str(errors))
 
     def test_update_annotations_multifiles(self):
         self.set_up_corpus()
@@ -189,15 +189,15 @@ class MyTestCase(unittest.TestCase):
         errorsB = batchCorpus.add_annotations("bucket1", self.get_zip_file_path("update_token_only.zip"))
         self.assertFalse(errorsB, str(errorsB))
         time.sleep(0.1)
-        bucket1 = get_master_bucket_list(self.envId, self.authorization).get_bucket("corpus1","bucket1")
-        annotation = bucket1.get_annotation("t1","token")
-        self.assertEqual(annotation["category"],"UPDATED")
+        bucket1 = get_master_bucket_list(self.envId, self.authorization).get_bucket("corpus1", "bucket1")
+        annotation = bucket1.get_annotation("t1", "token")
+        self.assertEqual(annotation["category"], "UPDATED")
 
     def test_invalid_annotation(self):
         self.set_up_corpus()
         batchCorpus = Corpus(self.envId, self.authorization, "corpus1")
         errors = batchCorpus.add_annotations("bucket1", self.get_zip_file_path("one_invalid_token.zip"))
-        self.assertTrue(errors,str(errors))
+        self.assertTrue(errors, str(errors))
         time.sleep(0.1)
         bucket1 = get_master_bucket_list(self.envId, self.authorization).get_bucket("corpus1", "bucket1")
         # Last annotation, needs to exist, since elastic search
@@ -206,7 +206,7 @@ class MyTestCase(unittest.TestCase):
     def tearDown(self):
         try:
             pass
-            #self.envList1.delete_env(self.envId)
+            # self.envList1.delete_env(self.envId)
         except:
             pass
 
@@ -215,7 +215,7 @@ class MyTestCase(unittest.TestCase):
         try:
             authorization = BaseAuthorization("unittest_", None, None, None)
             envList1 = get_env_list(authorization)
-            #envList1.delete_env("unittest_")
+            # envList1.delete_env("unittest_")
         except:
             pass
 

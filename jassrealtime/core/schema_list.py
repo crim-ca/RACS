@@ -421,7 +421,8 @@ class SchemaList:
                                 raise EsSchemaNotSupportedProperty(
                                     "Items of nested properties need a type {0}".format(key))
 
-                            field_type = self.json_to_elasticsearch_basic_type(itemsData["properties"][nestedProperty]["type"])
+                            field_type = self.json_to_elasticsearch_basic_type(
+                                itemsData["properties"][nestedProperty]["type"])
                             nestedProperties[nestedProperty]["type"] = field_type
 
                         # update the nested properties
