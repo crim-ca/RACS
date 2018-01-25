@@ -3,6 +3,10 @@
 History
 =======
 
+2.6.2
+---------------------
+* Bugfix string array properties
+
 2.6.1
 ---------------------
 * Bugfix get documents zip

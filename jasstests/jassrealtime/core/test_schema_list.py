@@ -100,6 +100,138 @@ TEST_JSON_SCHEMA_STR = """
 TEST_ES_PROPERTIES = '{"properties": {"end": {"type": "string"}, "_bucketID": {"type": "string"}, "@type": {"type": "string"}, "begin": {"type": "string"}, "poseType": {"type": "double"}, "_schemaType": {"type": "string"}, "@context": {"type": "string"}, "faceId": {"type": "string", "analyzer": "french"}, "confidence": {"type": "double", "index": "no"}}}'
 
 
+JSON_SCHEMA_WITH_STRING_ARRAY = """
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "targetType": "document_surface1d",
+  "schemaType": "TSD",
+  "title": "TSD",
+  "type": "object",
+  "required": [
+    "schemaType",
+    "_corpusID",
+    "_documentID",
+    "offsets",
+    "text",
+    "conceptID",
+    "domainNames"
+  ],
+  "properties": {
+    "schemaType": {
+      "type": "string",
+      "description": "Constant: 'TSD' ",
+      "searchable": true,
+      "searchModes": [
+        "noop"
+      ],
+      "default": "TSD",
+      "locked": true
+    },
+    "_documentID": {
+      "type": "string",
+      "description": "Internal document GUID",
+      "searchable": true,
+      "searchModes": [
+        "noop"
+      ],
+      "locked": true
+    },
+    "_corpusID": {
+      "type": "string",
+      "description": "Internal Corpus GUID",
+      "searchable": true,
+      "searchModes": [
+        "noop"
+      ],
+      "locked": true
+    },
+    "offsets": {
+      "type": "array",
+      "searchable": true,
+      "searchModes": [
+        "noop"
+      ],
+      "locked": true,
+      "description": "Position of the token within the target document",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "begin": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "end": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "text": {
+      "type": "string",
+      "description": "Targeted text",
+      "searchable": true,
+      "searchModes": ["basic"],
+      "locked": false
+    },
+    "domainNames": {
+      "type": "array",
+      "searchable": true,
+      "searchModes": ["basic"],
+      "locked": true,
+      "description": "Domain Names associated with the term",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "conceptID": {
+      "type": "string",
+      "description": "ID of the concept associated with the term",
+      "searchable": true,
+      "searchModes": ["noop"],
+      "locked": true
+    },
+    "conceptDescription": {
+      "type": "string",
+      "description": "Description of the concept associated with the term",
+      "searchable": true,
+      "searchModes": ["basic"],
+      "locked": true
+    },
+    "gender": {
+      "type": "string",
+      "description": "Gender of the term",
+      "searchable": true,
+      "searchModes": ["noop"],
+      "locked": true
+    },
+    "number": {
+      "type": "string",
+      "description": "Number of the term",
+      "searchable": true,
+      "searchModes": ["noop"],
+      "locked": true
+    },
+    "category": {
+      "type": "string",
+      "description": "Part of speech of the term",
+      "searchable": true,
+      "searchModes": ["noop"],
+      "locked": true
+    },
+    "score": {
+      "type": "number",
+      "description": "Score associated with the concept",
+      "searchable": true,
+      "searchModes": ["noop"],
+      "locked": true
+    }
+  }
+}"""
+
 class MyTestCase(unittest.TestCase):
     def setUp(self):
         try:
@@ -126,7 +258,6 @@ class MyTestCase(unittest.TestCase):
 
 
     def test_add_json_schema(self):
-        authorization = BaseAuthorization.create_authorization(self.envId, None, None)
         jsonSchema = json.loads(TEST_JSON_SCHEMA_STR)
         id = self.schemaList.add_json_schema(jsonSchema)
         time.sleep(1)
@@ -137,6 +268,14 @@ class MyTestCase(unittest.TestCase):
         time.sleep(1)
         schemasInfo = self.schemaList.get_json_schemas_infos()
         self.assertEqual(2, len(schemasInfo))
+
+    def test_add_json_schema_string_array(self):
+        jsonSchema = json.loads(JSON_SCHEMA_WITH_STRING_ARRAY)
+        self.schemaList.add_json_schema(jsonSchema, nestedFields=["offsets"])
+        time.sleep(1)
+        schemasInfo = self.schemaList.get_json_schemas_infos()
+        self.assertEqual(1, len(schemasInfo))
+        # adding a name
 
     def test_add_json_schema_as_hash(self):
         authorization = BaseAuthorization.create_authorization(self.envId, None, None)

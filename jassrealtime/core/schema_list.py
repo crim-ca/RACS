@@ -8,7 +8,7 @@ from .esutils import *
 from ..security.base_authorization import *
 from .language_manager import LanguageManager
 from uuid import uuid1
-from .settings_utils import get_number_of_replicas,get_number_of_shards
+from .settings_utils import get_number_of_replicas, get_number_of_shards
 
 from elasticsearch import exceptions
 from elasticsearch_dsl import Q
@@ -53,8 +53,7 @@ MASTER_ES_SCHEMA_INDEX_MAPPING = {
 }
 
 # Note: string -> text or keyword depending on the searchMode
-JSON_SCHEMA_TYPE_TO_ES_TYPE = {"boolean": "boolean", "long": "long", "integer": "long", "number": "double",
-                               "string": "string"}
+JSON_SCHEMA_TYPE_TO_ES_NON_STRING = {"boolean": "boolean", "long": "long", "integer": "long", "number": "double"}
 
 JSON_SCHEMA_PRIMITIVE_TYPES = {"boolean", "integer", "number", "string"}
 
@@ -255,7 +254,7 @@ class SchemaList:
         es_wait_ready()
         delete_indices(self.masterJsonSchemaIndex, self.envId, self.classIndex)
 
-    def add_json_schema_as_hash(self, jsonSchema: dict, shoudlValidate: bool = False, nestedFields=[]) -> str:
+    def add_json_schema_as_hash(self, jsonSchema: dict, shouldValidate: bool = False, nestedFields=[]) -> str:
         """
         Add this json schema and uses jsonSchemaHash as id.
         If a schema with the same jsonHash already exists does nothing
@@ -270,13 +269,13 @@ class SchemaList:
         jsonSchemaStr = json.dumps(jsonSchema)
         jsonSchemaHash = SchemaList.hash_json_schema(jsonSchemaStr)
         try:
-            id = self.add_json_schema(jsonSchema, None, None, jsonSchemaHash, shoudlValidate, nestedFields)
+            id = self.add_json_schema(jsonSchema, None, None, jsonSchemaHash, shouldValidate, nestedFields)
             return id
         except JsonSchemaAlreadyExistsException:
             return jsonSchemaHash
 
     def add_json_schema(self, jsonSchema: dict, name: str = None,
-                        description: str = None, id: str = None, shoudlValidate: bool = False,
+                        description: str = None, id: str = None, shouldValidate: bool = False,
                         nestedFields=[]):
         """
         This function is used by the user to add his json schema, and able to search it.
@@ -318,7 +317,7 @@ class SchemaList:
         else:
             id = gen_uuid()
 
-        if shoudlValidate:
+        if shouldValidate:
             raise NotImplemented()
 
         entry["jsonSchemaHash"] = jsonSchemaHash
@@ -422,8 +421,9 @@ class SchemaList:
                                 raise EsSchemaNotSupportedProperty(
                                     "Items of nested properties need a type {0}".format(key))
 
-                            nestedProperties[nestedProperty]["type"] = JSON_SCHEMA_TYPE_TO_ES_TYPE[
-                                itemsData["properties"][nestedProperty]["type"]]
+                            field_type = self.json_to_elasticsearch_basic_type(itemsData["properties"][nestedProperty]["type"])
+                            nestedProperties[nestedProperty]["type"] = field_type
+
                         # update the nested properties
                         properties["properties"][key]["type"] = "nested"
                         properties["properties"][key]["dynamic"] = "strict"
@@ -434,15 +434,15 @@ class SchemaList:
                     if "type" not in itemsData:
                         raise EsSchemaNotSupportedProperty("Missing type field for {0}".format(key))
 
-                    jsonType = itemsData["type"]
+                    json_type = itemsData["type"]
 
                     # Array of primitive types (must all be the same type)
-                    if jsonType in JSON_SCHEMA_PRIMITIVE_TYPES:
-                        properties["properties"][key]["type"] = JSON_SCHEMA_TYPE_TO_ES_TYPE[jsonType]
+                    if json_type in JSON_SCHEMA_PRIMITIVE_TYPES:
+                        properties["properties"][key] = self.atomic_field_mapping(item, json_type, key)
 
                     # Array of flat object (must all be the same object)
                     # Here, we make a normal ES object mapping
-                    elif jsonType == "object":
+                    elif json_type == "object":
                         if "properties" not in itemsData:
                             raise EsSchemaNotSupportedProperty("Missing properties field for {0}".format(key))
                         raise NotImplementedError(
@@ -451,43 +451,60 @@ class SchemaList:
                     else:
                         raise EsSchemaNotSupportedProperty(key)
             else:  # Not an array
-                properties["properties"][key] = self.atomic_field_mapping(item, key)
+                properties["properties"][key] = self.atomic_field_mapping(item, item["type"], key)
 
         return properties
 
-    def atomic_field_mapping(self, item, key):
-        field_type = JSON_SCHEMA_TYPE_TO_ES_TYPE[item["type"]]
-        if "searchable" not in item:  # searchable is not present in the schema
-            mapping = self.mapping_field_not_indexed(field_type)
+    @staticmethod
+    def json_to_elasticsearch_basic_type(json_type: str, searchable: bool = False, search_mode=None):
+        if json_type in JSON_SCHEMA_TYPE_TO_ES_NON_STRING:
+            return JSON_SCHEMA_TYPE_TO_ES_NON_STRING[json_type]
+
+        assert json_type == "string"
+
+        if not searchable:
+            return "keyword"
+
+        if search_mode and search_mode == "noop":
+            "keyword"
+
+        return "text"
+
+    def atomic_field_mapping(self, item, json_type: str, key):
+        searchable = self.item_searchable(item)
+
+        if not searchable:
+            mapping = self.mapping_field_not_indexed(self.json_to_elasticsearch_basic_type(json_type))
         else:
-            if not item["searchable"]:  # searchable IS present, but value is considered false
-                mapping = self.mapping_field_not_indexed(field_type)
+            # Only string properties can have a searchMode. Other types are just indexed as is.
+            if json_type != "string":
+                return self.mapping_field_non_string_indexed(self.json_to_elasticsearch_basic_type(json_type))
+
+            if "searchModes" not in item:
+                raise SchemaBindingInvalid("searchModes missing for field " + key)
             else:
-                # Only string properties can have a searchMode. Other types are just indexed as is.
-                if field_type != "string":
-                    return self.mapping_field_non_string_indexed(field_type)
+                search_modes = item["searchModes"]
 
-                if "searchModes" not in item:
-                    raise SchemaBindingInvalid("searchModes missing for field " + key)
-                else:
-                    search_modes = item["searchModes"]
+                if type(search_modes) is not list:
+                    raise SchemaBindingInvalid("searchModes must be a list for field " + key)
 
-                    if type(search_modes) is not list:
-                        raise SchemaBindingInvalid("searchModes must be a list for field " + key)
+                # Special case: default index
+                language = item.get("language")
+                mapping = self.mapping_field_index_with_search_mode(search_modes[0], language)
 
-                    # Special case: default index
-                    language = item.get("language")
-                    mapping = self.mapping_field_index_with_search_mode(search_modes[0], language)
-
-                    # Subsequent cases: index names will be appended with the corresponding searchMode.
-                    # E.g. title.edge
-                    subsequent_indices = search_modes[1:]
-                    if subsequent_indices:
-                        mapping["fields"] = {}
-                        for search_mode in subsequent_indices:
-                            sub_mapping = self.mapping_field_index_with_search_mode(search_mode, language)
-                            mapping["fields"][search_mode] = sub_mapping
+                # Subsequent cases: index names will be appended with the corresponding searchMode.
+                # E.g. title.edge
+                subsequent_indices = search_modes[1:]
+                if subsequent_indices:
+                    mapping["fields"] = {}
+                    for search_mode in subsequent_indices:
+                        sub_mapping = self.mapping_field_index_with_search_mode(search_mode, language)
+                        mapping["fields"][search_mode] = sub_mapping
         return mapping
+
+    @staticmethod
+    def item_searchable(item) -> bool:
+        return ("searchable" in item) and (item["searchable"])
 
     def add_es_schema(self, esProperties: dict):
         """
