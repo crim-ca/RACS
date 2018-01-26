@@ -3,6 +3,7 @@ import os
 
 from jassrealtime.core.settings_utils import get_settings, set_setting_path
 from jassrealtime.document.document_corpus import *
+from jasstests.jassrealtime.core.test_schema_list import JSON_SCHEMA_WITH_STRING_ARRAY
 
 
 class MyTestCase(unittest.TestCase):
@@ -254,6 +255,30 @@ class MyTestCase(unittest.TestCase):
         bucket1.add_annotation(anno2, "type1")
         bucket1.add_annotation(anno3, "type1")
         time.sleep(0.1)
+
+    def test_add_annotation_string_array(self):
+        schema = json.loads(JSON_SCHEMA_WITH_STRING_ARRAY)
+
+        corpus = get_master_document_corpus_list(self.envId, self.authorization).create_corpus("corpus1")
+        bucket1 = corpus.create_bucket("bucket1")
+        schema_id = get_schema_list(self.envId, self.authorization).add_json_schema_as_hash(schema, False,
+                                                                                            nestedFields=["offsets"])
+        time.sleep(1)
+
+        bucket1.add_or_update_schema_to_bucket(schema_id, "schema1", TargetType("document"), {})
+        time.sleep(1)
+
+        annotation = {
+            "schemaType": "TSD",
+            "_corpusID": "test",
+            "_documentID": "doc_test",
+            "offsets": [{"begin": 1, "end": 11}],
+            "text": "poulailler",
+            "conceptID": "conceptId1",
+            "domainNames": ["élevage aviaire", "agriculture"]
+        }
+
+        bucket1.add_annotation(annotation, "TSD")
 
     def test_get_annotation_uid(self):
         corpus = self.documentCorpusList.create_corpus()
