@@ -5,8 +5,8 @@ _SETT = None
 _SETT_PATH = None
 
 from jassrealtime.core.settings import _SETTINGS, JASS_ENV, JASS_MANAGE_ENV, JASS_REBUILD_ENV, \
-    FILE_STORAGE_DATA_URL, JASS_TMP_DIR, JASS_ALLOW_CORS, JASS_LOG_LEVEL , JASS_NB_CORES, \
-    NUMBER_OF_SHARDS,NUMBER_OF_REPLICAS,NB_DOCUMENTS_PER_SCAN_SCROLL,JASS_EXPOSE_SWAGGER
+    FILE_STORAGE_DATA_URL, JASS_TMP_DIR, JASS_ALLOW_CORS, JASS_LOG_LEVEL, JASS_NB_CORES, \
+    NUMBER_OF_SHARDS, NUMBER_OF_REPLICAS, NB_DOCUMENTS_PER_SCAN_SCROLL, JASS_EXPOSE_SWAGGER
 from jassrealtime.core.language_manager import LanguageManager
 
 
@@ -56,6 +56,7 @@ def get_file_storage_data_url():
 def get_jass_tmp_dir():
     return JASS_TMP_DIR
 
+
 def get_jass_allow_cors():
     return JASS_ALLOW_CORS
 
@@ -83,25 +84,30 @@ def set_setting_path(path=None):
 def get_log_level():
     return JASS_LOG_LEVEL
 
+
 def get_nb_cores():
     if JASS_NB_CORES:
         return int(JASS_NB_CORES)
 
     return 1
 
+
 def get_scan_scroll_duration():
     SETT = get_settings()
     return SETT["ELASTIC_SEARCH"]["scan_scroll_duration"]
 
+
 def get_number_of_shards():
     return NUMBER_OF_SHARDS
+
 
 def get_number_of_replicas():
     return NUMBER_OF_REPLICAS
 
+
 def get_nb_documents_per_scan_scroll():
     return NB_DOCUMENTS_PER_SCAN_SCROLL
 
+
 def get_expose_swagger():
     return (JASS_EXPOSE_SWAGGER == "True")
-

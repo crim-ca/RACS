@@ -2,7 +2,7 @@
 
 class Interval:
 
-    def __init__(self,begin,end, openBegin=False,openEnd=False,isFullyInclusif=True):
+    def __init__(self, begin, end, openBegin=False, openEnd=False, isFullyInclusif=True):
         """
         Creates a new interval. Begin must be < end.
         Example:

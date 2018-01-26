@@ -1,6 +1,6 @@
 from ..security.base_authorization import BaseAuthorization
 from ..core.esutils import get_es_conn
-from ..core.settings_utils import get_scan_scroll_duration,get_nb_documents_per_scan_scroll
+from ..core.settings_utils import get_scan_scroll_duration, get_nb_documents_per_scan_scroll
 from elasticsearch import helpers
 from .http_post_file_storage import HttpPostFileStorage
 from .tmp_file_storage import TmpFileStorage
@@ -10,6 +10,7 @@ import logging
 import time
 
 NB_OF_DOCUMENTS_TO_ADD_BEFORE_LOGGING = 1000
+
 
 class DocumentCorpus:
     def __init__(self, envId: str, authorization: BaseAuthorization, corpusId: str):
@@ -23,7 +24,7 @@ class DocumentCorpus:
         self.corpusId = corpusId
         self.tmpFileStorage = None
 
-    def get_documents_zip(self,zipFileName: str = None):
+    def get_documents_zip(self, zipFileName: str = None):
         """
         Creates a zip of all documents of the corpus and returns the path to them.
 
@@ -38,23 +39,23 @@ class DocumentCorpus:
         corpus = get_master_document_corpus_list(self.envId, self.authorization).get_corpus(self.corpusId)
         search = Search(using=es, index=corpus.dd.get_indices(corpus.languages))
         search = search.source(["text"])
-        search = search.params(scroll=get_scan_scroll_duration(),size=get_nb_documents_per_scan_scroll())
+        search = search.params(scroll=get_scan_scroll_duration(), size=get_nb_documents_per_scan_scroll())
 
         start = time.time()
         count = 0
         logger.info("Adding documents to zip: {0}".format(self.corpusId))
         for result in search.scan():
             self.tmpFileStorage.add_utf8_file(result.text, str(result.meta.id) + ".txt")
-            count +=1
+            count += 1
             if count % NB_OF_DOCUMENTS_TO_ADD_BEFORE_LOGGING == 0:
                 end = time.time()
                 logger.info("Time to add documents {0} to {1} : {2} seconds"
-                            .format(count - NB_OF_DOCUMENTS_TO_ADD_BEFORE_LOGGING,count,end-start))
+                            .format(count - NB_OF_DOCUMENTS_TO_ADD_BEFORE_LOGGING, count, end - start))
                 start = end
 
         end = time.time()
         logger.info("Time to add documents {0} to {1} : {2} seconds"
-                    .format(count - count % NB_OF_DOCUMENTS_TO_ADD_BEFORE_LOGGING,count,end-start))
+                    .format(count - count % NB_OF_DOCUMENTS_TO_ADD_BEFORE_LOGGING, count, end - start))
         self.tmpFileStorage.close()
 
         return self.tmpFileStorage.zipPath
@@ -63,8 +64,8 @@ class DocumentCorpus:
         if self.tmpFileStorage:
             self.tmpFileStorage.clear()
 
-    def upload_documents(self, url: str = None, zipFileName: str = None,isSendPut = False
-                         ,isMultipart: bool = True,multipartFieldName: str = "file"):
+    def upload_documents(self, url: str = None, zipFileName: str = None, isSendPut=False
+                         , isMultipart: bool = True, multipartFieldName: str = "file"):
         """
         Uploads all document for the current corpus
         :param url: Url to which to upload files
@@ -80,7 +81,7 @@ class DocumentCorpus:
         corpus = get_master_document_corpus_list(self.envId, self.authorization).get_corpus(self.corpusId)
         search = Search(using=es, index=corpus.dd.get_indices(corpus.languages))
         search = search.source(["text"])
-        search = search.params(scroll=get_scan_scroll_duration(),size=get_nb_documents_per_scan_scroll())
+        search = search.params(scroll=get_scan_scroll_duration(), size=get_nb_documents_per_scan_scroll())
 
         start = time.time()
         count = 0
@@ -98,4 +99,4 @@ class DocumentCorpus:
         logger.info("Time to add documents {0} to {1} : {2} seconds"
                     .format(count - count % NB_OF_DOCUMENTS_TO_ADD_BEFORE_LOGGING, count, end - start))
 
-        fileStorage.flush(True,isSendPut, isMultipart, multipartFieldName)
+        fileStorage.flush(True, isSendPut, isMultipart, multipartFieldName)

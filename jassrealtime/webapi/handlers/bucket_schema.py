@@ -17,7 +17,7 @@ from jassrealtime.document.bucket import BucketNotFoundException
 
 
 class BucketSchemaDeleteHandler(BaseHandler):
-    def delete(self, corpusId, bucketId,schemaType):
+    def delete(self, corpusId, bucketId, schemaType):
         try:
             envId = get_env_id()
             authorization = get_autorisation(envId, None, None)
@@ -43,8 +43,9 @@ class BucketSchemaDeleteHandler(BaseHandler):
             self.write_and_set_status({MESSAGE: "Internal server error", TRACE: trace},
                                       HTTPStatus.INTERNAL_SERVER_ERROR)
 
-    def options(self, corpusId, bucketId,schemaType):
+    def options(self, corpusId, bucketId, schemaType):
         self.write_and_set_status(None, HTTPStatus.OK)
+
 
 class BucketSchemaHandler(BaseHandler):
     def post(self, corpusId, bucketId):
@@ -126,7 +127,8 @@ class BucketSchemaHandler(BaseHandler):
             schemaTypes = [schema['schemaType'] for schema in schemas['data']]
             if schemaType not in schemaTypes:
                 self.write_and_set_status(
-                    {MESSAGE: "There is no schema with the schemaType '{0}' currently bound to the bucket.".format(schemaType)},
+                    {MESSAGE: "There is no schema with the schemaType '{0}' currently bound to the bucket.".format(
+                        schemaType)},
                     HTTPStatus.NOT_FOUND)
                 return
 

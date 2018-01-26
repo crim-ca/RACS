@@ -24,7 +24,7 @@ class MyTestCase(unittest.TestCase):
                 envList1.create_env(envIdReadOnly)
                 MyTestCase.populateData()
             except EnvAlreadyExistWithSameIdException:
-                #pass
+                # pass
                 # Read only so we dont need to change it if it exists.
                 # If search environement exists we do dothing
                 envList1.delete_env(envIdReadOnly)
@@ -525,7 +525,7 @@ class MyTestCase(unittest.TestCase):
 
         corpus = get_master_document_corpus_list(self.envId, self.authorization).create_corpus("corpusx")
         corpus.add_text_document("Another doc with auto id", "do1", "english")
-        bucket1 = corpus.create_bucket("bucket1","bucket1")
+        bucket1 = corpus.create_bucket("bucket1", "bucket1")
         schemaId1 = get_schema_list(self.envId, self.authorization).add_json_schema_as_hash(jsonSchema1, False, {})
         time.sleep(1)
         bucket1.add_or_update_schema_to_bucket(schemaId1, "schema1", TargetType("document_surface1d"), {})

@@ -5,7 +5,7 @@ from http import HTTPStatus
 from jassrealtime.webapi.handlers.base_handler import BaseHandler
 
 from jassrealtime.core.master_factory_list import get_master_document_corpus_list
-from jassrealtime.document.bucket import BucketAlreadyExistsException,BucketNotFoundException
+from jassrealtime.document.bucket import BucketAlreadyExistsException, BucketNotFoundException
 from jassrealtime.security.security_selector import get_autorisation
 from jassrealtime.webapi.handlers.parameter_names import *
 from jassrealtime.core.settings_utils import get_env_id
@@ -28,12 +28,14 @@ class BucketHandler(BaseHandler):
                 bucketName = body["name"]
 
             if bucketId and not valid_es_id(bucketId):
-                self.write_and_set_status({MESSAGE: "Bucket id invalid '{0}' . BucketId can only be lowercase,alphanumeric with -_".format(bucketId)},
+                self.write_and_set_status({
+                                              MESSAGE: "Bucket id invalid '{0}' . BucketId can only be lowercase,alphanumeric with -_".format(
+                                                  bucketId)},
                                           HTTPStatus.UNPROCESSABLE_ENTITY)
                 return
 
-            bucket = get_master_document_corpus_list(envId,authorization).\
-                get_corpus(corpusId).create_bucket(bucketName,bucketId)
+            bucket = get_master_document_corpus_list(envId, authorization). \
+                get_corpus(corpusId).create_bucket(bucketName, bucketId)
             self.write_and_set_status({"id": bucket.id},
                                       HTTPStatus.OK)
         except BucketAlreadyExistsException:
@@ -52,7 +54,7 @@ class BucketHandler(BaseHandler):
 
 
 class BucketFolderHandler(BaseHandler):
-    def delete(self, corpusId,bucketId):
+    def delete(self, corpusId, bucketId):
         try:
             envId = get_env_id()
             authorization = get_autorisation(envId, None, None)
@@ -70,7 +72,5 @@ class BucketFolderHandler(BaseHandler):
             self.write_and_set_status({MESSAGE: "Internal server error", TRACE: trace},
                                       HTTPStatus.INTERNAL_SERVER_ERROR)
 
-    def options(self, corpusId,bucketId):
+    def options(self, corpusId, bucketId):
         self.write_and_set_status(None, HTTPStatus.OK)
-
-

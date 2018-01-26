@@ -201,7 +201,6 @@ class BaseAuthorization:
 
     ##### Bucket
 
-
     def can_create_bucket(self, corpusId):
         """
         Throws an exception if user is not allowed to create a bucket for a given corpus

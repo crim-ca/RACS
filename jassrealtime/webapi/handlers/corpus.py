@@ -50,7 +50,9 @@ class CorporaHandler(BaseHandler):
             corpusId = json_args.get(CORPUS_ID, None)
 
             if corpusId and not valid_es_id(corpusId):
-                self.write_and_set_status({MESSAGE: "Corpus id invalid '{0}' . CorpusId can only be lowercase,alphanumeric with -_".format(corpusId)},
+                self.write_and_set_status({
+                                              MESSAGE: "Corpus id invalid '{0}' . CorpusId can only be lowercase,alphanumeric with -_".format(
+                                                  corpusId)},
                                           HTTPStatus.UNPROCESSABLE_ENTITY)
                 return
 

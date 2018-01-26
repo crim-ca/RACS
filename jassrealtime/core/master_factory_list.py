@@ -77,7 +77,7 @@ def get_schema_list(envId: str, authorization: BaseAuthorization):
 
     from jassrealtime.core.schema_list import SchemaList
     sett = get_settings()
-    return SchemaList(envId, sett['CLASSES']['SCHEMA_LIST'], authorization,get_language_manager())
+    return SchemaList(envId, sett['CLASSES']['SCHEMA_LIST'], authorization, get_language_manager())
 
 
 def create_all_lists_for_env(envId: str, authorization: BaseAuthorization):
@@ -97,7 +97,7 @@ def create_all_lists_for_env(envId: str, authorization: BaseAuthorization):
     sett = get_settings()
     DocumentDirectoryList.create(envId, sett['CLASSES']['DOCUMENT_DIRECTORY'], authorization)
     sleep(1)
-    SchemaList.create(envId, sett['CLASSES']['SCHEMA_LIST'], authorization,get_language_manager())
+    SchemaList.create(envId, sett['CLASSES']['SCHEMA_LIST'], authorization, get_language_manager())
     sleep(1)
     DocumentCorpusList.create(envId, sett['CLASSES']['DOCUMENT_CORPUS'], authorization)
     sleep(1)

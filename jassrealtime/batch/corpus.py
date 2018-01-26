@@ -50,11 +50,10 @@ class Corpus:
 
         # creates a zip file
         fileStorage = HttpPostFileStorage(url, zipFileName)
-        self._create_annotations_zip(fileStorage,bucketIds,schemaTypes)
+        self._create_annotations_zip(fileStorage, bucketIds, schemaTypes)
         fileStorage.flush(True, isSendPut, isMultipart, multipartFieldName)
 
-
-    def create_tmp_annotations_zip(self,bucketIds: List[str] = [], schemaTypes: List[str] = None,
+    def create_tmp_annotations_zip(self, bucketIds: List[str] = [], schemaTypes: List[str] = None,
                                    zipFileName: str = None):
         """
         Creates a zip file containing specified annotations by bucketIds/schemaTypes.
@@ -72,7 +71,7 @@ class Corpus:
         if self.tmpFileStorage:
             self.tmpFileStorage.clear()
 
-    def _create_annotations_zip(self,fileStorage ,bucketIds: List[str] = [], schemaTypes: List[str] = None):
+    def _create_annotations_zip(self, fileStorage, bucketIds: List[str] = [], schemaTypes: List[str] = None):
         fileStorage.create_zip_file()
         es = get_es_conn()
 
@@ -296,7 +295,7 @@ class Corpus:
                     break
 
         if errorsToReturn:
-            return {"data": errorsToReturn , "totalErrorsCount" : len(errorAnnotations)}
+            return {"data": errorsToReturn, "totalErrorsCount": len(errorAnnotations)}
         else:
             return None
 

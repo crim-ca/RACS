@@ -59,8 +59,8 @@ class MyTestCase(unittest.TestCase):
         es = get_es_conn()
         dd = self.masterList.create_document_directory("docs")
         body = {"name": "anton", "age": 666}
-        dd._create_data_index_if_not_exist("person",False)
-        self.assertRaises(DocumentDoesNotRespectSchemaException, dd.add_document,body, "_9XVI-_Ac","person")
+        dd._create_data_index_if_not_exist("person", False)
+        self.assertRaises(DocumentDoesNotRespectSchemaException, dd.add_document, body, "_9XVI-_Ac", "person")
 
     def test_create_document_no_id(self):
         es = get_es_conn()
@@ -70,9 +70,9 @@ class MyTestCase(unittest.TestCase):
 
     def test_create_document_no_default_type(self):
         es = get_es_conn()
-        dd = self.masterList.create_document_directory("docs",None,False)
+        dd = self.masterList.create_document_directory("docs", None, False)
         body = {"name": "anton", "age": 666}
-        dd.add_document(body,None)
+        dd.add_document(body, None)
 
     def test_document_not_found_exception(self):
         es = get_es_conn()
@@ -173,20 +173,19 @@ class MyTestCase(unittest.TestCase):
                 }
             }
         }
-        for i in range(0,100):
+        for i in range(0, 100):
             dd.add_document({"name": "Anton", "age": i}, i, "person", propertiesMyTermMapping)
 
         for i in range(0, 50):
-            dd.add_document({"name": "JF", "age": i}, i+100, "person", propertiesMyTermMapping)
+            dd.add_document({"name": "JF", "age": i}, i + 100, "person", propertiesMyTermMapping)
 
         time.sleep(2)
-        allJFs = dd.small_search(docTypes=['person'],matchFields={"name": "JF"},useScan=False)
+        allJFs = dd.small_search(docTypes=['person'], matchFields={"name": "JF"}, useScan=False)
         self.assertEqual(len(allJFs), 50)
 
         # testing with scan
         allJFs = dd.small_search(docTypes=['person'], matchFields={"name": "JF"}, useScan=True)
         self.assertEqual(len(allJFs), 50)
-
 
     def test_small_search_terms(self):
         es = get_es_conn()
@@ -247,7 +246,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_small_search_terms_no_default_schema(self):
         es = get_es_conn()
-        dd = self.masterList.create_document_directory("docs",None,False)
+        dd = self.masterList.create_document_directory("docs", None, False)
         propertiesMyTermMapping = {
             "properties": {
                 "myterm": {
@@ -336,11 +335,10 @@ class MyTestCase(unittest.TestCase):
         dd.delete_doc_type("animal")
         time.sleep(1)
 
-        self.assertFalse("animal" in dd.get_indices_per_doc_type(),"Indexes found for the deleted animal index")
+        self.assertFalse("animal" in dd.get_indices_per_doc_type(), "Indexes found for the deleted animal index")
 
         self.assertFalse(dd.document_exist(1, "animal"), "Animal found but animal index is supposed to be deleted")
         self.assertTrue(dd.document_exist(1, "person"), "Person not found, but person index is suppsed to exist")
-
 
     def test_empty_doc_type(self):
         es = get_es_conn()
@@ -372,8 +370,6 @@ class MyTestCase(unittest.TestCase):
 
         self.assertTrue(dd.document_exist(2, "animal"), "Animal was supposed to be added")
         self.assertTrue(dd.document_exist(1, "person"), "Person not found, but person index is suppsed to exist")
-
-
 
     def tearDown(self):
         es = get_es_conn()

@@ -99,6 +99,138 @@ TEST_JSON_SCHEMA_STR = """
     """
 TEST_ES_PROPERTIES = '{"properties": {"end": {"type": "string"}, "_bucketID": {"type": "string"}, "@type": {"type": "string"}, "begin": {"type": "string"}, "poseType": {"type": "double"}, "_schemaType": {"type": "string"}, "@context": {"type": "string"}, "faceId": {"type": "string", "analyzer": "french"}, "confidence": {"type": "double", "index": "no"}}}'
 
+JSON_SCHEMA_WITH_STRING_ARRAY = """
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "targetType": "document_surface1d",
+  "schemaType": "TSD",
+  "title": "TSD",
+  "type": "object",
+  "required": [
+    "schemaType",
+    "_corpusID",
+    "_documentID",
+    "offsets",
+    "text",
+    "conceptID",
+    "domainNames"
+  ],
+  "properties": {
+    "schemaType": {
+      "type": "string",
+      "description": "Constant: 'TSD' ",
+      "searchable": true,
+      "searchModes": [
+        "noop"
+      ],
+      "default": "TSD",
+      "locked": true
+    },
+    "_documentID": {
+      "type": "string",
+      "description": "Internal document GUID",
+      "searchable": true,
+      "searchModes": [
+        "noop"
+      ],
+      "locked": true
+    },
+    "_corpusID": {
+      "type": "string",
+      "description": "Internal Corpus GUID",
+      "searchable": true,
+      "searchModes": [
+        "noop"
+      ],
+      "locked": true
+    },
+    "offsets": {
+      "type": "array",
+      "searchable": true,
+      "searchModes": [
+        "noop"
+      ],
+      "locked": true,
+      "description": "Position of the token within the target document",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "begin": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "end": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "text": {
+      "type": "string",
+      "description": "Targeted text",
+      "searchable": true,
+      "searchModes": ["basic"],
+      "locked": false
+    },
+    "domainNames": {
+      "type": "array",
+      "searchable": true,
+      "searchModes": ["basic"],
+      "locked": true,
+      "description": "Domain Names associated with the term",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "conceptID": {
+      "type": "string",
+      "description": "ID of the concept associated with the term",
+      "searchable": true,
+      "searchModes": ["noop"],
+      "locked": true
+    },
+    "conceptDescription": {
+      "type": "string",
+      "description": "Description of the concept associated with the term",
+      "searchable": true,
+      "searchModes": ["basic"],
+      "locked": true
+    },
+    "gender": {
+      "type": "string",
+      "description": "Gender of the term",
+      "searchable": true,
+      "searchModes": ["noop"],
+      "locked": true
+    },
+    "number": {
+      "type": "string",
+      "description": "Number of the term",
+      "searchable": true,
+      "searchModes": ["noop"],
+      "locked": true
+    },
+    "category": {
+      "type": "string",
+      "description": "Part of speech of the term",
+      "searchable": true,
+      "searchModes": ["noop"],
+      "locked": true
+    },
+    "score": {
+      "type": "number",
+      "description": "Score associated with the concept",
+      "searchable": true,
+      "searchModes": ["noop"],
+      "locked": true
+    }
+  }
+}"""
+
 
 class MyTestCase(unittest.TestCase):
     def setUp(self):
@@ -108,7 +240,8 @@ class MyTestCase(unittest.TestCase):
             self.authorization = BaseAuthorization(self.envId, None, None, None)
             self.masterList = DocumentDirectoryList.create(self.envId, setting['CLASSES']['DOCUMENT_DIRECTORY'],
                                                            self.authorization)
-            self.schemaList = SchemaList.create(self.envId, setting['CLASSES']['SCHEMA_LIST'], self.authorization,get_language_manager())
+            self.schemaList = SchemaList.create(self.envId, setting['CLASSES']['SCHEMA_LIST'], self.authorization,
+                                                get_language_manager())
 
         finally:
             pass
@@ -124,9 +257,7 @@ class MyTestCase(unittest.TestCase):
         esHash2 = self.schemaList.add_es_schema(esProperties)
         self.assertEqual(esHash1, esHash2)
 
-
     def test_add_json_schema(self):
-        authorization = BaseAuthorization.create_authorization(self.envId, None, None)
         jsonSchema = json.loads(TEST_JSON_SCHEMA_STR)
         id = self.schemaList.add_json_schema(jsonSchema)
         time.sleep(1)
@@ -138,6 +269,14 @@ class MyTestCase(unittest.TestCase):
         schemasInfo = self.schemaList.get_json_schemas_infos()
         self.assertEqual(2, len(schemasInfo))
 
+    def test_add_json_schema_string_array(self):
+        jsonSchema = json.loads(JSON_SCHEMA_WITH_STRING_ARRAY)
+        self.schemaList.add_json_schema(jsonSchema, nestedFields=["offsets"])
+        time.sleep(1)
+        schemasInfo = self.schemaList.get_json_schemas_infos()
+        self.assertEqual(1, len(schemasInfo))
+        # adding a name
+
     def test_add_json_schema_as_hash(self):
         authorization = BaseAuthorization.create_authorization(self.envId, None, None)
         jsonSchema = json.loads(TEST_JSON_SCHEMA_STR)
@@ -146,7 +285,7 @@ class MyTestCase(unittest.TestCase):
         # adding a name
         id2 = self.schemaList.add_json_schema_as_hash(jsonSchema)
         time.sleep(1)
-        self.assertEqual(id1,id2)
+        self.assertEqual(id1, id2)
         # should only have 1 schema
         schemasInfo = self.schemaList.get_json_schemas_infos()
         self.assertEqual(1, len(schemasInfo))
@@ -204,7 +343,7 @@ class MyTestCase(unittest.TestCase):
         """
         authorization = BaseAuthorization.create_authorization(self.envId, None, None)
         jsonSchema = json.loads(TEST_JSON_SCHEMA_STR)
-        id1 = self.schemaList.add_json_schema_as_hash(jsonSchema,False,["offsets"])
+        id1 = self.schemaList.add_json_schema_as_hash(jsonSchema, False, ["offsets"])
 
     def test_get_json_schemas(self):
         authorization = BaseAuthorization.create_authorization(self.envId, None, None)
@@ -291,14 +430,14 @@ class MyTestCase(unittest.TestCase):
         esHash1 = self.schemaList.get_json_schemas_infos("Schema1")[0]["esHash"]
         esHash2 = self.schemaList.get_json_schemas_infos("Schema2")[0]["esHash"]
         esHash3 = self.schemaList.get_json_schema_info(id3)["esHash"]
-        esHash1Prop =self.schemaList.get_es_properties(esHash1)
+        esHash1Prop = self.schemaList.get_es_properties(esHash1)
         esHash2Prop = self.schemaList.get_es_properties(esHash2)
         esHash3Prop = self.schemaList.get_es_properties(esHash3)
 
-        self.assertTrue(SchemaList.can_migrate(esHash1Prop,esHash2Prop))
-        self.assertFalse(SchemaList.can_migrate(esHash1Prop,esHash3Prop))
+        self.assertTrue(SchemaList.can_migrate(esHash1Prop, esHash2Prop))
+        self.assertFalse(SchemaList.can_migrate(esHash1Prop, esHash3Prop))
         self.assertRaises(EsSchemaMigrationDeleteFieldsNotSupportedException,
-                          SchemaList.can_migrate,esHash2Prop, esHash1Prop)
+                          SchemaList.can_migrate, esHash2Prop, esHash1Prop)
 
     def test_hash_es_properties(self):
         # Theoretically sorted. Good for debugging

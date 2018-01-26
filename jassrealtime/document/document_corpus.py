@@ -11,7 +11,7 @@ from ..core.master_factory_list import get_master_document_directory_list, \
     get_master_document_sub_corpus_list, get_master_bucket_list
 
 from ..core.esutils import ES_DATE_FORMAT, convert_datetime_to_es, convert_es_date_to_datetime
-from ..core.settings_utils import get_language_manager,get_scan_scroll_duration, \
+from ..core.settings_utils import get_language_manager, get_scan_scroll_duration, \
     get_nb_documents_per_scan_scroll
 
 from functools import reduce
@@ -131,7 +131,7 @@ class DocumentCorpusList:
         :return:
         """
 
-        corpusIds = self.dd.small_search(returnFields=[],useScan=False)
+        corpusIds = self.dd.small_search(returnFields=[], useScan=False)
         # delete all corpuses
         for metadata in corpusIds:
             self.delete_corpus(metadata["id"])
@@ -423,7 +423,7 @@ class DocumentCorpus():
         return totalDocumentCount
 
     def get_text_document(self, documentId):
-        rawDoc = self.dd.small_search(docTypes=self.languages, filterTerms={"_id": documentId},useScan=False)
+        rawDoc = self.dd.small_search(docTypes=self.languages, filterTerms={"_id": documentId}, useScan=False)
         if not rawDoc:
             raise DocumentNotFoundException(documentId)
 
@@ -461,7 +461,7 @@ class DocumentCorpus():
         es = get_es_conn()
         search = Search(using=es, index=self.dd.get_indices(self.languages))
         search = search.source(["_id"])
-        search = search.params(scroll=get_scan_scroll_duration(),size=get_nb_documents_per_scan_scroll())
+        search = search.params(scroll=get_scan_scroll_duration(), size=get_nb_documents_per_scan_scroll())
         #  Only 10 hits if don't use scan.
         documentIds = [hit.meta.id for hit in search.scan()]
 
@@ -546,7 +546,6 @@ class DocumentCorpus():
         # TODO validate
 
     # Buckets
-
 
     def create_bucket(self, name: str, bucketId: str = None) -> Bucket:
         """

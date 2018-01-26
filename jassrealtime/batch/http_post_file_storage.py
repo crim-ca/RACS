@@ -12,6 +12,7 @@ from .tmp_file_storage import TmpFileStorage
 class UploadUrlFailException(Exception):
     pass
 
+
 class HttpPostFileStorage(TmpFileStorage):
     """
     This class sends creates a zip and sends it via post to a target url.
@@ -28,7 +29,8 @@ class HttpPostFileStorage(TmpFileStorage):
         super().__init__(zipFileName)
         self.postUrl = postUrl
 
-    def flush(self, removeEmpty: bool = True,isSendPut = False ,isMultipart: bool = True, multipartFieldName: str = "file"):
+    def flush(self, removeEmpty: bool = True, isSendPut=False, isMultipart: bool = True,
+              multipartFieldName: str = "file"):
         """
         Sends zip to the real storage and deletes it locally.
         :param removeEmpty: If true and zip is empty, delete zip without sending
@@ -49,7 +51,7 @@ class HttpPostFileStorage(TmpFileStorage):
                     resp = requests.post(self.postUrl,
                                          files={multipartFieldName: (self.zipFileName, f)})
                 else:
-                    if(isSendPut):
+                    if (isSendPut):
                         resp = requests.put(self.postUrl, data=f, headers={'Content-Type': 'application/octet-stream'})
                     else:
                         resp = requests.post(self.postUrl, data=f, headers={'Content-Type': 'application/octet-stream'})

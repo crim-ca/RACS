@@ -10,14 +10,15 @@ from urllib3.exceptions import NewConnectionError
 import time
 
 from elasticsearch import Elasticsearch
-from .settings_utils import get_settings,get_scan_scroll_duration,get_nb_documents_per_scan_scroll
+from .settings_utils import get_settings, get_scan_scroll_duration, get_nb_documents_per_scan_scroll
 
 _ES_CONN = None
 ES_DATE_FORMAT = "yyy-MM-dd HH:mm:ss"
 ES_TO_DATETIME_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 SLEEP_TIME_BEFORE_RECONNECT = 3  # sleep time in seconts
 NB_OF_RECONNECTS = 50
-MAX_SMALL_SEARCH_NO_SCAN_RESULTS = 10000    # Search can return at most 10000 results. Default ES configration
+MAX_SMALL_SEARCH_NO_SCAN_RESULTS = 10000  # Search can return at most 10000 results. Default ES configration
+
 
 class ESWaitTooLongForReadyState(Exception):
     pass
@@ -186,7 +187,7 @@ def term_query(value):
 
 
 def multi_indexes_small_search(indices: str, matchFields: dict = {}, termFields: dict = {},
-                               returnFields: List = None, filterMatch: dict = {}, filterTerms: dict = {},useScan = True):
+                               returnFields: List = None, filterMatch: dict = {}, filterTerms: dict = {}, useScan=True):
     """
     Search used to retrieve a reasonable amount of documents (All docs stored in memory, no streaming).)
 
@@ -210,6 +211,7 @@ def multi_indexes_small_search(indices: str, matchFields: dict = {}, termFields:
 
     s = get_multi_indexes_small_search_query(indices, matchFields, termFields, returnFields, filterMatch, filterTerms)
     resultingDocs = []
+
     def create_doc(res):
         # Convert result to dictionary
         doc = {}
@@ -219,11 +221,11 @@ def multi_indexes_small_search(indices: str, matchFields: dict = {}, termFields:
         return doc
 
     if useScan:
-        s = s.params(scroll=get_scan_scroll_duration(),size=get_nb_documents_per_scan_scroll())
+        s = s.params(scroll=get_scan_scroll_duration(), size=get_nb_documents_per_scan_scroll())
         for res in s.scan():
             resultingDocs.append(create_doc(res))
     else:
-        for res in s[0:(MAX_SMALL_SEARCH_NO_SCAN_RESULTS -1)]:
+        for res in s[0:(MAX_SMALL_SEARCH_NO_SCAN_RESULTS - 1)]:
             resultingDocs.append(create_doc(res))
 
     return resultingDocs
