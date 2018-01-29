@@ -231,6 +231,92 @@ JSON_SCHEMA_WITH_STRING_ARRAY = """
   }
 }"""
 
+JSON_SCHEMA_WITH_SCHEMA_TYPE_BASIC = """
+{
+  "targetType": "document_surface1d",
+  "title": "Definition of an English chunk - TreeTagger tagset",
+  "properties": {
+    "string": {
+      "searchable": true,
+      "searchModes": [
+        "basic"
+      ],
+      "type": "string",
+      "description": "Chunk string (as-is, extracted from the document using the `offsets` attribute)",
+      "locked": true
+    },
+    "_corpusID": {
+      "searchable": true,
+      "searchModes": [
+        "noop"
+      ],
+      "type": "string",
+      "description": "Internal Corpus GUID",
+      "locked": true
+    },
+    "_documentID": {
+      "searchable": true,
+      "searchModes": [
+        "noop"
+      ],
+      "type": "string",
+      "description": "Internal document GUID",
+      "locked": true
+    },
+    "length": {
+      "minimum": 0,
+      "searchable": false,
+      "type": "integer",
+      "description": "Length of the chunk. Should match the offset span",
+      "locked": true
+    },
+    "schemaType": {
+      "description": "Constant: 'CHUNK_en_adjc_en_advc_en_conjc_en_intj_en_lst_en_nc_en_pc_en_prt_en_vc_ap'",
+      "default": "CHUNK_en_adjc_en_advc_en_conjc_en_intj_en_lst_en_nc_en_pc_en_prt_en_vc_ap",
+      "searchable": true,
+      "type": "string",
+      "searchModes": [
+        "basic"
+      ],
+      "locked": true
+    },
+    "offsets": {
+      "minItems": 1,
+      "locked": true,
+      "description": "Position of the chunk within the target document",
+      "searchable": true,
+      "items": {
+        "type": "object",
+        "properties": {
+          "begin": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "end": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        }
+      },
+      "type": "array",
+      "searchModes": [
+        "noop"
+      ]
+    }
+  },
+  "required": [
+    "schemaType",
+    "_corpusID",
+    "_documentID",
+    "offsets",
+    "string",
+    "length",
+    "category"
+  ],
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "schemaType": "CHUNK_ap"
+}"""
 
 class MyTestCase(unittest.TestCase):
     def setUp(self):

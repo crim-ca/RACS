@@ -83,7 +83,9 @@ class DocumentSearch:
 
     def count_annotations_for_types(self, bucketId: str, schemaTypes: List[str]):
         """
-        Return the count of annotations for each schema types
+        Return the count of annotations for each schema types.
+
+        Assumption: there is only *one* index per schemaType in each bucket.
 
         :param bucketId:
         :param schemaTypes:
@@ -92,20 +94,14 @@ class DocumentSearch:
 
         es = get_es_conn()
 
-        bucketList = get_master_bucket_list(self.envId, self.authorization)
-        bucket = bucketList.get_bucket(self.corpusId, bucketId)
-        indices = bucket.dd.get_indices(docTypes=schemaTypes)
+        bucket_list = get_master_bucket_list(self.envId, self.authorization)
+        bucket = bucket_list.get_bucket(self.corpusId, bucketId)
 
-        if not indices:
-            return {}
-
-        search = Search(using=es, index=indices)
-        search.aggs.bucket('type_aggregation', 'terms', field='schemaType')
-
-        response = search.execute()
         counts = {}
-        for bucket in response.aggregations.type_aggregation.buckets:
-            counts[bucket.key] = bucket.doc_count
+        for schemaType in schemaTypes:
+            index = bucket.dd.get_indices(docTypes=[schemaType])
+            if index:
+                counts[schemaType] = es.count(index)["count"]
 
         return counts
 
