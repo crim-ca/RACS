@@ -5,6 +5,7 @@ from jassrealtime.core.master_factory_list import get_schema_list, get_env_list,
     get_master_document_corpus_list
 from jassrealtime.core.env import EnvAlreadyExistWithSameIdException
 from jassrealtime.search.document import *
+from jasstests.jassrealtime.core.test_schema_list import JSON_SCHEMA_WITH_SCHEMA_TYPE_BASIC
 
 envIdReadOnly = "unitsearch_"
 authorizationReadOnly = None
@@ -444,6 +445,84 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(len(sentences["corpus1"]["bucket1"]["sentence"]), 2)
         tokens = ds.get_annotations_for_one_type("bucket1", "token")
         self.assertEqual(len(tokens["corpus1"]["bucket1"]["token"]), 6)
+
+    def test_count_annotations_for_types(self):
+        global envIdReadOnly
+        global authorizationReadOnly
+        ds = DocumentSearch(envIdReadOnly, authorizationReadOnly, "doc1", "corpus1")
+        counts = ds.count_annotations_for_types("bucket1", ["sentence"])
+        self.assertEqual(counts["sentence"], 2)
+
+    def test_count_annotations_for_type_basic(self):
+        """
+            Test annotation count for schemaType indexed as basic instead of noop.
+            Note: Not sure it should be permitted at all to allow schemaType with main index different than noop.
+        """
+        global envIdReadOnly
+        global authorizationReadOnly
+        schema = json.loads(JSON_SCHEMA_WITH_SCHEMA_TYPE_BASIC)
+
+        corpus = get_master_document_corpus_list(envIdReadOnly, authorizationReadOnly).create_corpus()
+        bucket = corpus.create_bucket("bucket")
+        schema_id = get_schema_list(envIdReadOnly, authorizationReadOnly).add_json_schema_as_hash(schema, False,
+                                                                                                  nestedFields=[
+                                                                                                      "offsets"])
+        time.sleep(1)
+
+        schema_type = "CHUNK_ap"
+        bucket.add_or_update_schema_to_bucket(schema_id, schema_type, TargetType("document_surface1d"), {})
+        time.sleep(1)
+
+        annotations = [
+            {
+                "_documentID": "98ff06a6-02dd-11e8-b82a-0242ac12001f",
+                "_corpusID": "rqgbf20180126",
+                "length": 14,
+                "string": "contemporaines",
+                "schemaType": "CHUNK_ap",
+                "offsets": [
+                    {
+                        "end": 449,
+                        "begin": 435
+                    }
+                ],
+            },
+            {
+                "_documentID": "98ff06a6-02dd-11e8-b82a-0242ac12001f",
+                "_corpusID": "rqgbf20180126",
+                "length": 13,
+                "string": "plus anciens,",
+                "schemaType": "CHUNK_ap",
+                "offsets": [
+                    {
+                        "end": 593,
+                        "begin": 580
+                    }
+                ],
+            },
+            {
+                "_documentID": "98ff06a6-02dd-11e8-b82a-0242ac12001f",
+                "_corpusID": "rqgbf20180126",
+                "length": 9,
+                "string": "coloniale",
+                "schemaType": "CHUNK_ap",
+                "offsets": [
+                    {
+                        "end": 693,
+                        "begin": 684
+                    }
+                ],
+            }
+        ]
+
+        for annotation in annotations:
+            bucket.add_annotation(annotation, schema_type)
+
+        time.sleep(1)
+
+        ds = DocumentSearch(envIdReadOnly, authorizationReadOnly, "doc1", corpus.id)
+        counts = ds.count_annotations_for_types(bucket.id, [schema_type])
+        self.assertEqual(counts[schema_type], len(annotations))
 
     def test_get_annotations(self):
         global envIdReadOnly
