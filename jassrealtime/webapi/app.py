@@ -21,6 +21,7 @@ from jassrealtime.webapi.handlers.bucket import BucketHandler, BucketFolderHandl
 from jassrealtime.webapi.handlers.bucket_schema import BucketSchemaHandler, BucketSchemaDeleteHandler
 from jassrealtime.webapi.handlers.annotations import AnnotationHandler, AnnotationFolderHandler
 from jassrealtime.webapi.handlers.document import DocumentHandler, DocumentFolderHandler, DocumentIdsHandler
+from jassrealtime.webapi.handlers.search_documents_query_structure import SearchDocumentQueryStructureHandler
 from jassrealtime.webapi.handlers.structure import StructureHandler
 from jassrealtime.webapi.handlers.search import DocumentSearchHandler, DocumentFolderSearchHandler, \
     SingleTypeDocumentSearchHandler, DocumentMetadataSearchHandler
@@ -62,6 +63,9 @@ handlers = [
     (r"/annosearch/corpora/{0}".format(idsStruct), DocumentFolderSearchHandler),
     (r"/annosearch/corpora/{0}/bucket/{0}/schemaType/{0}".format(idsStruct), SingleTypeDocumentSearchHandler),
     (r"/annosearch/documents".format(idsStruct), DocumentMetadataSearchHandler),
+    (r"/search/documents/queryStructure", SearchDocumentQueryStructureHandler),
+    # (r"/search/documents/byText", SearchDocumentByTextHandler),
+    # (r"/search/documents/byAttribute", SearchDocumentByAttributeHandler),
     (r"/batch/corpora/{0}/documents".format(idsStruct), BatchDocumentsHandler),
     (r"/batch/corpora/{0}/annotations".format(idsStruct), BatchAnnotationsDownloadHandler),
     (r"/batch/corpora/{0}/bucket/{0}/annotations".format(idsStruct), BatchAnnotationsUploadHandler)

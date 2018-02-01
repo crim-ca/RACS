@@ -3,6 +3,10 @@
 History
 =======
 
+2.6.4
+---------------------
+* Return document list by text search on given corpus ids
+
 2.6.3
 ---------------------
 * Optimization annotation count for types

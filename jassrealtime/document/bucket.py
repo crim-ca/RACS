@@ -483,7 +483,7 @@ class Bucket:
 
         if shouldValidate:
             self.validate_annotation()
-            raise NotImplemented()
+            raise NotImplementedError()
             # TODO  verify that annotation respect schema
 
         return self.dd.add_document(jsonAnnotation, annotationId, docType)
@@ -512,7 +512,7 @@ class Bucket:
         self.authorization.can_update_annotation(self.corpusId, self.id)
 
         if shouldValidate:
-            raise NotImplemented()
+            raise NotImplementedError()
             # TODO  verify that annotation respect schema
 
         self.dd.update_document(jsonAnnotation, annotationId, docType)

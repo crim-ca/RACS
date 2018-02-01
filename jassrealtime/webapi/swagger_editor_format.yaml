@@ -3,7 +3,7 @@
 # Code completion support is available so start typing for available options.
 swagger: '2.0'
 info:
-  version: "2.6.3"
+  version: "2.6.4"
   title: RACS
   description: Annotation Storage
 

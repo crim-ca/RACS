@@ -10,7 +10,7 @@ def add_offset_to_query(esSearchData: dict, offsets: List[Interval]):
     :param offsets:       Offsets to search. Currently supports only 1 offset.
     """
     if len(offsets) > 1:
-        raise NotImplemented()
+        raise NotImplementedError()
     firstOffset = offsets[0]
     begin = firstOffset.begin
     if (firstOffset.openBegin):
@@ -21,7 +21,7 @@ def add_offset_to_query(esSearchData: dict, offsets: List[Interval]):
         end = end - 1
 
     if firstOffset.isFullyInclusif:
-        raise NotImplemented()
+        raise NotImplementedError()
     else:
         nestedQuery = {}
         nestedQuery["nested"] = {}
