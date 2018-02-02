@@ -18,11 +18,11 @@ def get_metadata_for_documents(corpusIds, schemaType, fromIndex, size, sortBy, s
 
     # Sort by score if no sort field specified
     if sortBy:
-        actualSort = make_sort_field(sortBy, sortOrder)
+        actual_sort = make_sort_field(sortBy, sortOrder)
     else:
-        actualSort = "_score"
+        actual_sort = "_score"
 
-    search = search.sort(actualSort)
+    search = search.sort(actual_sort)
 
     # Need to restrict the search annotations to the given schema type.
     # The alternative is doing a first search to retrieve only the indices of the given schema type.

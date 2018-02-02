@@ -60,6 +60,8 @@ class SearchDocumentQueryStructureHandler(BaseHandler):
             targets = parse_targets(targets_argument)
             grouped_targets = group_targets(targets)
 
+            gnannnnn!!!
+
             self.write_and_set_status({"structure": grouped_targets}, HTTPStatus.OK)
         except Exception:
             trace = traceback.format_exc().splitlines()
