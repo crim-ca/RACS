@@ -11,6 +11,11 @@ class TestTargets(TestCase):
         actual = parse_targets(targets_string)
         self.assertListEqual(actual, expected)
 
+    def test_parse_invalid_target_raise_error(self):
+        targets_string = "a:b:c"
+        with self.assertRaises(ValueError):
+            parse_targets(targets_string)
+
     def test_group_targets(self):
         targets = [('corpus_bucket', None), ('c4', None), ('c1', 'b1'), ('c1', 'b2'), ('c3', None), ('c4', 'b1'),
                    ('c1', None)]
