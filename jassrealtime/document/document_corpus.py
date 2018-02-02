@@ -27,7 +27,8 @@ class CorpusAlreadyExistsException(DocumentCorpusException):
 
 
 class CorpusNotFoundException(DocumentCorpusException):
-    pass
+    def __init__(self, corpus_id):
+        self.corpus_id = corpus_id
 
 
 class CorpusInvalidFieldException(DocumentCorpusException):
@@ -259,7 +260,7 @@ class DocumentCorpusList:
             # todo add metadata
             return DocumentCorpus(self.envId, dd, id, self.authorization, languages, modificationDate)
         except DocumentNotFoundException:
-            raise CorpusNotFoundException()
+            raise CorpusNotFoundException(id)
 
     def delete_corpus(self, id: str):
         """

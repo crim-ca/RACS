@@ -3,8 +3,9 @@ from typing import List
 
 from jassrealtime.core.esutils import get_es_conn
 from jassrealtime.core.settings_utils import get_settings, get_env_id
-from jassrealtime.document.document_corpus import make_sort_field, make_es_filters
+from jassrealtime.document.document_corpus import make_sort_field, make_es_filters, get_master_document_corpus_list
 from jassrealtime.search.document import map_search_hit
+from jassrealtime.security.security_selector import get_autorisation
 
 
 def get_metadata_for_documents(corpusIds, schemaType, fromIndex, size, sortBy, sortOrder, filters,
@@ -61,3 +62,26 @@ def partial_corpora_indices(corpus_ids: List[str]) -> str:
         indices.append(index_prefix + corpus_id + index_suffix)
     joined_indices = ','.join(indices)
     return joined_indices
+
+
+def corpus_languages(corpus):
+    return corpus.languages
+
+
+def query_structure(grouped_targets: dict) -> list:
+    structure = []
+
+    for corpusId, buckets in grouped_targets.items():
+        corpus = corpus_from_id(corpusId)
+        group_structure = {"id": corpusId, "languages": corpus_languages(corpus)}
+                           # "properties": bucket_properties(corpus, buckets)}
+        structure.append(group_structure)
+
+    return structure
+
+
+def corpus_from_id(corpus_id):
+    env_id = get_env_id()
+    authorization = get_autorisation(env_id, None, None)
+    corpora = get_master_document_corpus_list(env_id, authorization)
+    return corpora.get_corpus(corpus_id)
