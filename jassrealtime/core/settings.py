@@ -104,11 +104,12 @@ _SETTINGS = {
     'LANGUAGE': {
         # This dictionary maps language used by user to a correct elastic search analyser.
         'LANGUAGE_TO_ES_CONVERSION': {
-            'en_*': "english",
-            'fr_*': "french",
+            'en': "english",
+            'fr': "french",
+            'en-*': "english",
+            'fr-*': "french",
             "english": "english",
             "french": "french",
         }
     }
-
 }

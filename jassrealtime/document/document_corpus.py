@@ -174,6 +174,8 @@ class DocumentCorpusList:
             if not languageManager.has_es_analyser(language):
                 raise CorpusInvalidFieldException("Invalid language {0}".format(language))
 
+        # Use es analyser name instead of french, fr_ca, fr_f, etc to have a consistent index name
+
         corpus = {LANGUAGES_FIELD: languages, MODIFICATION_DATE_FIELD: self.generate_modification_date()}
 
         utcDateTime = convert_es_date_to_datetime(corpus[MODIFICATION_DATE_FIELD])
@@ -213,9 +215,6 @@ class DocumentCorpusList:
         corpus[MODIFICATION_DATE_FIELD] = self.generate_modification_date()
 
         self.dd.update_document(corpus, id)
-
-        for language in languages:
-            docCorpus.add_language(language)
 
     def generate_modification_date(self):
         return convert_datetime_to_es(datetime.utcnow())
@@ -370,7 +369,8 @@ class DocumentCorpus():
             raises LanguageNotSupported if not specified analyser associated with the language.
 
             Note: we use the resulting es analyser name instead of french, fr_ca, fr_f, etc to have a consistent
-            index name :param language: :return:
+            index name
+            :param language: :return:
         """
         languageManager = get_language_manager()
         if language not in self.languages:
@@ -417,13 +417,13 @@ class DocumentCorpus():
         return document
 
     def get_documents_count(self):
-        indices = self.dd.get_indices(self.languages).split(",")
+        indices_per_doc_type = self.dd.get_indices_per_doc_type()
         es = get_es_conn()
-        totalDocumentCount = 0
-        for index in indices:
-            escount = es.count(index)
-            totalDocumentCount = totalDocumentCount + escount["count"]
-        return totalDocumentCount
+        total_document_count = 0
+        for _, index in indices_per_doc_type.items():
+            index_count = es.count(index)
+            total_document_count = total_document_count + index_count["count"]
+        return total_document_count
 
     def get_text_document(self, documentId):
         rawDoc = self.dd.small_search(docTypes=self.languages, filterTerms={"_id": documentId}, useScan=False)
