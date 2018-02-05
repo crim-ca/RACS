@@ -368,12 +368,14 @@ class DocumentCorpus():
         """
         Adds a new language to the corpus if it doesn't exist
             raises LanguageNotSupported if not specified analyser associated with the language.
-        :param language:
-        :return:
+
+            Note: we use the resulting es analyser name instead of french, fr_ca, fr_f, etc to have a consistent
+            index name :param language: :return:
         """
         languageManager = get_language_manager()
         if language not in self.languages:
-            self.dd.add_or_update_schema(LANGUAGE_MAPPINGS[languageManager.get_es_analyser(language)], language, False)
+            analyser = languageManager.get_es_analyser(language)
+            self.dd.add_or_update_schema(LANGUAGE_MAPPINGS[analyser], analyser, False)
             self.languages.append(language)
 
     def add_text_document(self, text: str, title: str, language: str, id=None, source="") -> str:

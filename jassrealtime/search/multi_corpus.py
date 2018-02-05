@@ -73,15 +73,20 @@ def query_structure(grouped_targets: dict) -> list:
 
     for corpusId, buckets in grouped_targets.items():
         corpus = corpus_from_id(corpusId)
-        group_structure = {"id": corpusId, "languages": corpus_languages(corpus)}
-                           # "properties": bucket_properties(corpus, buckets)}
+        group_structure = {"id": corpusId, "languages": corpus_languages(corpus),
+                           "properties": bucket_properties(corpus, buckets)}
         structure.append(group_structure)
 
     return structure
 
 
-def corpus_from_id(corpus_id):
+def corpus_from_id(corpus_id: str):
     env_id = get_env_id()
     authorization = get_autorisation(env_id, None, None)
     corpora = get_master_document_corpus_list(env_id, authorization)
     return corpora.get_corpus(corpus_id)
+
+
+def bucket_properties(corpus: str, buckets: list) -> list:
+    pass
+
