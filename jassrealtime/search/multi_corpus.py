@@ -3,7 +3,9 @@ from typing import List
 
 from jassrealtime.core.esutils import get_es_conn
 from jassrealtime.core.settings_utils import get_settings, get_env_id
-from jassrealtime.document.document_corpus import make_sort_field, make_es_filters, get_master_document_corpus_list
+from jassrealtime.document.bucket import Bucket
+from jassrealtime.document.document_corpus import make_sort_field, make_es_filters, get_master_document_corpus_list, \
+    DocumentCorpus
 from jassrealtime.search.document import map_search_hit
 from jassrealtime.security.security_selector import get_autorisation
 
@@ -64,7 +66,7 @@ def partial_corpora_indices(corpus_ids: List[str]) -> str:
     return joined_indices
 
 
-def corpus_languages(corpus):
+def corpus_languages(corpus: DocumentCorpus) -> List[str]:
     # This is a delicate matter since external consensus forces the storage engine to accept things such as fr_ca,
     # fr_fr, en, etc but the locale concept is ignored for the language analyser.
     # To be uniform, we will return the analyser name used for the text field.
@@ -84,13 +86,19 @@ def query_structure(grouped_targets: dict) -> list:
     return structure
 
 
-def corpus_from_id(corpus_id: str):
+def corpus_from_id(corpus_id: str) -> DocumentCorpus:
     env_id = get_env_id()
     authorization = get_autorisation(env_id, None, None)
     corpora = get_master_document_corpus_list(env_id, authorization)
     return corpora.get_corpus(corpus_id)
 
 
-def bucket_properties(corpus: str, buckets: list) -> list:
-    pass
+def buckets_properties(corpus: DocumentCorpus, bucket_ids: list) -> list:
+    buckets = []
+    for bucket_id in bucket_ids:
+        buckets.append(buckets_properties(corpus.get_bucket(bucket_id)))
+    return buckets
 
+
+def bucket_properties(bucket: Bucket) -> dict:
+    pass

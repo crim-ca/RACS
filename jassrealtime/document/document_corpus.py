@@ -5,6 +5,7 @@
 # https://abhishek376.wordpress.com/2014/04/05/elasticsearch-sorting-and-paging-nested-documents/
 from elasticsearch_dsl.response import Hit
 
+from jassrealtime.batch.document_corpus import DocumentCorpus
 from .bucket import *
 from .document_sub_corpus import *
 from ..core.master_factory_list import get_master_document_directory_list, \
@@ -241,7 +242,7 @@ class DocumentCorpusList:
 
         return corpuses
 
-    def get_corpus(self, id: str):
+    def get_corpus(self, id: str) -> DocumentCorpus:
         """
         Gets the corpus.
 
