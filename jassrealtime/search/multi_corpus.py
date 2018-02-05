@@ -65,7 +65,11 @@ def partial_corpora_indices(corpus_ids: List[str]) -> str:
 
 
 def corpus_languages(corpus):
-    return corpus.languages
+    # This is a delicate matter since external consensus forces the storage engine to accept things such as fr_ca,
+    # fr_fr, en, etc but the locale concept is ignored for the language analyser.
+    # To be uniform, we will return the analyser name used for the text field.
+    indices_per_doc_type = corpus.dd.get_indices_per_doc_type()
+    return list(indices_per_doc_type.keys())
 
 
 def query_structure(grouped_targets: dict) -> list:
