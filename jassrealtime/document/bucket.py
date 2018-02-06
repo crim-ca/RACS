@@ -411,7 +411,7 @@ class Bucket:
         Returns the docType to which the schema is associated to for all schemas associated to the bucket.
 
         :param includeJson: If true will also return json contents
-        :param includeJson: If True will use scan api to return schemas.
+        :param useScan: If True will use scan api to return schemas.
             Should only be True if there is more than 10 000 schemas in a bucket.
         :return:    {data: [{"schemaType":"type of schema","jsonSchema":"json of schema if applicable"}]}
         """

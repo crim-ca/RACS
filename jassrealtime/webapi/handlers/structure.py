@@ -2,6 +2,7 @@ import json
 import traceback
 from http import HTTPStatus
 
+from jassrealtime.document.bucket import Bucket
 from jassrealtime.webapi.handlers.base_handler import BaseHandler
 
 from jassrealtime.core.master_factory_list import get_master_document_corpus_list
@@ -14,7 +15,7 @@ from jassrealtime.webapi.handlers.parameter_names import MESSAGE, TRACE
 INCLUDE_SCHEMA_JSON = "includeSchemaJson"
 
 
-def getBucketWithSchema(bucket, includeSchemaJson: bool):
+def getBucketWithSchema(bucket: Bucket, includeSchemaJson: bool):
     augmentedBucket = {"name": bucket.name, "id": bucket.id}
     schemas = bucket.get_schemas_info(includeSchemaJson)
     augmentedBucket["schemas"] = schemas["data"]

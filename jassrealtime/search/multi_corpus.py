@@ -1,3 +1,5 @@
+import json
+
 from elasticsearch_dsl import Search, Q
 from typing import List
 
@@ -80,7 +82,7 @@ def query_structure(grouped_targets: dict) -> list:
     for corpusId, buckets in grouped_targets.items():
         corpus = corpus_from_id(corpusId)
         group_structure = {"id": corpusId, "languages": corpus_languages(corpus),
-                           "properties": bucket_properties(corpus, buckets)}
+                           "types": buckets_types(corpus, buckets)}
         structure.append(group_structure)
 
     return structure
@@ -93,12 +95,32 @@ def corpus_from_id(corpus_id: str) -> DocumentCorpus:
     return corpora.get_corpus(corpus_id)
 
 
-def buckets_properties(corpus: DocumentCorpus, bucket_ids: list) -> list:
+def buckets_types(corpus: DocumentCorpus, bucket_ids: list) -> list:
     buckets = []
     for bucket_id in bucket_ids:
-        buckets.append(buckets_properties(corpus.get_bucket(bucket_id)))
+        buckets.append(bucket_types(corpus.get_bucket(bucket_id)))
     return buckets
 
 
-def bucket_properties(bucket: Bucket) -> dict:
-    pass
+def is_searchable(schema_property: dict) -> bool:
+    return schema_property.get("searchable", False)
+
+
+def properties(schema: dict) -> List:
+    #  Keep properties that are searchable. Return name, type (and searchModes for string)
+    searchable_properties = []
+    for schema_type, definition in schema["properties"].items():
+        if is_searchable(definition):
+            searchable_properties.append(schema_type)
+
+    return searchable_properties
+
+
+def bucket_types(bucket: Bucket) -> dict:
+    schemas_info = bucket.get_schemas_info(includeJson=True)["data"]
+    properties_by_schema = []
+    for schema_info in schemas_info:
+        schema_ = json.loads(schema_info["jsonSchema"])
+        properties_by_schema.append({"type": schema_info["schemaType"], "Properties": properties(schema_)})
+
+    return properties_by_schema
