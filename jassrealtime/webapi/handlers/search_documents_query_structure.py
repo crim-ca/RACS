@@ -1,6 +1,7 @@
 import traceback
 from http import HTTPStatus
 
+from jassrealtime.document.bucket import BucketNotFoundException
 from jassrealtime.document.document_corpus import CorpusNotFoundException
 from jassrealtime.search.multi_corpus import query_structure
 from jassrealtime.webapi.handlers.base_handler import BaseHandler
@@ -68,6 +69,9 @@ class SearchDocumentQueryStructureHandler(BaseHandler):
             self.write_and_set_status({"structure": structure}, HTTPStatus.OK)
         except CorpusNotFoundException as exception:
             self.write_and_set_status({MESSAGE: "Corpus not found with id:'{}'".format(exception.corpus_id)},
+                                      HTTPStatus.NOT_FOUND)
+        except BucketNotFoundException as exception:
+            self.write_and_set_status({MESSAGE: "Bucket not found with id:'{}'".format(exception.bucket_id)},
                                       HTTPStatus.NOT_FOUND)
         except Exception:
             trace = traceback.format_exc().splitlines()

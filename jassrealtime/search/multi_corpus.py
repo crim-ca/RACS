@@ -69,21 +69,13 @@ def partial_corpora_indices(corpus_ids: List[str]) -> str:
     return joined_indices
 
 
-def corpus_languages(corpus: DocumentCorpus) -> List[str]:
-    # This is a delicate matter since external consensus forces the storage engine to accept things such as fr_ca,
-    # fr_fr, en, etc but the locale concept is ignored for the language analyser.
-    # To be uniform, we will return the analyser name used for the text field.
-    indices_per_doc_type = corpus.dd.get_indices_per_doc_type()
-    return list(indices_per_doc_type.keys())
-
-
 def query_structure(grouped_targets: dict) -> list:
     structure = []
 
     for corpusId, buckets in grouped_targets.items():
         corpus = corpus_from_id(corpusId)
-        group_structure = {"id": corpusId, "languages": corpus_languages(corpus),
-                           "types": buckets_types(corpus, buckets)}
+        group_structure = {"corpusId": corpusId, "languages": corpus.languages,
+                           "groups": buckets_types(corpus, buckets)}
         structure.append(group_structure)
 
     return structure
@@ -99,7 +91,7 @@ def corpus_from_id(corpus_id: str) -> DocumentCorpus:
 def buckets_types(corpus: DocumentCorpus, bucket_ids: list) -> list:
     buckets = []
     for bucket_id in bucket_ids:
-        buckets.append(bucket_types(corpus.get_bucket(bucket_id)))
+        buckets.append({"bucketId": bucket_id, "types": bucket_types(corpus.get_bucket(bucket_id))})
     return buckets
 
 
@@ -132,7 +124,7 @@ def bucket_types(bucket: Bucket) -> dict:
     schemas_info = bucket.get_schemas_info(includeJson=True)["data"]
     properties_by_schema = []
     for schema_info in schemas_info:
-        schema_ = json.loads(schema_info["jsonSchema"])
-        properties_by_schema.append({"type": schema_info["schemaType"], "Properties": properties(schema_)})
+        schema = json.loads(schema_info["jsonSchema"])
+        properties_by_schema.append({"type": schema_info["schemaType"], "Properties": properties(schema)})
 
     return properties_by_schema

@@ -64,7 +64,8 @@ class BucketAlreadyExistsException(BucketException):
 
 
 class BucketNotFoundException(BucketException):
-    pass
+    def __init__(self, bucket_id):
+        self.bucket_id = bucket_id
 
 
 class TargetNotSupportedException(BucketException):
@@ -203,7 +204,7 @@ class BucketList:
             return Bucket(self.envId, self.bucketBindingIndex, self.authorization, dd, bucketInfo["name"], id,
                           bucketInfo["corpusId"])
         except DocumentNotFoundException:
-            raise BucketNotFoundException()
+            raise BucketNotFoundException(id)
 
     def delete_bucket(self, corpusId, id):
         """
@@ -231,10 +232,10 @@ class BucketList:
 
         except exceptions.NotFoundError as e:
             logger.warning(e)
-            raise BucketNotFoundException
+            raise BucketNotFoundException(id)
         except DocumentDirectoryDoesntExistsException as e:
             logger.warning(e)
-            raise BucketNotFoundException
+            raise BucketNotFoundException(id)
 
     def get_all_buckets_for_corpus(self, corpusId: str) -> List:
         """
