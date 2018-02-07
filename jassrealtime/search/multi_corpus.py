@@ -4,6 +4,7 @@ from elasticsearch_dsl import Search, Q
 from typing import List
 
 from jassrealtime.core.esutils import get_es_conn
+from jassrealtime.core.schema_list import JSON_SCHEMA_PRIMITIVE_TYPES
 from jassrealtime.core.settings_utils import get_settings, get_env_id
 from jassrealtime.document.bucket import Bucket
 from jassrealtime.document.document_corpus import make_sort_field, make_es_filters, get_master_document_corpus_list, \
@@ -106,12 +107,23 @@ def is_searchable(schema_property: dict) -> bool:
     return schema_property.get("searchable", False)
 
 
+def property_query_structure(definition: dict) -> dict:
+    structure = {"type": definition["type"]}
+    if definition.get("searchModes", False):
+        structure["searchModes"] = definition["searchModes"]
+    return structure
+
+
+def is_simple_type(definition):
+    return definition["type"] in JSON_SCHEMA_PRIMITIVE_TYPES
+
+
 def properties(schema: dict) -> List:
-    #  Keep properties that are searchable. Return name, type (and searchModes for string)
-    searchable_properties = []
-    for schema_type, definition in schema["properties"].items():
-        if is_searchable(definition):
-            searchable_properties.append(schema_type)
+    #  Keep simple properties that are searchable. Return name, type (and searchModes for string)
+    searchable_properties = {}
+    for name, definition in schema["properties"].items():
+        if is_searchable(definition) and is_simple_type(definition):
+            searchable_properties[name] = property_query_structure(definition)
 
     return searchable_properties
 
