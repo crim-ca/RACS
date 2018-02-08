@@ -101,9 +101,14 @@ def is_searchable(schema_property: dict) -> bool:
 
 def property_query_structure(definition: dict) -> dict:
     structure = {"type": definition["type"]}
-    if definition.get("searchModes", False):
-        structure["searchModes"] = definition["searchModes"]
+    copy_property_if_exists(definition, structure, "searchModes")
+    copy_property_if_exists(definition, structure, "language")
     return structure
+
+
+def copy_property_if_exists(definition, structure, property_name):
+    if definition.get(property_name, False):
+        structure[property_name] = definition[property_name]
 
 
 def is_simple_type(definition):
