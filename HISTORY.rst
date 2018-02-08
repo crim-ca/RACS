@@ -5,7 +5,7 @@ History
 
 2.6.4
 ---------------------
-* Return document list by text search on given corpus ids
+* Expose query structure for document search by text and annotations
 
 2.6.3
 ---------------------
