@@ -21,6 +21,7 @@ from jassrealtime.webapi.handlers.bucket import BucketHandler, BucketFolderHandl
 from jassrealtime.webapi.handlers.bucket_schema import BucketSchemaHandler, BucketSchemaDeleteHandler
 from jassrealtime.webapi.handlers.annotations import AnnotationHandler, AnnotationFolderHandler
 from jassrealtime.webapi.handlers.document import DocumentHandler, DocumentFolderHandler, DocumentIdsHandler
+from jassrealtime.webapi.handlers.search_documents_by_text import SearchDocumentByTextHandler
 from jassrealtime.webapi.handlers.search_documents_query_structure import SearchDocumentQueryStructureHandler
 from jassrealtime.webapi.handlers.structure import StructureHandler
 from jassrealtime.webapi.handlers.search import DocumentSearchHandler, DocumentFolderSearchHandler, \
@@ -64,7 +65,7 @@ handlers = [
     (r"/annosearch/corpora/{0}/bucket/{0}/schemaType/{0}".format(idsStruct), SingleTypeDocumentSearchHandler),
     (r"/annosearch/documents".format(idsStruct), DocumentMetadataSearchHandler),
     (r"/search/documents/queryStructure", SearchDocumentQueryStructureHandler),
-    # (r"/search/documents/byText", SearchDocumentByTextHandler),
+    (r"/search/documents/byText", SearchDocumentByTextHandler),
     # (r"/search/documents/byAttribute", SearchDocumentByAttributeHandler),
     (r"/batch/corpora/{0}/documents".format(idsStruct), BatchDocumentsHandler),
     (r"/batch/corpora/{0}/annotations".format(idsStruct), BatchAnnotationsDownloadHandler),
@@ -75,7 +76,7 @@ handlers = [
 def make_app():
     setup_logging()
     initialize_es()
-    set_up_environnement()
+    set_up_environment()
 
     if can_rebuild_env():
         handlers.append((r"/rebuildenv", RebuildEnvHandler))
@@ -91,7 +92,6 @@ def make_app():
 
 def setup_logging():
     logLevelStr = get_log_level()
-    logLevel = logging.INFO
     if logLevelStr == "debug":
         logLevel = logging.DEBUG
     elif logLevelStr == "info":
@@ -120,7 +120,7 @@ def initialize_es():
     EnvList.initialize_env_list(sett['CLASSES']['ENV'])
 
 
-def set_up_environnement():
+def set_up_environment():
     try:
         es_wait_ready()
         envId = get_env_id()
