@@ -1268,10 +1268,10 @@ definitions:
         description: "Languages for the analyzer of all the documents of the corpus."
         items:
           type: string
-          description: 'Language of documents in the corpus. As of version 0.2 it is only possible to add languages. Attempting to remove a language will throw an exception. Language format: ISO 639-1. Example: fr_FR'
+          description: 'Language of documents in the corpus. As of version 0.2 it is only possible to add languages. Attempting to remove a language will throw an exception. Language format: ISO 639-1. Example: fr-FR'
     example: {
       "languages": [
-        "en_EN","fr_FR"
+        "en-EN","fr-FR"
       ]
     }
 
@@ -1291,14 +1291,14 @@ definitions:
         description: "Languages for the analyzer of all the documents of the corpus."
         items:
           type: string
-          description: 'Language of documents in the corpus. As of version 0.2 it is only possible to add languages. Attempting to remove a language will throw an exception. Language format: ISO 639-1. Example: fr_FR'
+          description: 'Language of documents in the corpus. As of version 0.2 it is only possible to add languages. Attempting to remove a language will throw an exception. Language format: ISO 639-1. Example: fr-FR'
     allOf:
       - $ref: '#/definitions/CorpusUpdate'
       - $ref: '#/definitions/CorpusInProps'
     example: {
       "id": "corpus1",
       "languages": [
-        "fr_FR"
+        "fr-FR"
       ]
     }
 
@@ -1323,7 +1323,7 @@ definitions:
       "modificationDate": "2016-11-30T22:29:06Z",
       "documentCount": 0,
       "languages": [
-        "fr_FR"
+        "fr-FR"
       ]
     }
 
@@ -1379,7 +1379,7 @@ definitions:
       "title":"Last Friday Night",
       "source":"http://havetobefound.com",
       "text":"What a nice night of coding it has been",
-      "language":"fr_FR"}
+      "language":"fr-FR"}
 
   DocumentsExport:
     type: object

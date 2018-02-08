@@ -27,7 +27,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_create_modify_languages(self):
         # ISO language OK
-        c1 = self.documentCorpusList.create_corpus(languages=["fr_FR"])
+        c1 = self.documentCorpusList.create_corpus(languages=["fr-FR"])
         self.assertRaises(CorpusInvalidFieldException, self.documentCorpusList.create_corpus, languages=None)
         self.assertRaises(CorpusInvalidFieldException, self.documentCorpusList.create_corpus,
                           languages=["doesnotexist"])
