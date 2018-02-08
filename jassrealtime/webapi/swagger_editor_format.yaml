@@ -3,7 +3,7 @@
 # Code completion support is available so start typing for available options.
 swagger: '2.0'
 info:
-  version: "2.6.3"
+  version: "2.6.4"
   title: RACS
   description: Annotation Storage
 
@@ -1189,6 +1189,34 @@ paths:
         - api_key: []
 
 
+  /search/documents/queryStructure:
+    get:
+      tags:
+        - search
+      summary: Get document query structure
+      description: 'Return a query structure which will be used for searching for documents by text and/or annotations.'
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: targets
+          description: 'List of corpus/bucket id pairs separated by commas. Format: corpusId[:bucketId]. E.G. corpus1:bucket2,corpus2,corpus4:bucket1,corpus4:bucket5'
+          required: true
+          type: array
+          items: {
+            type: string
+          }
+      responses:
+        "200":
+          description: 'Successful operation. Will return annotations grouped by corpus,bucket,schema. Will only return if there is data inside (will not return for example schema: {"corptest": {"bucket1":{"sentence": []}. If there is no annotations found will return {}'
+          schema:
+            $ref: "#/definitions/SearchDocumentQueryStructure"
+        "404":
+          description: 'Corpus or bucket not found.'
+      security:
+        - api_key: []
+
+
 definitions:
   Id:
     type: object
@@ -1240,10 +1268,10 @@ definitions:
         description: "Languages for the analyzer of all the documents of the corpus."
         items:
           type: string
-          description: 'Language of documents in the corpus. As of version 0.2 it is only possible to add languages. Attempting to remove a language will throw an exception. Language format: ISO 639-1. Example: fr_FR'
+          description: 'Language of documents in the corpus. As of version 0.2 it is only possible to add languages. Attempting to remove a language will throw an exception. Language format: ISO 639-1. Example: fr-FR'
     example: {
       "languages": [
-        "en_EN","fr_FR"
+        "en-EN","fr-FR"
       ]
     }
 
@@ -1263,14 +1291,14 @@ definitions:
         description: "Languages for the analyzer of all the documents of the corpus."
         items:
           type: string
-          description: 'Language of documents in the corpus. As of version 0.2 it is only possible to add languages. Attempting to remove a language will throw an exception. Language format: ISO 639-1. Example: fr_FR'
+          description: 'Language of documents in the corpus. As of version 0.2 it is only possible to add languages. Attempting to remove a language will throw an exception. Language format: ISO 639-1. Example: fr-FR'
     allOf:
       - $ref: '#/definitions/CorpusUpdate'
       - $ref: '#/definitions/CorpusInProps'
     example: {
       "id": "corpus1",
       "languages": [
-        "fr_FR"
+        "fr-FR"
       ]
     }
 
@@ -1295,7 +1323,7 @@ definitions:
       "modificationDate": "2016-11-30T22:29:06Z",
       "documentCount": 0,
       "languages": [
-        "fr_FR"
+        "fr-FR"
       ]
     }
 
@@ -1351,7 +1379,7 @@ definitions:
       "title":"Last Friday Night",
       "source":"http://havetobefound.com",
       "text":"What a nice night of coding it has been",
-      "language":"fr_FR"}
+      "language":"fr-FR"}
 
   DocumentsExport:
     type: object
@@ -1527,6 +1555,16 @@ definitions:
     description: "count of annotations per schema type. Schema type is the key and value is count."
     type: object
     example: {"namedEntity": 99, "place": 12}
+
+  SearchDocumentQueryStructure:
+    description: "Search document query structure"
+    type: object
+    properties:
+      structure:
+        type: object
+        description: "Search document query structure"
+    example: {"structure": [{"corpusId": "jfh-corpus-english", "languages": ["en-CA"], "groups": []}, {"corpusId": "jfh-corpus-demo", "languages": ["en-EN", "fr-FR"], "groups": [{"bucketId": "29550cda-0c40-11e8-aa88-a8206600f845", "types": [{"type": "Animal", "Properties": {"schemaType": {"type": "string", "searchModes": ["noop", "edge"]}, "jeff": {"type": "string", "searchModes": ["basic"]}, "_documentID": {"type": "string", "searchModes": ["noop"]}, "_corpusID": {"type": "string", "searchModes": ["noop"]}, "notes": {"type": "string", "searchModes": ["language"]}}}, {"type": "Plant", "Properties": {"schemaType": {"type": "string", "searchModes": ["noop"]}, "_documentID": {"type": "string", "searchModes": ["noop"]}, "_corpusID": {"type": "string", "searchModes": ["noop"]}, "notes": {"type": "string", "searchModes": ["basic"]}, "NumProperty": {"type": "number"}}}]}]}]}
+
 
 securityDefinitions:
   api_key:

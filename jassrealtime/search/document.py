@@ -142,7 +142,7 @@ class DocumentSearch:
         """
         annotations = None
         if offsets:
-            raise NotImplemented()
+            raise NotImplementedError()
         else:
             bucketList = get_master_bucket_list(self.envId, self.authorization)
             bucket = bucketList.get_bucket(self.corpusId, bucketId)

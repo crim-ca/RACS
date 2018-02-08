@@ -27,7 +27,8 @@ class CorpusAlreadyExistsException(DocumentCorpusException):
 
 
 class CorpusNotFoundException(DocumentCorpusException):
-    pass
+    def __init__(self, corpus_id):
+        self.corpus_id = corpus_id
 
 
 class CorpusInvalidFieldException(DocumentCorpusException):
@@ -92,205 +93,6 @@ LANGUAGE_MAPPINGS = {
 }
 
 
-class DocumentCorpusList:
-    @staticmethod
-    def create(envId: str, sett: dict, authorization: BaseAuthorization):
-        """
-        Creates a new corpus list. A corpus list contains all corpuses for a envId.
-
-        :param envId:      envId associated with this corpus.
-        :param sett:        settings for the corpus.
-        :return:            DocumentCorpusList
-        """
-
-        masterList = get_master_document_directory_list(envId, authorization)
-        corpusList = masterList.create_document_directory(sett['MASTER_DOCUMENT_CORPUS_ID'])
-        time.sleep(1)
-        corpusList.add_or_update_schema(CORPUS_LIST_PROPERTIES_MAPPING, "default", True)
-        DocumentSubCorpusList.create(envId, sett['DOCUMENT_SUB_CORPUS'], authorization)
-
-        return DocumentCorpusList(envId, sett, authorization)
-
-    def __init__(self, envId, sett, authorization: BaseAuthorization):
-        """
-        Creates a new corpus list. A corpus list contains all corpuses for a envId.
-
-        :param envId:      envId associated with this corpus.
-        :param sett:        settings for the corpus.
-        """
-        self.envId = envId
-        self.classPrefix = sett['CLASS_PREFIX']
-        self.masterDocumentCorpusId = sett['MASTER_DOCUMENT_CORPUS_ID']
-        self.masterList = get_master_document_directory_list(envId, authorization)
-        self.dd = self.masterList.get_directory(self.masterDocumentCorpusId)
-        self.authorization = authorization
-
-    def delete(self):
-        """
-        Deletes all corpuses and sub corpuses for this envId. Must have authorisation to delete each corpus
-        :return:
-        """
-
-        corpusIds = self.dd.small_search(returnFields=[], useScan=False)
-        # delete all corpuses
-        for metadata in corpusIds:
-            self.delete_corpus(metadata["id"])
-
-        # delete all subcorpuses
-        subCorpusList = get_master_document_sub_corpus_list(self.envId, self.authorization)
-        subCorpusList.delete()
-
-        # delete the list
-        masterList = get_master_document_directory_list(self.envId, self.authorization)
-        masterList.delete_document_directory(self.dd)
-
-    def create_corpus(self, id: str = None, languages: dict = ["english"]):
-        """
-        This function creates a new document corpus. It assumes the function, create_corpus_directory
-        was called beforehand.
-
-        :param languages:
-        :param id:       Unique ID identifying the corpus, if none supplied one will be generated.
-                         Should be alphanumeric _- lowercase.
-        :return: Corpus Object
-        """
-        logger = logging.getLogger(__name__)
-        self.authorization.can_create_document_corpus()
-
-        if id:
-            if self.dd.document_exist(id):
-                logger.info("Corpus Already Exists with the following id:".format(id))
-                raise CorpusAlreadyExistsException(id)
-        else:
-            id = gen_uuid()
-
-        # validate data
-        if not languages:
-            raise CorpusInvalidFieldException("Missing languages for corpus")
-
-        languageManager = get_language_manager()
-        for language in languages:
-            if not languageManager.has_es_analyser(language):
-                raise CorpusInvalidFieldException("Invalid language {0}".format(language))
-
-        corpus = {LANGUAGES_FIELD: languages, MODIFICATION_DATE_FIELD: self.generate_modification_date()}
-
-        utcDateTime = convert_es_date_to_datetime(corpus[MODIFICATION_DATE_FIELD])
-
-        self.dd.add_document(corpus, id)
-
-        # creating listing for sub corpus
-        dd = self.masterList.create_document_directory(id, None, False)
-        # TODO create authorizations
-        docCorpus = DocumentCorpus(self.envId, dd, id, self.authorization, [], utcDateTime)
-        for language in languages:
-            docCorpus.add_language(language)
-
-        return docCorpus
-
-    def update_corpus(self, id: str, languages: [str] = None):
-        """
-        See create corpus for field descriptions.
-
-        :param id:
-        :param languages:
-        :return:
-        """
-
-        docCorpus = self.get_corpus(id)
-        languageManager = get_language_manager()
-        for language in languages:
-            if not languageManager.has_es_analyser(language):
-                raise CorpusInvalidFieldException("Invalid language {0}".format(language))
-
-        for language in docCorpus.languages:
-            if language not in languages:
-                raise CorpusInvalidFieldException("Can not remove language from corpus {0}".format(language))
-
-        corpus = {LANGUAGES_FIELD: languages}
-
-        corpus[MODIFICATION_DATE_FIELD] = self.generate_modification_date()
-
-        self.dd.update_document(corpus, id)
-
-        for language in languages:
-            docCorpus.add_language(language)
-
-    def generate_modification_date(self):
-        return convert_datetime_to_es(datetime.utcnow())
-
-    def get_corpuses_list(self):
-        """
-        Lists all corpuses. This only return corpus metadata.
-
-        :return: { data : [ {id:"id",name:NAME_FIELD,platformId:PLATFORM_ID_FIELD}]}
-        """
-
-        # TODO get security to filter list
-
-        res = self.dd.small_search(useScan=False)
-        corpuses = []
-        for doc in res:
-            corpusInfo = doc
-
-            # getting documents is very slow. will need to be changed eventually
-            corp = self.get_corpus(doc["id"])
-            del corpusInfo["type"]
-            doc[CORPUS_DOCUMENT_COUNT] = corp.get_documents_count()
-            corpuses.append(corpusInfo)
-
-        return corpuses
-
-    def get_corpus(self, id: str):
-        """
-        Gets the corpus.
-
-        :param id: Id of the corpus
-        :return:
-        """
-
-        self.authorization.can_get_document_corpus(id)
-
-        try:
-            corpusInfo = self.dd.get_document(id)
-            dd = self.masterList.get_directory(id)
-            languages = corpusInfo.get(LANGUAGES_FIELD)
-            modificationDate = convert_es_date_to_datetime(corpusInfo.get(MODIFICATION_DATE_FIELD))
-            # todo add metadata
-            return DocumentCorpus(self.envId, dd, id, self.authorization, languages, modificationDate)
-        except DocumentNotFoundException:
-            raise CorpusNotFoundException()
-
-    def delete_corpus(self, id: str):
-        """
-        Deletes a corpus
-
-        :param id:                  Id of the corpus to delete
-        :return:
-        """
-        logger = logging.getLogger(__name__)
-        self.authorization.can_delete_document_corpus(id)
-        corpus = self.get_corpus(id)
-        subCorpusList = corpus.get_all_sub_corpuses()
-
-        # removes all buckets
-        buckets = corpus.get_buckets()
-        for bucket in buckets:
-            corpus.delete_bucket(bucket.id)
-
-        # removes all sub corpuses
-        for subCorpus in subCorpusList:
-            try:
-                corpus.delete_sub_corpus(subCorpus.id)
-            except Exception as e:
-                logger.warning("Something went wrong when delete subCorpus for document {0}. {1}".format(id, str(e)))
-                pass
-
-        # deletes all indexes associated with this corpus.
-        self.dd.delete_document(id)
-        self.masterList.delete_document_directory(corpus.dd)
-
-
 def add_filter(filters: List[tuple], fieldName: str, fieldValue: str):
     if fieldValue is not None:
         filters.append((fieldName, fieldValue))
@@ -320,7 +122,7 @@ def make_es_filters(filters: List[tuple], filterJoin: str):
     return reduce(joinOperator, esFilters)
 
 
-class DocumentCorpus():
+class DocumentCorpus:
     """
         Creates a document corpus.
     """
@@ -367,12 +169,15 @@ class DocumentCorpus():
         """
         Adds a new language to the corpus if it doesn't exist
             raises LanguageNotSupported if not specified analyser associated with the language.
-        :param language:
-        :return:
+
+            Note: we use the resulting es analyser name instead of french, fr_ca, fr_f, etc to have a consistent
+            index name
+            :param language: :return:
         """
         languageManager = get_language_manager()
         if language not in self.languages:
-            self.dd.add_or_update_schema(LANGUAGE_MAPPINGS[languageManager.get_es_analyser(language)], language, False)
+            analyser = languageManager.get_es_analyser(language)
+            self.dd.add_or_update_schema(LANGUAGE_MAPPINGS[analyser], analyser, False)
             self.languages.append(language)
 
     def add_text_document(self, text: str, title: str, language: str, id=None, source="") -> str:
@@ -414,13 +219,13 @@ class DocumentCorpus():
         return document
 
     def get_documents_count(self):
-        indices = self.dd.get_indices(self.languages).split(",")
+        indices_per_doc_type = self.dd.get_indices_per_doc_type()
         es = get_es_conn()
-        totalDocumentCount = 0
-        for index in indices:
-            escount = es.count(index)
-            totalDocumentCount = totalDocumentCount + escount["count"]
-        return totalDocumentCount
+        total_document_count = 0
+        for _, index in indices_per_doc_type.items():
+            index_count = es.count(index)
+            total_document_count = total_document_count + index_count["count"]
+        return total_document_count
 
     def get_text_document(self, documentId):
         rawDoc = self.dd.small_search(docTypes=self.languages, filterTerms={"_id": documentId}, useScan=False)
@@ -580,3 +385,204 @@ class DocumentCorpus():
         :return:
         """
         self.bucketList.delete_bucket(self.id, bucketId)
+
+
+class DocumentCorpusList:
+    @staticmethod
+    def create(envId: str, sett: dict, authorization: BaseAuthorization):
+        """
+        Creates a new corpus list. A corpus list contains all corpuses for a envId.
+
+        :param envId:      envId associated with this corpus.
+        :param sett:        settings for the corpus.
+        :return:            DocumentCorpusList
+        """
+
+        masterList = get_master_document_directory_list(envId, authorization)
+        corpusList = masterList.create_document_directory(sett['MASTER_DOCUMENT_CORPUS_ID'])
+        time.sleep(1)
+        corpusList.add_or_update_schema(CORPUS_LIST_PROPERTIES_MAPPING, "default", True)
+        DocumentSubCorpusList.create(envId, sett['DOCUMENT_SUB_CORPUS'], authorization)
+
+        return DocumentCorpusList(envId, sett, authorization)
+
+    def __init__(self, envId, sett, authorization: BaseAuthorization):
+        """
+        Creates a new corpus list. A corpus list contains all corpuses for a envId.
+
+        :param envId:      envId associated with this corpus.
+        :param sett:        settings for the corpus.
+        """
+        self.envId = envId
+        self.classPrefix = sett['CLASS_PREFIX']
+        self.masterDocumentCorpusId = sett['MASTER_DOCUMENT_CORPUS_ID']
+        self.masterList = get_master_document_directory_list(envId, authorization)
+        self.dd = self.masterList.get_directory(self.masterDocumentCorpusId)
+        self.authorization = authorization
+
+    def delete(self):
+        """
+        Deletes all corpuses and sub corpuses for this envId. Must have authorisation to delete each corpus
+        :return:
+        """
+
+        corpusIds = self.dd.small_search(returnFields=[], useScan=False)
+        # delete all corpuses
+        for metadata in corpusIds:
+            self.delete_corpus(metadata["id"])
+
+        # delete all subcorpuses
+        subCorpusList = get_master_document_sub_corpus_list(self.envId, self.authorization)
+        subCorpusList.delete()
+
+        # delete the list
+        masterList = get_master_document_directory_list(self.envId, self.authorization)
+        masterList.delete_document_directory(self.dd)
+
+    def create_corpus(self, id: str = None, languages: dict = ["english"]):
+        """
+        This function creates a new document corpus. It assumes the function, create_corpus_directory
+        was called beforehand.
+
+        :param languages:
+        :param id:       Unique ID identifying the corpus, if none supplied one will be generated.
+                         Should be alphanumeric _- lowercase.
+        :return: Corpus Object
+        """
+        logger = logging.getLogger(__name__)
+        self.authorization.can_create_document_corpus()
+
+        if id:
+            if self.dd.document_exist(id):
+                logger.info("Corpus Already Exists with the following id:".format(id))
+                raise CorpusAlreadyExistsException(id)
+        else:
+            id = gen_uuid()
+
+        # validate data
+        if not languages:
+            raise CorpusInvalidFieldException("Missing languages for corpus")
+
+        languageManager = get_language_manager()
+        for language in languages:
+            if not languageManager.has_es_analyser(language):
+                raise CorpusInvalidFieldException("Invalid language {0}".format(language))
+
+        # Use es analyser name instead of french, fr_ca, fr_f, etc to have a consistent index name
+
+        corpus = {LANGUAGES_FIELD: languages, MODIFICATION_DATE_FIELD: self.generate_modification_date()}
+
+        utcDateTime = convert_es_date_to_datetime(corpus[MODIFICATION_DATE_FIELD])
+
+        self.dd.add_document(corpus, id)
+
+        # creating listing for sub corpus
+        dd = self.masterList.create_document_directory(id, None, False)
+        # TODO create authorizations
+        docCorpus = DocumentCorpus(self.envId, dd, id, self.authorization, [], utcDateTime)
+        for language in languages:
+            docCorpus.add_language(language)
+
+        return docCorpus
+
+    def update_corpus(self, id: str, languages: [str] = None):
+        """
+        See create corpus for field descriptions.
+
+        :param id:
+        :param languages:
+        :return:
+        """
+
+        docCorpus = self.get_corpus(id)
+        languageManager = get_language_manager()
+        for language in languages:
+            if not languageManager.has_es_analyser(language):
+                raise CorpusInvalidFieldException("Invalid language {0}".format(language))
+
+        for language in docCorpus.languages:
+            if language not in languages:
+                raise CorpusInvalidFieldException("Can not remove language from corpus {0}".format(language))
+
+        corpus = {LANGUAGES_FIELD: languages}
+
+        corpus[MODIFICATION_DATE_FIELD] = self.generate_modification_date()
+
+        self.dd.update_document(corpus, id)
+
+        for language in languages:
+            docCorpus.add_language(language)
+
+    def generate_modification_date(self):
+        return convert_datetime_to_es(datetime.utcnow())
+
+    def get_corpuses_list(self):
+        """
+        Lists all corpuses. This only return corpus metadata.
+
+        :return: { data : [ {id:"id",name:NAME_FIELD,platformId:PLATFORM_ID_FIELD}]}
+        """
+
+        # TODO get security to filter list
+
+        res = self.dd.small_search(useScan=False)
+        corpuses = []
+        for doc in res:
+            corpusInfo = doc
+
+            # getting documents is very slow. will need to be changed eventually
+            corp = self.get_corpus(doc["id"])
+            del corpusInfo["type"]
+            doc[CORPUS_DOCUMENT_COUNT] = corp.get_documents_count()
+            corpuses.append(corpusInfo)
+
+        return corpuses
+
+    def get_corpus(self, id: str) -> DocumentCorpus:
+        """
+        Gets the corpus.
+
+        :param id: Id of the corpus
+        :return:
+        """
+
+        self.authorization.can_get_document_corpus(id)
+
+        try:
+            corpusInfo = self.dd.get_document(id)
+            dd = self.masterList.get_directory(id)
+            languages = corpusInfo.get(LANGUAGES_FIELD)
+            modificationDate = convert_es_date_to_datetime(corpusInfo.get(MODIFICATION_DATE_FIELD))
+            # todo add metadata
+            return DocumentCorpus(self.envId, dd, id, self.authorization, languages, modificationDate)
+        except DocumentNotFoundException:
+            raise CorpusNotFoundException(id)
+
+    def delete_corpus(self, id: str):
+        """
+        Deletes a corpus
+
+        :param id:                  Id of the corpus to delete
+        :return:
+        """
+        logger = logging.getLogger(__name__)
+        self.authorization.can_delete_document_corpus(id)
+        corpus = self.get_corpus(id)
+        subCorpusList = corpus.get_all_sub_corpuses()
+
+        # removes all buckets
+        buckets = corpus.get_buckets()
+        for bucket in buckets:
+            corpus.delete_bucket(bucket.id)
+
+        # removes all sub corpuses
+        for subCorpus in subCorpusList:
+            try:
+                corpus.delete_sub_corpus(subCorpus.id)
+            except Exception as e:
+                logger.warning("Something went wrong when delete subCorpus for document {0}. {1}".format(id, str(e)))
+                pass
+
+        # deletes all indexes associated with this corpus.
+        self.dd.delete_document(id)
+        self.masterList.delete_document_directory(corpus.dd)

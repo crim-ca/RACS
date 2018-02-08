@@ -318,7 +318,7 @@ class SchemaList:
             id = gen_uuid()
 
         if shouldValidate:
-            raise NotImplemented()
+            raise NotImplementedError()
 
         entry["jsonSchemaHash"] = jsonSchemaHash
         entry["esHash"] = esHash

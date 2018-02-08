@@ -3,6 +3,10 @@
 History
 =======
 
+2.6.4
+---------------------
+* Expose query structure for document search by text and annotations
+
 2.6.3
 ---------------------
 * Optimization annotation count for types

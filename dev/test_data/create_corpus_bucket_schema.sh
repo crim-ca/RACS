@@ -11,7 +11,7 @@ tokeschema="token"
 tokenwithlemmaschema="tokenwithlemma"
 
 # create corpus
-curl -H "Content-Type: application/json" -X POST -d '{"id": "corptest","title":"Test Corpus","platformId":"test","languages":["fr_FR","en_EN"],"description":"Minimalistic corpus for testing jass functionnality","reference":"http://doesnotexist.com","source":"Testing Source","version":"1.0"}' "http://$jassloc/corpora"
+curl -H "Content-Type: application/json" -X POST -d '{"id": "corptest","title":"Test Corpus","platformId":"test","languages":["fr-FR","en-EN"],"description":"Minimalistic corpus for testing jass functionnality","reference":"http://doesnotexist.com","source":"Testing Source","version":"1.0"}' "http://$jassloc/corpora"
 sleep 1
 curl -H "Content-Type: application/json" -X POST -d '{"id": "bucket1","name":"Bucket with document annotations"}' "http://$jassloc/corpora/$corpus/buckets"
 curl -H "Content-Type: application/json" -X POST -d '{"id": "bucket2","name":"Bucket with surface annotations only"}' "http://$jassloc/corpora/$corpus/buckets"

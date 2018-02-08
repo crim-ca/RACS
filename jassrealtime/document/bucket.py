@@ -64,7 +64,8 @@ class BucketAlreadyExistsException(BucketException):
 
 
 class BucketNotFoundException(BucketException):
-    pass
+    def __init__(self, bucket_id):
+        self.bucket_id = bucket_id
 
 
 class TargetNotSupportedException(BucketException):
@@ -203,7 +204,7 @@ class BucketList:
             return Bucket(self.envId, self.bucketBindingIndex, self.authorization, dd, bucketInfo["name"], id,
                           bucketInfo["corpusId"])
         except DocumentNotFoundException:
-            raise BucketNotFoundException()
+            raise BucketNotFoundException(id)
 
     def delete_bucket(self, corpusId, id):
         """
@@ -231,10 +232,10 @@ class BucketList:
 
         except exceptions.NotFoundError as e:
             logger.warning(e)
-            raise BucketNotFoundException
+            raise BucketNotFoundException(id)
         except DocumentDirectoryDoesntExistsException as e:
             logger.warning(e)
-            raise BucketNotFoundException
+            raise BucketNotFoundException(id)
 
     def get_all_buckets_for_corpus(self, corpusId: str) -> List:
         """
@@ -411,7 +412,7 @@ class Bucket:
         Returns the docType to which the schema is associated to for all schemas associated to the bucket.
 
         :param includeJson: If true will also return json contents
-        :param includeJson: If True will use scan api to return schemas.
+        :param useScan: If True will use scan api to return schemas.
             Should only be True if there is more than 10 000 schemas in a bucket.
         :return:    {data: [{"schemaType":"type of schema","jsonSchema":"json of schema if applicable"}]}
         """
@@ -483,7 +484,7 @@ class Bucket:
 
         if shouldValidate:
             self.validate_annotation()
-            raise NotImplemented()
+            raise NotImplementedError()
             # TODO  verify that annotation respect schema
 
         return self.dd.add_document(jsonAnnotation, annotationId, docType)
@@ -512,7 +513,7 @@ class Bucket:
         self.authorization.can_update_annotation(self.corpusId, self.id)
 
         if shouldValidate:
-            raise NotImplemented()
+            raise NotImplementedError()
             # TODO  verify that annotation respect schema
 
         self.dd.update_document(jsonAnnotation, annotationId, docType)

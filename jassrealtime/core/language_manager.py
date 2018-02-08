@@ -14,7 +14,7 @@ class LanguageManager:
         """
         :param es_analyser_by_language: Dictionary which maps a custom language field to an
             es analyser. wildcards can be used at the end of language. Example en_* will match
-            with en_EN and en_UK and en_whatever.
+            with en_EN and en-UK and en_whatever.
         """
         self.es_analyser_by_language_static = {}
         self.es_analyser_by_language_regex = {}
