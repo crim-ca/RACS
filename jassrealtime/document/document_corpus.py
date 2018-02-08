@@ -510,6 +510,9 @@ class DocumentCorpusList:
 
         self.dd.update_document(corpus, id)
 
+        for language in languages:
+            docCorpus.add_language(language)
+
     def generate_modification_date(self):
         return convert_datetime_to_es(datetime.utcnow())
 
