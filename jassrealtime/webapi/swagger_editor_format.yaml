@@ -1579,11 +1579,11 @@ definitions:
                   items:
                     type: object
                     properties:
-                      type:
+                      schemaType:
                         type: string
                       Properties:
                         type: object
-    example: {"structure": [{"corpusId": "jfh-corpus-english", "languages": ["en-CA"], "groups": []}, {"corpusId": "jfh-corpus-demo", "languages": ["en-EN", "fr-FR"], "groups": [{"bucketId": "29550cda-0c40-11e8-aa88-a8206600f845", "types": [{"type": "Animal", "Properties": {"schemaType": {"type": "string", "searchModes": ["noop", "edge"]}, "_documentID": {"type": "string", "searchModes": ["noop"]}, "_corpusID": {"type": "string", "searchModes": ["noop"]}, "notes": {"type": "string", "searchModes": ["language"]}}}, {"type": "Plant", "Properties": {"schemaType": {"type": "string", "searchModes": ["noop"]}, "_documentID": {"type": "string", "searchModes": ["noop"]}, "_corpusID": {"type": "string", "searchModes": ["noop"]}, "notes": {"type": "string", "searchModes": ["basic"]}, "NumProperty": {"type": "number"}}}]}]}]}
+    example: {"structure": [{"corpusId": "jfh-corpus-english", "languages": ["en-CA"], "groups": []}, {"corpusId": "jfh-corpus-demo", "languages": ["en-EN", "fr-FR"], "groups": [{"bucketId": "29550cda-0c40-11e8-aa88-a8206600f845", "types": [{"schemaType": "Animal", "Properties": {"schemaType": {"type": "string", "searchModes": ["noop", "edge"]}, "_documentID": {"type": "string", "searchModes": ["noop"]}, "_corpusID": {"type": "string", "searchModes": ["noop"]}, "notes": {"type": "string", "searchModes": ["language"]}}}, {"schemaType": "Plant", "Properties": {"schemaType": {"type": "string", "searchModes": ["noop"]}, "_documentID": {"type": "string", "searchModes": ["noop"]}, "_corpusID": {"type": "string", "searchModes": ["noop"]}, "notes": {"type": "string", "searchModes": ["basic"]}, "NumProperty": {"type": "number"}}}]}]}]}
 
 
 securityDefinitions:
