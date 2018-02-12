@@ -3,6 +3,10 @@
 History
 =======
 
+2.6.5
+---------------------
+* Document search by text
+
 2.6.4
 ---------------------
 * Expose query structure for document search by text and annotations

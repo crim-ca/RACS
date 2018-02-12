@@ -3,7 +3,7 @@ from http import HTTPStatus
 
 from ...document.bucket import BucketNotFoundException
 from ...document.document_corpus import CorpusNotFoundException
-from ...search.multi_corpus import query_structure
+from jassrealtime.search.multicorpus.multi_corpus import query_structure
 from .base_handler import BaseHandler
 from .parameter_names import MESSAGE, TRACE
 

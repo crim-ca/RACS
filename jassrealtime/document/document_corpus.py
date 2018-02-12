@@ -69,8 +69,14 @@ LANGUAGE_MAPPINGS = {
             },
             "text": {
                 "type": "text",
-                "analyzer": "french"
-            },
+                "analyzer": "standard",
+                "fields": {
+                    "french": {
+                        "type": "text",
+                        "analyzer": "french"
+                    }
+                }
+            }
         }
     },
     "english": {
@@ -86,7 +92,13 @@ LANGUAGE_MAPPINGS = {
             },
             "text": {
                 "type": "text",
-                "analyzer": "english"
+                "analyzer": "standard",
+                "fields": {
+                    "english": {
+                        "type": "text",
+                        "analyzer": "english"
+                    }
+                }
             }
         }
     }

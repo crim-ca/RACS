@@ -1,27 +1,44 @@
 import traceback
 from http import HTTPStatus
 
+from ...search.multicorpus.documents_by_text import documents_by_text
 from ...document.document_corpus import CorpusNotFoundException
 from .base_handler import BaseHandler
 from .document import MAX_DOCUMENT_SIZE
 from .parameter_names import MESSAGE, TRACE
 
 
+def validate(query):
+    if query["operator"] not in ["must", "should", "must_not"]:
+        raise ValueError("Invalid operator in query {}.".format(query))
+    if query["search_mode"] not in ["basic", "language"]:
+        raise ValueError("Invalid search_mode in query {}.".format(query))
+
+
 def parse_query(query_argument: str) -> dict:
     """
-    A query argument is a quad of the form :corpus_id:language:text
+    A query argument is a quintuple of the form:
+     boolean_operator:corpus_id:searchMode:language:search_text
 
-    We can use the language "basic" to target the standard index.
+    Search mode will be 'basic' or 'language', but language field will contain
+    the actual target language.
+
+    E.G ...basic:english..., ...language:english...
+
+
     :param query_argument:
     :return:
     """
     query_parts = query_argument.split(":")
-    if len(query_parts) != 4:
-        raise ValueError("Invalid query quad: " + str(query_argument))
-    return {"": query_parts[0],
+    if len(query_parts) != 5:
+        raise ValueError("Invalid query: " + str(query_argument))
+    query = {"operator": query_parts[0],
             "corpus_id": query_parts[1],
-            "language": query_parts[2],
-            "text": query_parts[3]}
+            "search_mode": query_parts[2],
+            "language": query_parts[3],
+            "text": query_parts[4]}
+    validate(query)
+    return query
 
 
 def parse_queries(queries_argument: str) -> list:
@@ -70,12 +87,14 @@ class SearchDocumentByTextHandler(BaseHandler):
 
             queries = parse_queries(queries_argument)
 
-            documents = something(queries, from_index, size)
+            documents = documents_by_text(queries, from_index, size)
 
             self.write_and_set_status({"documents": documents}, HTTPStatus.OK)
         except CorpusNotFoundException as exception:
             self.write_and_set_status({MESSAGE: "Corpus not found with id:'{}'".format(exception.corpus_id)},
                                       HTTPStatus.NOT_FOUND)
+        except ValueError as error:
+            self.write_and_set_status({MESSAGE: str(error)}, HTTPStatus.BAD_REQUEST)
         except Exception:
             trace = traceback.format_exc().splitlines()
             self.write_and_set_status({MESSAGE: "Internal server error", TRACE: trace},

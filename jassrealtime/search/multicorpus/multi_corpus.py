@@ -13,18 +13,31 @@ from jassrealtime.search.document import map_search_hit
 from jassrealtime.security.security_selector import get_autorisation
 
 
-def get_metadata_for_documents(corpusIds, schemaType, fromIndex, size, sortBy, sortOrder, filters,
-                               filterJoin):
+def get_annotations_of_type(corpus_ids, schema_type, from_index, size, sort_by, sort_order, filters,
+                            filter_join):
+    """
+    Paginated annotations of the specified type.
+
+    :param corpus_ids:
+    :param schema_type:
+    :param from_index:
+    :param size:
+    :param sort_by:
+    :param sort_order:
+    :param filters:
+    :param filter_join:
+    :return:
+    """
     # Specify all annotations indices for specified corpora
-    indices = partial_corpora_indices(corpusIds)
+    indices = partial_corpora_indices(corpus_ids)
 
     es = get_es_conn()
     search = Search(using=es, index=indices)
-    search = search[fromIndex:fromIndex + size]  # We are forced to use the scrolling API to sort (scan won't work)
+    search = search[from_index:from_index + size]  # We are forced to use the scrolling API to sort (scan won't work)
 
     # Sort by score if no sort field specified
-    if sortBy:
-        actual_sort = make_sort_field(sortBy, sortOrder)
+    if sort_by:
+        actual_sort = make_sort_field(sort_by, sort_order)
     else:
         actual_sort = "_score"
 
@@ -33,10 +46,10 @@ def get_metadata_for_documents(corpusIds, schemaType, fromIndex, size, sortBy, s
     # Need to restrict the search annotations to the given schema type.
     # The alternative is doing a first search to retrieve only the indices of the given schema type.
     # We are not sure which approach is faster overall.
-    schema_type_query = Q('term', schemaType=schemaType)
+    schema_type_query = Q('term', schemaType=schema_type)
 
     if filters:
-        es_filters = make_es_filters(filters, filterJoin)
+        es_filters = make_es_filters(filters, filter_join)
         # Although we are calling them filters,
         # we cannot actually use an ElasticSearch filter because we would lose score.
         # Scoring is important for sorting searches with analyzers like Ngram, EdgeNgram, etc.
@@ -53,6 +66,11 @@ def get_metadata_for_documents(corpusIds, schemaType, fromIndex, size, sortBy, s
 
 
 def partial_corpora_indices(corpus_ids: List[str]) -> str:
+    """
+        Returns all bucket indices for all the corpus ids specified.
+    :param corpus_ids:
+    :return:
+    """
     # The idiomatic way would be to instantiate a corpus for each corpus Id and then do a search in each corpus
     # for the bucket with the right schema type.
     # As it represent a 2n operation before doing the main search, and fearing latency,
@@ -115,7 +133,7 @@ def is_simple_type(definition):
     return definition["type"] in JSON_SCHEMA_PRIMITIVE_TYPES
 
 
-def properties(schema: dict) -> List:
+def properties(schema: dict) -> dict:
     #  Keep simple properties that are searchable. Return name, type (and searchModes for string)
     searchable_properties = {}
     for name, definition in schema["properties"].items():
@@ -125,7 +143,7 @@ def properties(schema: dict) -> List:
     return searchable_properties
 
 
-def bucket_types(bucket: Bucket) -> dict:
+def bucket_types(bucket: Bucket) -> list:
     schemas_info = bucket.get_schemas_info(includeJson=True)["data"]
     properties_by_schema = []
     for schema_info in schemas_info:

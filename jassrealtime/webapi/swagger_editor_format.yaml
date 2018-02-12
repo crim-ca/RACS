@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: "2.6.4"
+  version: "2.6.5"
   title: RACS
   description: Annotation Storage
 
@@ -1208,6 +1208,8 @@ paths:
           description: 'Successful operation. Will return annotations grouped by corpus,bucket,schema. Will only return if there is data inside (will not return for example schema: {"corptest": {"bucket1":{"sentence": []}. If there is no annotations found will return {}'
           schema:
             $ref: "#/definitions/SearchDocumentQueryStructure"
+        "400":
+          description: 'Corpus or bucket not found.'
         "404":
           description: 'Corpus or bucket not found.'
       security:

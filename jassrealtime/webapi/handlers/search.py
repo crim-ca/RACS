@@ -3,7 +3,7 @@ from http import HTTPStatus
 
 from jassrealtime.core.settings_utils import get_env_id
 from jassrealtime.search.document import *
-from jassrealtime.search.multi_corpus import get_metadata_for_documents
+from jassrealtime.search.multicorpus.multi_corpus import get_annotations_of_type
 from jassrealtime.security.security_selector import get_autorisation
 from jassrealtime.webapi.handlers.base_handler import BaseHandler
 from jassrealtime.webapi.handlers.parameter_names import *
@@ -189,7 +189,7 @@ class DocumentMetadataSearchHandler(BaseHandler):
             sortBy = self.get_query_argument("sortBy", default=None)
             sortOrder = self.get_query_argument("sortOrder", default=None)
 
-            count, annotations = get_metadata_for_documents(
+            count, annotations = get_annotations_of_type(
                 corpusIds, SCHEMA_TYPE_DOCUMENT_METADATA,
                 fromIndex, size, sortBy, sortOrder, filters, filterJoin)
 
