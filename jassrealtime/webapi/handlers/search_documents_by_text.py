@@ -33,10 +33,10 @@ def parse_query(query_argument: str) -> dict:
     if len(query_parts) != 5:
         raise ValueError("Invalid query: " + str(query_argument))
     query = {"operator": query_parts[0],
-            "corpus_id": query_parts[1],
-            "search_mode": query_parts[2],
-            "language": query_parts[3],
-            "text": query_parts[4]}
+             "corpus_id": query_parts[1],
+             "search_mode": query_parts[2],
+             "language": query_parts[3],
+             "text": query_parts[4]}
     validate(query)
     return query
 
@@ -87,9 +87,9 @@ class SearchDocumentByTextHandler(BaseHandler):
 
             queries = parse_queries(queries_argument)
 
-            documents = documents_by_text(queries, from_index, size)
+            count, documents = documents_by_text(queries, from_index, size)
 
-            self.write_and_set_status({"documents": documents}, HTTPStatus.OK)
+            self.write_and_set_status({"count": count, "documents": documents}, HTTPStatus.OK)
         except CorpusNotFoundException as exception:
             self.write_and_set_status({MESSAGE: "Corpus not found with id:'{}'".format(exception.corpus_id)},
                                       HTTPStatus.NOT_FOUND)

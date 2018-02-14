@@ -509,7 +509,7 @@ class SchemaList:
 
     def add_es_schema(self, esProperties: dict):
         """
-        Add an esScheam to the list of available schemas. (If already exists do nothing)
+        Add an es Schema to the list of available schemas. (If already exists do nothing)
 
         :param esProperties:      Properties Section of es schema
         :return:                  esHash
