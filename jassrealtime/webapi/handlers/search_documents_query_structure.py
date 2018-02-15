@@ -73,6 +73,8 @@ class SearchDocumentQueryStructureHandler(BaseHandler):
         except BucketNotFoundException as exception:
             self.write_and_set_status({MESSAGE: "Bucket not found with id:'{}'".format(exception.bucket_id)},
                                       HTTPStatus.NOT_FOUND)
+        except ValueError as error:
+            self.write_and_set_status({MESSAGE: str(error)}, HTTPStatus.BAD_REQUEST)
         except Exception:
             trace = traceback.format_exc().splitlines()
             self.write_and_set_status({MESSAGE: "Internal server error", TRACE: trace},

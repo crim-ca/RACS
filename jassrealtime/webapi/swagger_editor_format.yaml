@@ -1209,7 +1209,7 @@ paths:
           schema:
             $ref: "#/definitions/SearchDocumentQueryStructure"
         "400":
-          description: 'Corpus or bucket not found.'
+          description: 'Invalid target.'
         "404":
           description: 'Corpus or bucket not found.'
       security:
