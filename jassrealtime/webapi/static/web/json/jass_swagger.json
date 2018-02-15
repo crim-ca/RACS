@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "2.6.4",
+    "version": "2.6.4.1",
     "title": "RACS",
     "description": "Annotation Storage"
   },
@@ -1796,6 +1796,9 @@
               "$ref": "#/definitions/SearchDocumentQueryStructure"
             }
           },
+          "400": {
+            "description": "Bad request."
+          },
           "404": {
             "description": "Corpus or bucket not found."
           }
@@ -2280,8 +2283,47 @@
       "type": "object",
       "properties": {
         "structure": {
-          "type": "object",
-          "description": "Search document query structure"
+          "description": "Search document query structure",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "corpusId": {
+                "type": "string"
+              },
+              "languages": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "groups": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "bucketId": {
+                      "type": "string"
+                    },
+                    "types": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "schemaType": {
+                            "type": "string"
+                          },
+                          "Properties": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       },
       "example": {
@@ -2304,19 +2346,13 @@
                 "bucketId": "29550cda-0c40-11e8-aa88-a8206600f845",
                 "types": [
                   {
-                    "type": "Animal",
+                    "schemaType": "Animal",
                     "Properties": {
                       "schemaType": {
                         "type": "string",
                         "searchModes": [
                           "noop",
                           "edge"
-                        ]
-                      },
-                      "jeff": {
-                        "type": "string",
-                        "searchModes": [
-                          "basic"
                         ]
                       },
                       "_documentID": {
@@ -2340,7 +2376,7 @@
                     }
                   },
                   {
-                    "type": "Plant",
+                    "schemaType": "Plant",
                     "Properties": {
                       "schemaType": {
                         "type": "string",
