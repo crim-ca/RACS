@@ -1,8 +1,7 @@
-import itertools
 from elasticsearch_dsl import Search, Q
 
-from jassrealtime.core.language_manager import LanguageManager
-from jassrealtime.core.settings_utils import get_language_manager
+from ...core.language_manager import LanguageManager
+from ...core.settings_utils import get_language_manager
 from ...core.esutils import get_es_conn
 from ...search.document import map_search_hit
 from .multi_corpus import corpus_from_id
@@ -68,7 +67,7 @@ def documents_by_text(queries: list, from_index: int, size: int) -> tuple:
     es = get_es_conn()
     search = Search(using=es, index=indices_argument)
     search = search.source(["title", "language", "source"])
-    
+
     search.query = Q('bool',
                      must=grouped_queries["must"],
                      must_not=grouped_queries["must_not"],
