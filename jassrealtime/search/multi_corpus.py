@@ -130,6 +130,6 @@ def bucket_types(bucket: Bucket) -> dict:
     properties_by_schema = []
     for schema_info in schemas_info:
         schema = json.loads(schema_info["jsonSchema"])
-        properties_by_schema.append({"type": schema_info["schemaType"], "Properties": properties(schema)})
+        properties_by_schema.append({"schemaType": schema_info["schemaType"], "properties": properties(schema)})
 
     return properties_by_schema
