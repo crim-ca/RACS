@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "2.6.4",
+    "version": "2.6.5",
     "title": "RACS",
     "description": "Annotation Storage"
   },
@@ -1796,8 +1796,68 @@
               "$ref": "#/definitions/SearchDocumentQueryStructure"
             }
           },
+          "400": {
+            "description": "Invalid target."
+          },
           "404": {
             "description": "Corpus or bucket not found."
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/search/documents/byText": {
+      "get": {
+        "tags": [
+          "search"
+        ],
+        "summary": "Search documents by text",
+        "description": "Search documents with list of must/should/must_not queries",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "description": "zero-based starting index.",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "description": "Number of documents to retrieve",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "queries",
+            "description": "List of boolean_operator:corpus_id:search_mode:language:search_text quintuples separated by commas. Search mode will be 'basic' or 'language', but language field will contain the actual target language. Boolean operators are must/should/must_not. Language field is ignored when search mode is basic.\nExample: must:corpus-jeff-bilingual:language:en-xx:books,must:corpus-jeff-bilingual:basic::alice",
+            "required": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation.",
+            "schema": {
+              "$ref": "#/definitions/ResultSearchDocumentsBy"
+            }
+          },
+          "400": {
+            "description": "Invalid queries."
+          },
+          "404": {
+            "description": "Corpus not found."
           }
         },
         "security": [
@@ -2280,8 +2340,47 @@
       "type": "object",
       "properties": {
         "structure": {
-          "type": "object",
-          "description": "Search document query structure"
+          "description": "Search document query structure",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "corpusId": {
+                "type": "string"
+              },
+              "languages": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "groups": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "bucketId": {
+                      "type": "string"
+                    },
+                    "types": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "schemaType": {
+                            "type": "string"
+                          },
+                          "Properties": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       },
       "example": {
@@ -2304,19 +2403,13 @@
                 "bucketId": "29550cda-0c40-11e8-aa88-a8206600f845",
                 "types": [
                   {
-                    "type": "Animal",
+                    "schemaType": "Animal",
                     "Properties": {
                       "schemaType": {
                         "type": "string",
                         "searchModes": [
                           "noop",
                           "edge"
-                        ]
-                      },
-                      "jeff": {
-                        "type": "string",
-                        "searchModes": [
-                          "basic"
                         ]
                       },
                       "_documentID": {
@@ -2340,7 +2433,7 @@
                     }
                   },
                   {
-                    "type": "Plant",
+                    "schemaType": "Plant",
                     "Properties": {
                       "schemaType": {
                         "type": "string",
@@ -2374,6 +2467,61 @@
                 ]
               }
             ]
+          }
+        ]
+      }
+    },
+    "ResultSearchDocument": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Document ID",
+          "type": "string"
+        },
+        "language": {
+          "description": "Document language",
+          "type": "string"
+        },
+        "title": {
+          "description": "Title of the document to be used as needed by the platform",
+          "type": "string"
+        },
+        "source": {
+          "description": "Document provenance",
+          "type": "string"
+        }
+      }
+    },
+    "ResultSearchDocumentsBy": {
+      "description": "Paginated list of matching documents.",
+      "type": "object",
+      "properties": {
+        "count": {
+          "description": "Count of all matching results excluding pagination.",
+          "type": "integer"
+        },
+        "documents": {
+          "description": "Documents excluding the actual text.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ResultSearchDocument"
+          }
+        }
+      },
+      "example": {
+        "count": 99,
+        "documents": [
+          {
+            "language": "fr-FR",
+            "source": "https://www.gutenberg.org/files/55456/55456-0.txt",
+            "title": "AU FOND DU TERRIER",
+            "id": "7e776152-1287-11e8-94ab-a8206600f845"
+          },
+          {
+            "language": "en-UK",
+            "source": "http://www.gutenberg.org/files/11/11-0.txt",
+            "title": "Down the Rabbit-Hole",
+            "id": "4c457d82-1349-11e8-b900-a8206600f845"
           }
         ]
       }

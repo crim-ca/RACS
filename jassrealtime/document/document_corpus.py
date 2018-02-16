@@ -69,8 +69,14 @@ LANGUAGE_MAPPINGS = {
             },
             "text": {
                 "type": "text",
-                "analyzer": "french"
-            },
+                "analyzer": "standard",
+                "fields": {
+                    "french": {
+                        "type": "text",
+                        "analyzer": "french"
+                    }
+                }
+            }
         }
     },
     "english": {
@@ -86,7 +92,13 @@ LANGUAGE_MAPPINGS = {
             },
             "text": {
                 "type": "text",
-                "analyzer": "english"
+                "analyzer": "standard",
+                "fields": {
+                    "english": {
+                        "type": "text",
+                        "analyzer": "english"
+                    }
+                }
             }
         }
     }
@@ -120,6 +132,13 @@ def make_es_filters(filters: List[tuple], filterJoin: str):
         joinOperator = and_
 
     return reduce(joinOperator, esFilters)
+
+
+def language_doc_type(language_locale: str) -> str:
+    # Clients of the API insists on passing a locale instead of just a language so we must transform to get the
+    # language used as the index doc type.
+    doc_type = get_language_manager().get_es_analyser(language_locale)
+    return doc_type
 
 
 class DocumentCorpus:
@@ -206,7 +225,7 @@ class DocumentCorpus:
 
         document = dict(text=text, title=title, language=language, source=source)
 
-        self.dd.add_document(document, id, language)
+        self.dd.add_document(document, id, language_doc_type(language))
 
         return id
 
@@ -228,7 +247,7 @@ class DocumentCorpus:
         return total_document_count
 
     def get_text_document(self, documentId):
-        rawDoc = self.dd.small_search(docTypes=self.languages, filterTerms={"_id": documentId}, useScan=False)
+        rawDoc = self.dd.small_search(docTypes=self.languages_doc_types(), filterTerms={"_id": documentId}, useScan=False)
         if not rawDoc:
             raise DocumentNotFoundException(documentId)
 
@@ -236,10 +255,14 @@ class DocumentCorpus:
 
         return document
 
+    def languages_doc_types(self):
+        return [language_doc_type(language) for language in self.languages]
+
+
     def get_text_documents(self, fromIndex: int, size: int, sortBy: str = None, sortOrder: str = None,
                            filterTitle: str = None, filterSource: str = None, filterJoin: str = None):
         es = get_es_conn()
-        search = Search(using=es, index=self.dd.get_indices(self.languages))
+        search = Search(using=es, index=self.dd.get_indices(self.languages_doc_types()))
         search = search[fromIndex:fromIndex + size]
         search = search.source(["title", "language", "source"])
 
@@ -264,7 +287,7 @@ class DocumentCorpus:
         Get document ids of all the documents of the corpus
         """
         es = get_es_conn()
-        search = Search(using=es, index=self.dd.get_indices(self.languages))
+        search = Search(using=es, index=self.dd.get_indices(self.languages_doc_types()))
         search = search.source(["_id"])
         search = search.params(scroll=get_scan_scroll_duration(), size=get_nb_documents_per_scan_scroll())
         #  Only 10 hits if don't use scan.
@@ -276,7 +299,7 @@ class DocumentCorpus:
         doc = self.get_text_document(documentId)
         if not doc:
             raise DocumentNotFoundException()
-        self.dd.delete_document(documentId, doc["language"])
+        self.dd.delete_document(documentId, language_doc_type(doc["language"]))
 
     def get_all_documents_ids_and_types(self):
         """
