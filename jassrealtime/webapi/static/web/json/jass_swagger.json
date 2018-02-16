@@ -1797,7 +1797,11 @@
             }
           },
           "400": {
+<<<<<<< HEAD
             "description": "Invalid target."
+=======
+            "description": "Bad request."
+>>>>>>> 6e16f1340b3b72b52615373e654c8e72af910c6c
           },
           "404": {
             "description": "Corpus or bucket not found."
