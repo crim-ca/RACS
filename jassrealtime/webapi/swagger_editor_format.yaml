@@ -1216,6 +1216,50 @@ paths:
         - api_key: []
 
 
+  /search/documents/byText:
+    get:
+      tags:
+        - search
+      summary: Search documents by text
+      description: 'Search documents with list of must/should/must_not queries'
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: from
+          description: 'zero-based starting index.'
+          required: true
+          type: integer
+        - in: query
+          name: size
+          description: 'Number of documents to retrieve'
+          required: true
+          type: integer
+        - in: query
+          name: queries
+          description: "List of boolean_operator:corpus_id:search_mode:language:search_text quintuples separated by commas. Search mode will be 'basic' or 'language', but language field will contain the actual target language.
+          Boolean operators are must/should/must_not.
+          Language field is ignored when search mode is basic.
+
+           Example: must:corpus-jeff-bilingual:language:en-xx:books,must:corpus-jeff-bilingual:basic::alice"
+          required: true
+          type: array
+          items: {
+            type: string
+          }
+      responses:
+        "200":
+          description: 'Successful operation.'
+          schema:
+            $ref: "#/definitions/ResultSearchDocumentsBy"
+        "400":
+          description: 'Invalid queries.'
+        "404":
+          description: 'Corpus not found.'
+      security:
+        - api_key: []
+
+
 definitions:
   Id:
     type: object
@@ -1588,6 +1632,47 @@ definitions:
                         Properties:
                           type: object
     example: {"structure": [{"corpusId": "jfh-corpus-english", "languages": ["en-CA"], "groups": []}, {"corpusId": "jfh-corpus-demo", "languages": ["en-EN", "fr-FR"], "groups": [{"bucketId": "29550cda-0c40-11e8-aa88-a8206600f845", "types": [{"schemaType": "Animal", "Properties": {"schemaType": {"type": "string", "searchModes": ["noop", "edge"]}, "_documentID": {"type": "string", "searchModes": ["noop"]}, "_corpusID": {"type": "string", "searchModes": ["noop"]}, "notes": {"type": "string", "searchModes": ["language"]}}}, {"schemaType": "Plant", "Properties": {"schemaType": {"type": "string", "searchModes": ["noop"]}, "_documentID": {"type": "string", "searchModes": ["noop"]}, "_corpusID": {"type": "string", "searchModes": ["noop"]}, "notes": {"type": "string", "searchModes": ["basic"]}, "NumProperty": {"type": "number"}}}]}]}]}
+
+  ResultSearchDocument:
+    type: object
+    properties:
+      id:
+        description: "Document ID"
+        type: string
+      language:
+        description: "Document language"
+        type: string
+      title:
+        description: "Title of the document to be used as needed by the platform"
+        type: string
+      source:
+        description: "Document provenance"
+        type: string
+
+  ResultSearchDocumentsBy:
+    description: "Paginated list of matching documents."
+    type: object
+    properties:
+      count:
+        description: "Count of all matching results excluding pagination."
+        type: integer
+      documents:
+        description: "Documents excluding the actual text."
+        type: array
+        items:
+          $ref: "#/definitions/ResultSearchDocument"
+    example: {"count": 99, "documents": [{
+			"language": "fr-FR",
+			"source": "https://www.gutenberg.org/files/55456/55456-0.txt",
+			"title": "AU FOND DU TERRIER",
+			"id": "7e776152-1287-11e8-94ab-a8206600f845"
+		},
+		{
+			"language": "en-UK",
+			"source": "http://www.gutenberg.org/files/11/11-0.txt",
+			"title": "Down the Rabbit-Hole",
+			"id": "4c457d82-1349-11e8-b900-a8206600f845"
+		}]}
 
 
 securityDefinitions:

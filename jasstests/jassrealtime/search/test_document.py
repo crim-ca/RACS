@@ -5,7 +5,7 @@ from jassrealtime.core.master_factory_list import get_schema_list, get_env_list,
     get_master_document_corpus_list
 from jassrealtime.core.env import EnvAlreadyExistWithSameIdException
 from jassrealtime.search.document import *
-from jassrealtime.search.multicorpus.documents_by_text import documents_by_text
+from jassrealtime.search.multicorpus.documents_by_text import DocumentsByText
 from jasstests.jassrealtime.core.test_schema_list import JSON_SCHEMA_WITH_SCHEMA_TYPE_BASIC
 
 CORPUS_ID = "corpus1"
@@ -60,7 +60,7 @@ class MyTestCase(unittest.TestCase):
         global envIdReadOnly
         global authorizationReadOnly
         # Copy paste from test corpus
-        corpus = get_master_document_corpus_list(envIdReadOnly, authorizationReadOnly).\
+        corpus = get_master_document_corpus_list(envIdReadOnly, authorizationReadOnly). \
             create_corpus(CORPUS_ID, languages=["fr-xx", "en-xx"])
         bucket1 = corpus.create_bucket("bucket1", "bucket1")
         bucket2 = corpus.create_bucket("bucket2", "bucket2")
@@ -462,6 +462,7 @@ class MyTestCase(unittest.TestCase):
                  "to do: once or twice she had peeped into the book her sister was reading, but it had no pictures or "
                  "conversations in it, ‘and what is the use of a book,’ thought Alice ‘without pictures or "
                  "conversations?’")
+        time.sleep(1)
 
     def test_get_annotations_by_document_one_type(self):
         global envIdReadOnly
@@ -649,14 +650,106 @@ class MyTestCase(unittest.TestCase):
         bucket1.add_annotation(anno1, "schema1", "1")
 
     def test_documents_by_text_basic(self):
+        global envIdReadOnly
+        global authorizationReadOnly
+        documents_by_text = DocumentsByText(envIdReadOnly, authorizationReadOnly)
         queries = [{'operator': 'must', 'corpus_id': CORPUS_ID,
                     'search_mode': 'basic', 'language': '', 'text': 'alice'}]
-        count, documents = documents_by_text(queries, 0, 10)
-        self.assertEquals(2, count)
+        count, documents = documents_by_text.documents_by_text(queries, 0, 10)
+        self.assertEqual(2, count)
         document_ids = [document["id"] for document in documents]
         self.assertIn(ALICE_EN_DOC_ID, document_ids)
         self.assertIn(ALICE_FR_DOC_ID, document_ids)
-        self.assertEquals(2, count)
+
+    def test_documents_by_text_must_sister_french(self):
+        global envIdReadOnly
+        global authorizationReadOnly
+        documents_by_text = DocumentsByText(envIdReadOnly, authorizationReadOnly)
+        queries = [{'operator': 'must', 'corpus_id': CORPUS_ID,
+                    'search_mode': 'language', 'language': 'fr-xx', 'text': 'sœur'}]
+        count, documents = documents_by_text.documents_by_text(queries, 0, 10)
+        self.assertEqual(1, count)
+        document_ids = [document["id"] for document in documents]
+        self.assertIn(ALICE_FR_DOC_ID, document_ids)
+
+    def test_documents_by_text_should_sister_french(self):
+        global envIdReadOnly
+        global authorizationReadOnly
+        documents_by_text = DocumentsByText(envIdReadOnly, authorizationReadOnly)
+        queries = [{'operator': 'should', 'corpus_id': CORPUS_ID,
+                    'search_mode': 'language', 'language': 'fr-xx', 'text': 'sœur'}]
+        count, documents = documents_by_text.documents_by_text(queries, 0, 10)
+        self.assertEqual(1, count)
+        document_ids = [document["id"] for document in documents]
+        self.assertIn(ALICE_FR_DOC_ID, document_ids)
+
+    def test_documents_by_text_english_books(self):
+        global envIdReadOnly
+        global authorizationReadOnly
+        documents_by_text = DocumentsByText(envIdReadOnly, authorizationReadOnly)
+        queries = [{'operator': 'must', 'corpus_id': CORPUS_ID,
+                    'search_mode': 'language', 'language': 'en-xx', 'text': 'books'}]
+        count, documents = documents_by_text.documents_by_text(queries, 0, 10)
+        self.assertEqual(1, count)
+        document_ids = [document["id"] for document in documents]
+        self.assertIn(ALICE_EN_DOC_ID, document_ids)
+
+    def test_documents_by_text_must_and_must_not(self):
+        global envIdReadOnly
+        global authorizationReadOnly
+        documents_by_text = DocumentsByText(envIdReadOnly, authorizationReadOnly)
+        must = {'operator': 'must', 'corpus_id': CORPUS_ID,
+                'search_mode': 'basic', 'language': '', 'text': 'alice'}
+        must_not = {'operator': 'must_not', 'corpus_id': CORPUS_ID,
+                    'search_mode': 'language', 'language': 'fr-xx', 'text': 'sœur'}
+        count, documents = documents_by_text.documents_by_text([must, must_not], 0, 10)
+        self.assertEqual(1, count)
+        document_ids = [document["id"] for document in documents]
+        self.assertIn(ALICE_EN_DOC_ID, document_ids)
+
+    def test_documents_by_text_must_and_should(self):
+        """
+        https://stackoverflow.com/questions/28768277/elasticsearch-difference-between-must-and-should-bool-query
+        Must: The clause (query) must appear in matching documents.
+
+        Should: The clause (query) should appear in the matching document. In a boolean query with no must clauses,
+        one or more should clauses must match a document. The minimum number of should clauses to match can be set
+        using the minimum_should_match parameter.
+
+        Here, we assume the soeur document will not match because it isn't already part of the must matches.
+        """
+        global envIdReadOnly
+        global authorizationReadOnly
+        documents_by_text = DocumentsByText(envIdReadOnly, authorizationReadOnly)
+        must = {'operator': 'must', 'corpus_id': CORPUS_ID,
+                'search_mode': 'language', 'language': 'en-xx', 'text': 'books'}
+        should = {'operator': 'should', 'corpus_id': CORPUS_ID,
+                  'search_mode': 'language', 'language': 'fr-xx', 'text': 'sœur'}
+        count, documents = documents_by_text.documents_by_text([must, should], 0, 10)
+        self.assertEqual(1, count)
+        document_ids = [document["id"] for document in documents]
+        self.assertIn(ALICE_EN_DOC_ID, document_ids)
+
+    def test_documents_by_text_should(self):
+        """
+        https://stackoverflow.com/questions/28768277/elasticsearch-difference-between-must-and-should-bool-query
+        Must: The clause (query) must appear in matching documents.
+
+        Should: The clause (query) should appear in the matching document. In a boolean query with no must clauses,
+        one or more should clauses must match a document. The minimum number of should clauses to match can be set
+        using the minimum_should_match parameter.
+
+        Here, we assume the soeur document will match because there is no must clause.
+        """
+        global envIdReadOnly
+        global authorizationReadOnly
+        documents_by_text = DocumentsByText(envIdReadOnly, authorizationReadOnly)
+        should = {'operator': 'should', 'corpus_id': CORPUS_ID,
+                  'search_mode': 'language', 'language': 'fr-xx', 'text': 'sœur'}
+        count, documents = documents_by_text.documents_by_text([should], 0, 10)
+        self.assertEqual(1, count)
+        document_ids = [document["id"] for document in documents]
+        self.assertIn(ALICE_FR_DOC_ID, document_ids)
 
     def tearDown(self):
         try:

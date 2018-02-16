@@ -1,9 +1,11 @@
 import traceback
 from http import HTTPStatus
 
+from ...core.settings_utils import get_env_id
+from ...security.security_selector import get_autorisation
 from ...document.bucket import BucketNotFoundException
 from ...document.document_corpus import CorpusNotFoundException
-from jassrealtime.search.multicorpus.multi_corpus import query_structure
+from ...search.multicorpus.multi_corpus import MultiCorpus
 from .base_handler import BaseHandler
 from .parameter_names import MESSAGE, TRACE
 
@@ -64,7 +66,10 @@ class SearchDocumentQueryStructureHandler(BaseHandler):
             targets = parse_targets(targets_argument)
             grouped_targets = group_targets(targets)
 
-            structure = query_structure(grouped_targets)
+            env_id = get_env_id()
+            authorization = get_autorisation(env_id, None, None)
+            mc = MultiCorpus(env_id, authorization)
+            structure = mc.query_structure(grouped_targets)
 
             self.write_and_set_status({"structure": structure}, HTTPStatus.OK)
         except CorpusNotFoundException as exception:

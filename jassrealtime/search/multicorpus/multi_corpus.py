@@ -3,15 +3,15 @@ import json
 from elasticsearch_dsl import Search, Q
 from typing import List
 
-from jassrealtime.core.esutils import get_es_conn
-from jassrealtime.core.schema_list import JSON_SCHEMA_PRIMITIVE_TYPES
-from jassrealtime.core.settings_utils import get_settings
-from jassrealtime.document.bucket import Bucket
-from jassrealtime.document.document_corpus import make_sort_field, make_es_filters, get_master_document_corpus_list, \
+from ...core.esutils import get_es_conn
+from ...core.schema_list import JSON_SCHEMA_PRIMITIVE_TYPES
+from ...core.settings_utils import get_settings
+from ...document.bucket import Bucket
+from ...document.document_corpus import make_sort_field, make_es_filters, get_master_document_corpus_list, \
     DocumentCorpus
-from jassrealtime.search.document import map_search_hit
-from jassrealtime.security.base_authorization import BaseAuthorization
-from jassrealtime.security.security_selector import get_autorisation
+from ...search.document import map_search_hit
+from ...security.base_authorization import BaseAuthorization
+from ...security.security_selector import get_autorisation
 
 
 class MultiCorpus:

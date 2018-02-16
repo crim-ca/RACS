@@ -1,7 +1,9 @@
 import traceback
 from http import HTTPStatus
 
-from ...search.multicorpus.documents_by_text import documents_by_text
+from ...core.settings_utils import get_env_id
+from ...search.multicorpus.documents_by_text import DocumentsByText
+from ...security.security_selector import get_autorisation
 from ...document.document_corpus import CorpusNotFoundException
 from .base_handler import BaseHandler
 from .document import MAX_DOCUMENT_SIZE
@@ -18,7 +20,7 @@ def validate(query):
 def parse_query(query_argument: str) -> dict:
     """
     A query argument is a quintuple of the form:
-     boolean_operator:corpus_id:searchMode:language:search_text
+     boolean_operator:corpus_id:search_mode:language:search_text
 
     Search mode will be 'basic' or 'language', but language field will contain
     the actual target language.
@@ -87,7 +89,10 @@ class SearchDocumentByTextHandler(BaseHandler):
 
             queries = parse_queries(queries_argument)
 
-            count, documents = documents_by_text(queries, from_index, size)
+            env_id = get_env_id()
+            authorization = get_autorisation(env_id, None, None)
+            documents_by_text = DocumentsByText(env_id, authorization)
+            count, documents = documents_by_text.documents_by_text(queries, from_index, size)
 
             self.write_and_set_status({"count": count, "documents": documents}, HTTPStatus.OK)
         except CorpusNotFoundException as exception:
