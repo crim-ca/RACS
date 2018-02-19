@@ -1215,7 +1215,6 @@ paths:
       security:
         - api_key: []
 
-
   /search/documents/byText:
     get:
       tags:
@@ -1258,7 +1257,6 @@ paths:
           description: 'Corpus not found.'
       security:
         - api_key: []
-
 
 definitions:
   Id:
@@ -1631,7 +1629,7 @@ definitions:
                           type: string
                         properties:
                           type: object
-    example: {"structure": [{"corpusId": "jfh-corpus-english", "languages": ["en-CA"], "groups": []}, {"corpusId": "jfh-corpus-demo", "languages": ["en-EN", "fr-FR"], "groups": [{"bucketId": "29550cda-0c40-11e8-aa88-a8206600f845", "types": [{"schemaType": "Animal", "properties": {"schemaType": {"type": "string", "searchModes": ["noop", "edge"]}, "_documentID": {"type": "string", "searchModes": ["noop"]}, "_corpusID": {"type": "string", "searchModes": ["noop"]}, "notes": {"type": "string", "searchModes": ["language"]}}}, {"schemaType": "Plant", "properties": {"schemaType": {"type": "string", "searchModes": ["noop"]}, "_documentID": {"type": "string", "searchModes": ["noop"]}, "_corpusID": {"type": "string", "searchModes": ["noop"]}, "notes": {"type": "string", "searchModes": ["basic"]}, "NumProperty": {"type": "number"}}}]}]}]}
+    example: {"structure": [{"corpusId": "jfh-corpus-english", "languages": ["en-CA"], "groups": []}, {"corpusId": "jfh-corpus-demo", "languages": ["en-EN", "fr-FR"], "groups": [{"bucketId": "29550cda-0c40-11e8-aa88-a8206600f845", "types": [{"schemaType": "Animal", "Properties": {"schemaType": {"type": "string", "searchModes": ["noop", "edge"]}, "_documentID": {"type": "string", "searchModes": ["noop"]}, "_corpusID": {"type": "string", "searchModes": ["noop"]}, "notes": {"type": "string", "searchModes": ["language"]}}}, {"schemaType": "Plant", "Properties": {"schemaType": {"type": "string", "searchModes": ["noop"]}, "_documentID": {"type": "string", "searchModes": ["noop"]}, "_corpusID": {"type": "string", "searchModes": ["noop"]}, "notes": {"type": "string", "searchModes": ["basic"]}, "NumProperty": {"type": "number"}}}]}]}]}
 
   ResultSearchDocument:
     type: object
@@ -1661,19 +1659,7 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/ResultSearchDocument"
-    example: {"count": 99, "documents": [{
-			"language": "fr-FR",
-			"source": "https://www.gutenberg.org/files/55456/55456-0.txt",
-			"title": "AU FOND DU TERRIER",
-			"id": "7e776152-1287-11e8-94ab-a8206600f845"
-		},
-		{
-			"language": "en-UK",
-			"source": "http://www.gutenberg.org/files/11/11-0.txt",
-			"title": "Down the Rabbit-Hole",
-			"id": "4c457d82-1349-11e8-b900-a8206600f845"
-		}]}
-
+    example: {"count": 99, "documents": [{"language": "fr-FR","source": "https://www.gutenberg.org/files/55456/55456-0.txt","title": "AU FOND DU TERRIER","id": "7e776152-1287-11e8-94ab-a8206600f845"},{"language": "en-UK","source": "http://www.gutenberg.org/files/11/11-0.txt","title": "Down the Rabbit-Hole","id": "4c457d82-1349-11e8-b900-a8206600f845"}]}
 
 securityDefinitions:
   api_key:
