@@ -3,6 +3,10 @@
 History
 =======
 
+2.6.6
+---------------------
+* Document search by annotation
+
 2.6.5
 ---------------------
 * Document search by text

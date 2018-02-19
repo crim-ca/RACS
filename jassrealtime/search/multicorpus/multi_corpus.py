@@ -113,7 +113,10 @@ class MultiCorpus:
     def buckets_types(self, corpus: DocumentCorpus, bucket_ids: list) -> list:
         buckets = []
         for bucket_id in bucket_ids:
-            buckets.append({"bucketId": bucket_id, "types": self.bucket_types(corpus.get_bucket(bucket_id))})
+            bucket = corpus.get_bucket(bucket_id)
+            buckets.append({"bucketId": bucket_id,
+                            "name": bucket.name,
+                            "types": self.bucket_types(bucket)})
         return buckets
 
     @staticmethod

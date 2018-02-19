@@ -1,11 +1,12 @@
 import traceback
 from http import HTTPStatus
 
-from ...webapi.handlers.search_documents import SearchDocumentsHandler
+from jassrealtime.webapi.handlers.search_documents import SearchDocumentsHandler
+from ...search.multicorpus.documents_by_annotation import DocumentsByAnnotation
 from ...core.settings_utils import get_env_id
-from ...search.multicorpus.documents_by_text import DocumentsByText
 from ...security.security_selector import get_autorisation
 from ...document.document_corpus import CorpusNotFoundException
+from .base_handler import BaseHandler
 from .document import MAX_DOCUMENT_SIZE
 from .parameter_names import MESSAGE, TRACE
 
@@ -47,7 +48,7 @@ def parse_queries(queries_argument: str) -> list:
     return [parse_query(query_argument) for query_argument in queries_argument.split(",")]
 
 
-class SearchDocumentsByTextHandler(SearchDocumentsHandler):
+class SearchDocumentsByAnnotationHandler(SearchDocumentsHandler):
     def get(self):
         try:
             from_index_argument = self.get_query_argument("from", None)
@@ -75,17 +76,26 @@ class SearchDocumentsByTextHandler(SearchDocumentsHandler):
 
             size = min(size, MAX_DOCUMENT_SIZE)
 
+            # Get corpus id list and their selected bucket ids
+            targets_argument = self.get_query_argument("targets", default=None)
+            if not targets_argument:
+                self.missing_required_field("targets")
+                return
+
             queries_argument = self.get_query_argument("queries", default=None)
             if not queries_argument:
                 self.missing_required_field("queries")
                 return
 
+            targets = self.parse_targets(targets_argument)
+            grouped_targets = self.group_targets(targets)
+
             queries = parse_queries(queries_argument)
 
             env_id = get_env_id()
             authorization = get_autorisation(env_id, None, None)
-            documents_by_text = DocumentsByText(env_id, authorization)
-            count, documents = documents_by_text.documents_by_text(queries, from_index, size)
+            documents_by_annotation = DocumentsByAnnotation(env_id, authorization)
+            count, documents = documents_by_annotation.documents_by_annotation(queries, from_index, size)
 
             self.write_and_set_status({"count": count, "documents": documents}, HTTPStatus.OK)
         except CorpusNotFoundException as exception:

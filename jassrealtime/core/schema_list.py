@@ -489,18 +489,16 @@ class SchemaList:
                 if type(search_modes) is not list:
                     raise SchemaBindingInvalid("searchModes must be a list for field " + key)
 
-                # Special case: default index
-                language = item.get("language")
-                mapping = self.mapping_field_index_with_search_mode(search_modes[0], language)
+                # Special case: default index.
+                # We will never search be default index; we will use explicit search mode
+                mapping = {"type": "keyword", "index": "false", "fields": {}}
 
-                # Subsequent cases: index names will be appended with the corresponding searchMode.
+                # Index names will be appended with the corresponding searchMode.
                 # E.g. title.edge
-                subsequent_indices = search_modes[1:]
-                if subsequent_indices:
-                    mapping["fields"] = {}
-                    for search_mode in subsequent_indices:
-                        sub_mapping = self.mapping_field_index_with_search_mode(search_mode, language)
-                        mapping["fields"][search_mode] = sub_mapping
+                language = item.get("language")
+                for search_mode in search_modes:
+                    sub_mapping = self.mapping_field_index_with_search_mode(search_mode, language)
+                    mapping["fields"][search_mode] = sub_mapping
         return mapping
 
     @staticmethod
