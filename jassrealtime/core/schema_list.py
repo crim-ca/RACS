@@ -489,8 +489,7 @@ class SchemaList:
                 if type(search_modes) is not list:
                     raise SchemaBindingInvalid("searchModes must be a list for field " + key)
 
-                # Special case: default index.
-                # We will never search be default index; we will use explicit search mode
+                # We will never search the default field name; we will use explicit search mode
                 mapping = {"type": "keyword", "index": "false", "fields": {}}
 
                 # Index names will be appended with the corresponding searchMode.

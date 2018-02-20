@@ -1,12 +1,11 @@
 import traceback
 from http import HTTPStatus
 
-from jassrealtime.webapi.handlers.search_documents import SearchDocumentsHandler
+from .search_documents import SearchDocumentsHandler
 from ...search.multicorpus.documents_by_annotation import DocumentsByAnnotation
 from ...core.settings_utils import get_env_id
 from ...security.security_selector import get_autorisation
 from ...document.document_corpus import CorpusNotFoundException
-from .base_handler import BaseHandler
 from .document import MAX_DOCUMENT_SIZE
 from .parameter_names import MESSAGE, TRACE
 
@@ -14,32 +13,30 @@ from .parameter_names import MESSAGE, TRACE
 def validate(query):
     if query["operator"] not in ["must", "should", "must_not"]:
         raise ValueError("Invalid operator in query {}.".format(query))
-    if query["search_mode"] not in ["basic", "language"]:
+    if query["search_mode"] not in ["noop", "basic", "language", "edge", "path", "ngram"]:
         raise ValueError("Invalid search_mode in query {}.".format(query))
 
 
 def parse_query(query_argument: str) -> dict:
     """
-    A query argument is a quintuple of the form:
-     boolean_operator:corpus_id:search_mode:language:search_text
+    A query argument is a tuple of the form:
+     boolean_operator:schema_type:attribute:search_mode:language:search_text
 
-    Search mode will be 'basic' or 'language', but language field will contain
-    the actual target language.
-
-    E.G ...basic:english..., ...language:english...
-
+     And eventually, but not implemented yet:
+     boolean_operator:schema_type:at_least:count
 
     :param query_argument:
     :return:
     """
     query_parts = query_argument.split(":")
-    if len(query_parts) != 5:
+    if len(query_parts) != 6:
         raise ValueError("Invalid query: " + str(query_argument))
     query = {"operator": query_parts[0],
-             "corpus_id": query_parts[1],
-             "search_mode": query_parts[2],
-             "language": query_parts[3],
-             "text": query_parts[4]}
+             "schema_type": query_parts[1],
+             "attribute": query_parts[2],
+             "search_mode": query_parts[3],
+             "language": query_parts[4],
+             "text": query_parts[5]}
     validate(query)
     return query
 
@@ -59,7 +56,7 @@ class SearchDocumentsByAnnotationHandler(SearchDocumentsHandler):
             from_index = int(from_index_argument)
             if from_index < 0:
                 self.write_and_set_status({MESSAGE: "'from' must cannot be less than zero"},
-                                          HTTPStatus.UNPROCESSABLE_ENTITY)
+                                          HTTPStatus.BAD_REQUEST)
                 return
 
             size_argument = self.get_query_argument("size")
@@ -71,7 +68,7 @@ class SearchDocumentsByAnnotationHandler(SearchDocumentsHandler):
 
             if size < 1:
                 self.write_and_set_status({MESSAGE: "'size' cannot be less than 1"},
-                                          HTTPStatus.UNPROCESSABLE_ENTITY)
+                                          HTTPStatus.BAD_REQUEST)
                 return
 
             size = min(size, MAX_DOCUMENT_SIZE)
@@ -94,8 +91,8 @@ class SearchDocumentsByAnnotationHandler(SearchDocumentsHandler):
 
             env_id = get_env_id()
             authorization = get_autorisation(env_id, None, None)
-            documents_by_annotation = DocumentsByAnnotation(env_id, authorization)
-            count, documents = documents_by_annotation.documents_by_annotation(queries, from_index, size)
+            search = DocumentsByAnnotation(env_id, authorization)
+            count, documents = search.documents_by_annotation(grouped_targets, queries, from_index, size)
 
             self.write_and_set_status({"count": count, "documents": documents}, HTTPStatus.OK)
         except CorpusNotFoundException as exception:

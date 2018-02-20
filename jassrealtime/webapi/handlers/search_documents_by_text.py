@@ -58,7 +58,7 @@ class SearchDocumentsByTextHandler(SearchDocumentsHandler):
             from_index = int(from_index_argument)
             if from_index < 0:
                 self.write_and_set_status({MESSAGE: "'from' must cannot be less than zero"},
-                                          HTTPStatus.UNPROCESSABLE_ENTITY)
+                                          HTTPStatus.BAD_REQUEST)
                 return
 
             size_argument = self.get_query_argument("size")
@@ -70,7 +70,7 @@ class SearchDocumentsByTextHandler(SearchDocumentsHandler):
 
             if size < 1:
                 self.write_and_set_status({MESSAGE: "'size' cannot be less than 1"},
-                                          HTTPStatus.UNPROCESSABLE_ENTITY)
+                                          HTTPStatus.BAD_REQUEST)
                 return
 
             size = min(size, MAX_DOCUMENT_SIZE)
@@ -84,8 +84,8 @@ class SearchDocumentsByTextHandler(SearchDocumentsHandler):
 
             env_id = get_env_id()
             authorization = get_autorisation(env_id, None, None)
-            documents_by_text = DocumentsByText(env_id, authorization)
-            count, documents = documents_by_text.documents_by_text(queries, from_index, size)
+            search = DocumentsByText(env_id, authorization)
+            count, documents = search.documents_by_text(queries, from_index, size)
 
             self.write_and_set_status({"count": count, "documents": documents}, HTTPStatus.OK)
         except CorpusNotFoundException as exception:
