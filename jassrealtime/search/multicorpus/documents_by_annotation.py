@@ -37,7 +37,10 @@ class DocumentsByAnnotation:
         indices = self.targets_indices(grouped_targets, list(schema_types))
         # indices_argument = ','.join(indices)
         # TODO actual annotation search
+
+        # shall we refactor to extract annotation search returning all annotations fields or just doc ids
         # TODO get meta_document information from docid (or search corpus documents?)
+
         return len(indices), indices
 
     def targets_indices(self, grouped_targets: dict, schema_types: list) -> list:

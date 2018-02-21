@@ -6,6 +6,10 @@ from jassrealtime.core.master_factory_list import get_env_list, get_master_docum
 from jassrealtime.core.env import EnvAlreadyExistWithSameIdException
 from jassrealtime.batch.document_corpus import DocumentCorpus
 
+ENCODING = "utf-8"
+
+CORPUS_ID = "corpus1"
+
 JASS_TEST_DATA_PATH = os.path.join("/tmp", "jass_test_data")
 POST_URL = 'http://localhost:25478/upload?token=f9403fc5f537b4ab332d'
 GET_URL = 'http://localhost:25478/files/3docs.zip?token=f9403fc5f537b4ab332d'
@@ -43,8 +47,8 @@ class MyTestCase(unittest.TestCase):
             pass
 
     def set_up_corpus(self):
-        corpus = get_master_document_corpus_list(self.envId, self.authorization).create_corpus("corpus1",
-                                                                                               languages=["en_US"])
+        corpus = get_master_document_corpus_list(self.envId, self.authorization).create_corpus(CORPUS_ID,
+                                                                                               languages=["en-US"])
         files = glob.iglob(os.path.join(JASS_TEST_DATA_PATH, "*.txt"))
         self.contentById = dict()
         for filePath in files:
@@ -52,7 +56,7 @@ class MyTestCase(unittest.TestCase):
                 id = os.path.basename(filePath)
                 contents = f.read()
                 self.contentById[str(id) + ".txt"] = contents
-                corpus.add_text_document(contents, filePath, "en_US", id)
+                corpus.add_text_document(contents, filePath, "en-US", id)
         time.sleep(1)
 
         # def test_upload_documents(self):
@@ -76,6 +80,7 @@ class MyTestCase(unittest.TestCase):
     #        with open(os.path.join(JASS_TEST_DATA_PATH,fileName),'r',encoding='utf8') as f:
     #            self.assertEqual(data,f.read())
 
+    @unittest.skip("This is more of an integration test with an external file server")
     def test_upload_documents_mss(self):
         # INTEGRATION TEST with leads mss
         self.set_up_corpus()
@@ -83,7 +88,7 @@ class MyTestCase(unittest.TestCase):
         resp = requests.get("http://services-leads.vesta.crim.ca/multimedia_storage/v1_7/add",
                             params={"filename": uploadFileName})
         swift_url_info = json.loads(resp.text)
-        documentCorpus = DocumentCorpus(self.envId, self.authorization, "corpus1")
+        documentCorpus = DocumentCorpus(self.envId, self.authorization, CORPUS_ID)
         documentCorpus.upload_documents(swift_url_info["upload_url"], uploadFileName, True, False)
         time.sleep(2)
         # getting the file we uploaded
@@ -102,3 +107,27 @@ class MyTestCase(unittest.TestCase):
         for fileName, data in self.contentById.items():
             with open(os.path.join(JASS_TEST_DATA_PATH, fileName), 'r', encoding='utf8') as f:
                 self.assertEqual(data, f.read())
+
+    def test_get_documents(self):
+        """
+        Verify that each file added in the corpus is present in the zip file and is the same file.
+        We compare the binary form of the files;we do not consider encoding.
+        """
+        self.set_up_corpus()
+        document_corpus = DocumentCorpus(self.envId, self.authorization, CORPUS_ID)
+        zip_path = document_corpus.get_documents_zip()
+        with zipfile.ZipFile(zip_path) as documents_zip:
+            files = glob.iglob(os.path.join(JASS_TEST_DATA_PATH, "*.txt"))
+            original_files_count = 0
+            for filePath in files:
+                with open(filePath, 'r', encoding=ENCODING) as document:
+                    original_files_count += 1
+                    text_id = os.path.basename(filePath)
+                    original_contents = document.read()
+                    with documents_zip.open(str(text_id) + ".txt") as document_zip:
+                        retrieved_content = document_zip.read().decode(ENCODING)
+                        self.assertEqual(original_contents, retrieved_content)
+            self.assertEqual(len(documents_zip.infolist()), original_files_count)
+
+        document_corpus.clear_temporary_files()
+

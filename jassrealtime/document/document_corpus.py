@@ -258,11 +258,13 @@ class DocumentCorpus:
     def languages_doc_types(self):
         return [language_doc_type(language) for language in self.languages]
 
+    def languages_indices(self):
+        return self.dd.get_indices(self.languages_doc_types())
 
     def get_text_documents(self, fromIndex: int, size: int, sortBy: str = None, sortOrder: str = None,
                            filterTitle: str = None, filterSource: str = None, filterJoin: str = None):
         es = get_es_conn()
-        search = Search(using=es, index=self.dd.get_indices(self.languages_doc_types()))
+        search = Search(using=es, index=self.languages_indices())
         search = search[fromIndex:fromIndex + size]
         search = search.source(["title", "language", "source"])
 
@@ -287,7 +289,7 @@ class DocumentCorpus:
         Get document ids of all the documents of the corpus
         """
         es = get_es_conn()
-        search = Search(using=es, index=self.dd.get_indices(self.languages_doc_types()))
+        search = Search(using=es, index=self.languages_indices())
         search = search.source(["_id"])
         search = search.params(scroll=get_scan_scroll_duration(), size=get_nb_documents_per_scan_scroll())
         #  Only 10 hits if don't use scan.
