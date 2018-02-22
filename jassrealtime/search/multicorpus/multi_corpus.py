@@ -99,7 +99,8 @@ class MultiCorpus:
 
         for corpusId, buckets in grouped_targets.items():
             corpus = self.corpus_from_id(corpusId)
-            group_structure = {"corpusId": corpusId, "languages": corpus.languages,
+            group_structure = {"corpusId": corpusId,
+                               "languages": corpus.languages,
                                "groups": self.buckets_types(corpus, buckets)}
             structure.append(group_structure)
 

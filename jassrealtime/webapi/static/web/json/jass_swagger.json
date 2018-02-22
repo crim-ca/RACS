@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "2.6.5",
+    "version": "2.6.5.1",
     "title": "RACS",
     "description": "Annotation Storage"
   },
@@ -1791,7 +1791,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Successful operation. Will return annotations grouped by corpus,bucket,schema. Will only return if there is data inside (will not return for example schema: {\"corptest\": {\"bucket1\":{\"sentence\": []}. If there is no annotations found will return {}",
+            "description": "Successful operation.",
             "schema": {
               "$ref": "#/definitions/SearchDocumentQueryStructure"
             }
@@ -2362,6 +2362,9 @@
                     "bucketId": {
                       "type": "string"
                     },
+                    "name": {
+                      "type": "string"
+                    },
                     "types": {
                       "type": "array",
                       "items": {
@@ -2401,6 +2404,7 @@
             "groups": [
               {
                 "bucketId": "29550cda-0c40-11e8-aa88-a8206600f845",
+                "name": "Animal Group",
                 "types": [
                   {
                     "schemaType": "Animal",
@@ -2434,7 +2438,7 @@
                   },
                   {
                     "schemaType": "Plant",
-                    "Properties": {
+                    "properties": {
                       "schemaType": {
                         "type": "string",
                         "searchModes": [
