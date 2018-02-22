@@ -235,7 +235,7 @@ class DocumentSearch:
         :return:
         """
         if self.documentIds:
-            return {"_documentID": self.documentIds}
+            return {"_documentID.noop": self.documentIds}
         else:
             return {}
 

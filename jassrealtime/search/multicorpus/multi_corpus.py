@@ -99,7 +99,8 @@ class MultiCorpus:
 
         for corpusId, buckets in grouped_targets.items():
             corpus = self.corpus_from_id(corpusId)
-            group_structure = {"corpusId": corpusId, "languages": corpus.languages,
+            group_structure = {"corpusId": corpusId,
+                               "languages": corpus.languages,
                                "groups": self.buckets_types(corpus, buckets)}
             structure.append(group_structure)
 
@@ -113,7 +114,10 @@ class MultiCorpus:
     def buckets_types(self, corpus: DocumentCorpus, bucket_ids: list) -> list:
         buckets = []
         for bucket_id in bucket_ids:
-            buckets.append({"bucketId": bucket_id, "types": self.bucket_types(corpus.get_bucket(bucket_id))})
+            bucket = corpus.get_bucket(bucket_id)
+            buckets.append({"bucketId": bucket_id,
+                            "name": bucket.name,
+                            "types": self.bucket_types(bucket)})
         return buckets
 
     @staticmethod

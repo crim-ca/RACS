@@ -1,9 +1,9 @@
 import traceback
 from http import HTTPStatus
 
-from ...webapi.handlers.search_documents import SearchDocumentsHandler
+from .search_documents import SearchDocumentsHandler
+from ...search.multicorpus.documents_by_annotation import DocumentsByAnnotation
 from ...core.settings_utils import get_env_id
-from ...search.multicorpus.documents_by_text import DocumentsByText
 from ...security.security_selector import get_autorisation
 from ...document.document_corpus import CorpusNotFoundException
 from .document import MAX_DOCUMENT_SIZE
@@ -13,32 +13,30 @@ from .parameter_names import MESSAGE, TRACE
 def validate(query):
     if query["operator"] not in ["must", "should", "must_not"]:
         raise ValueError("Invalid operator in query {}.".format(query))
-    if query["search_mode"] not in ["basic", "language"]:
+    if query["search_mode"] not in ["noop", "basic", "language", "edge", "path", "ngram"]:
         raise ValueError("Invalid search_mode in query {}.".format(query))
 
 
 def parse_query(query_argument: str) -> dict:
     """
-    A query argument is a quintuple of the form:
-     boolean_operator:corpus_id:search_mode:language:search_text
+    A query argument is a tuple of the form:
+     boolean_operator:schema_type:attribute:search_mode:language:search_text
 
-    Search mode will be 'basic' or 'language', but language field will contain
-    the actual target language.
-
-    E.G ...basic:english..., ...language:english...
-
+     And eventually, but not implemented yet:
+     boolean_operator:schema_type:at_least:count
 
     :param query_argument:
     :return:
     """
     query_parts = query_argument.split(":")
-    if len(query_parts) != 5:
+    if len(query_parts) != 6:
         raise ValueError("Invalid query: " + str(query_argument))
     query = {"operator": query_parts[0],
-             "corpus_id": query_parts[1],
-             "search_mode": query_parts[2],
-             "language": query_parts[3],
-             "text": query_parts[4]}
+             "schema_type": query_parts[1],
+             "attribute": query_parts[2],
+             "search_mode": query_parts[3],
+             "language": query_parts[4],
+             "text": query_parts[5]}
     validate(query)
     return query
 
@@ -47,7 +45,7 @@ def parse_queries(queries_argument: str) -> list:
     return [parse_query(query_argument) for query_argument in queries_argument.split(",")]
 
 
-class SearchDocumentsByTextHandler(SearchDocumentsHandler):
+class SearchDocumentsByAnnotationHandler(SearchDocumentsHandler):
     def get(self):
         try:
             from_index_argument = self.get_query_argument("from", None)
@@ -75,17 +73,26 @@ class SearchDocumentsByTextHandler(SearchDocumentsHandler):
 
             size = min(size, MAX_DOCUMENT_SIZE)
 
+            # Get corpus id list and their selected bucket ids
+            targets_argument = self.get_query_argument("targets", default=None)
+            if not targets_argument:
+                self.missing_required_field("targets")
+                return
+
             queries_argument = self.get_query_argument("queries", default=None)
             if not queries_argument:
                 self.missing_required_field("queries")
                 return
 
+            targets = self.parse_targets(targets_argument)
+            grouped_targets = self.group_targets(targets)
+
             queries = parse_queries(queries_argument)
 
             env_id = get_env_id()
             authorization = get_autorisation(env_id, None, None)
-            search = DocumentsByText(env_id, authorization)
-            count, documents = search.documents_by_text(queries, from_index, size)
+            search = DocumentsByAnnotation(env_id, authorization)
+            count, documents = search.documents_by_annotation(grouped_targets, queries, from_index, size)
 
             self.write_and_set_status({"count": count, "documents": documents}, HTTPStatus.OK)
         except CorpusNotFoundException as exception:

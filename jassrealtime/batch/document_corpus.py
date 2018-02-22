@@ -37,7 +37,7 @@ class DocumentCorpus:
         self.tmpFileStorage.create_zip_file()
         es = get_es_conn()
         corpus = get_master_document_corpus_list(self.envId, self.authorization).get_corpus(self.corpusId)
-        search = Search(using=es, index=corpus.dd.get_indices(corpus.languages))
+        search = Search(using=es, index=corpus.languages_indices())
         search = search.source(["text"])
         search = search.params(scroll=get_scan_scroll_duration(), size=get_nb_documents_per_scan_scroll())
 
@@ -79,7 +79,7 @@ class DocumentCorpus:
         fileStorage.create_zip_file()
         es = get_es_conn()
         corpus = get_master_document_corpus_list(self.envId, self.authorization).get_corpus(self.corpusId)
-        search = Search(using=es, index=corpus.dd.get_indices(corpus.languages))
+        search = Search(using=es, index=corpus.languages_indices())
         search = search.source(["text"])
         search = search.params(scroll=get_scan_scroll_duration(), size=get_nb_documents_per_scan_scroll())
 

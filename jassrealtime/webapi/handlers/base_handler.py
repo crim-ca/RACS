@@ -2,6 +2,8 @@ import json
 from codecs import BOM_UTF8
 from http import HTTPStatus
 from tornado.web import RequestHandler
+
+from jassrealtime.webapi.handlers.parameter_names import MESSAGE
 from jassrealtime.webapi.handlers.utils import add_cors
 
 
@@ -48,3 +50,7 @@ class BaseHandler(RequestHandler):
                     break
                 self.write(data)
         self.finish()
+
+    def missing_required_field(self, required_field):
+        self.write_and_set_status({MESSAGE: "Missing required parameters. {0}".format(required_field)},
+                                  HTTPStatus.UNPROCESSABLE_ENTITY)

@@ -1,4 +1,4 @@
-Repository for Annotations, Corporas and Schemas
+Repository for Annotations, Corpora and Schemas
 ================================================
 
 The purpose of RACS is to offer a REST API to store and manipulate text documents and annotations. Annotation are stored in JSON format

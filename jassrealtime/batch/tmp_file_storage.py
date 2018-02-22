@@ -15,7 +15,7 @@ class TmpFileStorage:
 
     def __init__(self, zipFileName: str = None):
         """
-        Createa a file in temporary directory.
+        Create a a file in temporary directory.
         """
         sett = get_settings()
         self.tmpDirPath = get_jass_tmp_dir()
