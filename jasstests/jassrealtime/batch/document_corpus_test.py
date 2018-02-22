@@ -111,7 +111,7 @@ class MyTestCase(unittest.TestCase):
     def test_get_documents(self):
         """
         Verify that each file added in the corpus is present in the zip file and is the same file.
-        We compare the binary form of the files;we do not consider encoding.
+        We compare files with the encoding applied when adding the documents to a corpus.
         """
         self.set_up_corpus()
         document_corpus = DocumentCorpus(self.envId, self.authorization, CORPUS_ID)
