@@ -16,7 +16,10 @@ def to_match_query(query: dict) -> tuple:
     search_mode = query["search_mode"]
     search_mode_field = "{}.{}".format(attribute_field_name, search_mode)
 
-    match_query = Q({"match": {search_mode_field: query["text"]}})
+    type_query = Q({"term": {"schemaType.noop": query["schema_type"]}})
+    attribute_query = Q({"match": {search_mode_field: query["text"]}})
+
+    match_query = type_query & attribute_query
     return query["operator"], match_query
 
 
@@ -64,7 +67,7 @@ class DocumentsByAnnotation(DocumentsBy):
 
         annotations = [self.map_document_id_and_score(hit) for hit in search]
 
-        # TODO aggregate annotation score per document?
+        # TODO aggregate annotation score per document? (doubly so for pagination to work)
         # TODO get document information from document id
         # TODO Can score order be retained by the "join" or should we sort after?
 

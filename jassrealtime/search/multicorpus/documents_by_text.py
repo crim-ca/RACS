@@ -64,6 +64,7 @@ class DocumentsByText(DocumentsBy):
                          must_not=grouped_queries["must_not"],
                          should=grouped_queries["should"])
 
+        # TODO need to aggregate by document_id?
         search = search[from_index:from_index + size]
         count = search.count()
         documents = [self.map_hit_with_score(hit) for hit in search]
