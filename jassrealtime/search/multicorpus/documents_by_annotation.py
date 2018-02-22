@@ -1,14 +1,23 @@
 from elasticsearch_dsl import Search, Q
+from elasticsearch_dsl.response import Hit
 
 from .DocumentsBy import DocumentsBy
 from ...search.multicorpus.multi_corpus import MultiCorpus
 from ...core.esutils import get_es_conn
-from ...search.document import map_search_hit
 from ...security.base_authorization import BaseAuthorization
 
 
 def schema_types_of(queries: list) -> set:
     return {query["schema_type"] for query in queries}
+
+
+def to_match_query(query: dict) -> tuple:
+    attribute_field_name = query["attribute"]
+    search_mode = query["search_mode"]
+    search_mode_field = "{}.{}".format(attribute_field_name, search_mode)
+
+    match_query = Q({"match": {search_mode_field: query["text"]}})
+    return query["operator"], match_query
 
 
 class DocumentsByAnnotation(DocumentsBy):
@@ -36,13 +45,13 @@ class DocumentsByAnnotation(DocumentsBy):
         indices = self.targets_indices(grouped_targets, list(schema_types))
         indices_argument = ','.join(indices)
 
-        # Sticks the `must`, `should` and `must not` in 3 different bags
-        grouped_queries = self.group_and_transform_queries_by_operator(queries)
+        match_queries = [to_match_query(query) for query in queries]
+        grouped_queries = self.group_queries_by_operator(match_queries)
 
         # Actual annotation search
         es = get_es_conn()
         search = Search(using=es, index=indices_argument)
-        # search = search.source(["title", "language", "source"])
+        search = search.source(["_documentID"])
 
         search.query = Q('bool',
                          must=grouped_queries["must"],
@@ -50,13 +59,16 @@ class DocumentsByAnnotation(DocumentsBy):
                          should=grouped_queries["should"])
 
         search = search[from_index:from_index + size]
+
         count = search.count()
-        annotations = [map_search_hit(hit) for hit in search]
 
-        # shall we refactor to extract annotation search returning all annotations fields or just doc ids
-        # TODO get meta_document information from docid (or search corpus documents?)
+        annotations = [self.map_document_id_and_score(hit) for hit in search]
 
-        return count, indices
+        # TODO aggregate annotation score per document?
+        # TODO get document information from document id
+        # TODO Can score order be retained by the "join" or should we sort after?
+
+        return count, annotations
 
     def targets_indices(self, grouped_targets: dict, schema_types: list) -> list:
         return [self.group_indices(corpus_id, buckets_ids, schema_types) for corpus_id, buckets_ids in grouped_targets.items()]
@@ -66,4 +78,10 @@ class DocumentsByAnnotation(DocumentsBy):
         buckets = [corpus.get_bucket(buckets_id) for buckets_id in buckets_ids]
         bucket_indices = [bucket.dd.get_indices(docTypes=schema_types) for bucket in buckets]
         return ','.join(bucket_indices)
+
+    @staticmethod
+    def map_document_id_and_score(hit: Hit) -> dict:
+        result = hit.__dict__['_d_']
+        result["score"] = hit.meta.score
+        return result
 

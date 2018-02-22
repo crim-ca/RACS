@@ -1,10 +1,20 @@
 from elasticsearch_dsl import Search, Q
 
+from jassrealtime.core.settings_utils import get_language_manager
 from .DocumentsBy import DocumentsBy
+from ...core.language_manager import LanguageManager
 from ...search.multicorpus.multi_corpus import MultiCorpus
 from ...core.esutils import get_es_conn
-from ...search.document import map_search_hit
 from ...security.base_authorization import BaseAuthorization
+
+
+def to_match_query(language_manager: LanguageManager, query: dict) -> tuple:
+    text_field_name = "text"
+    if query["search_mode"] == "language":
+        text_field_name = text_field_name + "." + language_manager.get_es_analyser(query["language"])
+
+    match_query = Q({"match": {text_field_name: query["text"]}})
+    return query["operator"], match_query
 
 
 class DocumentsByText(DocumentsBy):
@@ -40,8 +50,9 @@ class DocumentsByText(DocumentsBy):
         indices = self.queries_indices(queries)
         indices_argument = ','.join(indices)
 
-        # Sticks the `must`, `should` and `must not` in 3 different bags
-        grouped_queries = self.group_and_transform_queries_by_operator(queries)
+        language_manager = get_language_manager()
+        match_queries = [to_match_query(language_manager, query) for query in queries]
+        grouped_queries = self.group_queries_by_operator(match_queries)
 
         # A query language restriction, if present, will work automatically via the query text.<language> mapping.
         es = get_es_conn()
@@ -55,6 +66,6 @@ class DocumentsByText(DocumentsBy):
 
         search = search[from_index:from_index + size]
         count = search.count()
-        documents = [map_search_hit(hit) for hit in search]
+        documents = [self.map_hit_with_score(hit) for hit in search]
 
         return count, documents

@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: "2.6.5.1"
+  version: "2.6.6"
   title: RACS
   description: Annotation Storage
 
@@ -1648,6 +1648,9 @@ definitions:
       source:
         description: "Document provenance"
         type: string
+      score:
+        description: "Search platform result score"
+        type: number
 
   ResultSearchDocumentsBy:
     description: "Paginated list of matching documents."
@@ -1661,7 +1664,7 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/ResultSearchDocument"
-    example: {"count": 99, "documents": [{"language": "fr-FR","source": "https://www.gutenberg.org/files/55456/55456-0.txt","title": "AU FOND DU TERRIER","id": "7e776152-1287-11e8-94ab-a8206600f845"},{"language": "en-UK","source": "http://www.gutenberg.org/files/11/11-0.txt","title": "Down the Rabbit-Hole","id": "4c457d82-1349-11e8-b900-a8206600f845"}]}
+    example: {"count": 99, "documents": [{"language": "fr-FR","source": "https://www.gutenberg.org/files/55456/55456-0.txt","title": "AU FOND DU TERRIER","id": "7e776152-1287-11e8-94ab-a8206600f845"},{"language": "en-UK","source": "http://www.gutenberg.org/files/11/11-0.txt","title": "Down the Rabbit-Hole","id": "4c457d82-1349-11e8-b900-a8206600f845", "score": 0.39767316}]}
 
 securityDefinitions:
   api_key:

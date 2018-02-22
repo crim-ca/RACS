@@ -1,30 +1,25 @@
-from elasticsearch_dsl import Q
-
-from ...core.language_manager import LanguageManager
-from ...core.settings_utils import get_language_manager
+from elasticsearch_dsl.response import Hit
 
 
 class DocumentsBy:
     @staticmethod
-    def transform(language_manager: LanguageManager, query: dict) -> Q:
-        text_field_name = "text"
-        if query["search_mode"] == "language":
-            text_field_name = text_field_name + "." + language_manager.get_es_analyser(query["language"])
+    def map_hit_with_score(hit: Hit) -> dict:
+        document = hit.__dict__['_d_']
+        document["id"] = hit.meta.id
+        document["score"] = hit.meta.score
+        return document
 
-        return Q({"match": {text_field_name: query["text"]}})
-
-    def group_and_transform_queries_by_operator(self, queries: list) -> dict:
-        language_manager = get_language_manager()
+    @staticmethod
+    def group_queries_by_operator(queries: list) -> dict:
         operators = ["must", "must_not", "should"]
         grouped_queries = {}
         for operator in operators:
             grouped_queries[operator] = []
 
-        for query in queries:
+        for query_operator, query in queries:
             for operator in operators:
-                if operator == query["operator"]:
-                    grouped_queries[operator].append(self.transform(language_manager, query))
+                if operator == query_operator:
+                    grouped_queries[operator].append(query)
                     continue
 
         return grouped_queries
-
