@@ -32,12 +32,6 @@ class DocumentsByAnnotation(DocumentsBy):
     def documents_by_annotation(self, grouped_targets: dict, queries: list, from_index: int, size: int) -> tuple:
         """
         Paginated documents found by annotation.
-
-        :param grouped_targets: buckets grouped by corpus
-        :param queries:
-        :param from_index:
-        :param size:
-        :return:
         """
 
         # Get a set of all schema types
@@ -67,8 +61,13 @@ class DocumentsByAnnotation(DocumentsBy):
 
         annotations = [self.map_document_id_and_score(hit) for hit in search]
 
-        # TODO aggregate annotation score per document? (doubly so for pagination to work)
+        # TODO aggregate annotation score per document for pagination to work
+        # Note: using aggregation means we could lose some hits:
+        # "when there are lots of unique terms, Elasticsearch only returns the top terms"
+        # https://www.elastic.co/guide/en/elasticsearch/reference/6.1/search-aggregations-bucket-terms-aggregation.html#CO105-2
+
         # TODO get document information from document id
+
         # TODO Can score order be retained by the "join" or should we sort after?
 
         return count, annotations

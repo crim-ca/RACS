@@ -529,6 +529,13 @@ paths:
           description: 'ID of document.'
           required: true
           type: string
+        - in: query
+          name: deleteAnnotations
+          description: 'If true will also deletes all corpus annotations referring to the document'
+          required: true
+          type: boolean
+
+
       responses:
         "404":
           description: Specified corpus or document not found
@@ -1235,12 +1242,20 @@ paths:
           required: true
           type: integer
         - in: query
+          name: targets
+          description: 'List of corpus ids separated by commas. E.G. corpus1,corpus2,corpus4'
+          required: true
+          type: array
+          items: {
+            type: string
+          }
+        - in: query
           name: queries
-          description: "List of boolean_operator:corpus_id:search_mode:language:search_text quintuples separated by commas. Search mode will be 'basic' or 'language', but language field will contain the actual target language.
+          description: "List of boolean_operator:search_mode:language:search_text quintuples separated by commas. Search mode will be 'basic' or 'language', but language field will contain the actual target language.
           Boolean operators are must/should/must_not.
           Language field is ignored when search mode is basic.
 
-           Example: must:corpus-jeff-bilingual:language:en-xx:books,must:corpus-jeff-bilingual:basic::alice"
+           Example: must:language:en-xx:books,must:basic::alice"
           required: true
           type: array
           items: {

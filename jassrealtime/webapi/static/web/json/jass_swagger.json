@@ -1837,8 +1837,18 @@
           },
           {
             "in": "query",
+            "name": "targets",
+            "description": "List of corpus ids separated by commas. E.G. corpus1,corpus2,corpus4",
+            "required": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
             "name": "queries",
-            "description": "List of boolean_operator:corpus_id:search_mode:language:search_text quintuples separated by commas. Search mode will be 'basic' or 'language', but language field will contain the actual target language. Boolean operators are must/should/must_not. Language field is ignored when search mode is basic.\nExample: must:corpus-jeff-bilingual:language:en-xx:books,must:corpus-jeff-bilingual:basic::alice",
+            "description": "List of boolean_operator:search_mode:language:search_text tuples separated by commas. Search mode will be 'basic' or 'language', but language field will contain the actual target language. Boolean operators are must/should/must_not. Language field is ignored when search mode is basic.\nExample: must:language:en-xx:books,must:basic::alice",
             "required": true,
             "type": "array",
             "items": {
@@ -2408,7 +2418,7 @@
                 "types": [
                   {
                     "schemaType": "Animal",
-                    "Properties": {
+                    "properties": {
                       "schemaType": {
                         "type": "string",
                         "searchModes": [
@@ -2438,7 +2448,7 @@
                   },
                   {
                     "schemaType": "Plant",
-                    "properties": {
+                    "Properties": {
                       "schemaType": {
                         "type": "string",
                         "searchModes": [
@@ -2493,6 +2503,10 @@
         "source": {
           "description": "Document provenance",
           "type": "string"
+        },
+        "score": {
+          "description": "Search platform result score",
+          "type": "number"
         }
       }
     },
@@ -2525,7 +2539,8 @@
             "language": "en-UK",
             "source": "http://www.gutenberg.org/files/11/11-0.txt",
             "title": "Down the Rabbit-Hole",
-            "id": "4c457d82-1349-11e8-b900-a8206600f845"
+            "id": "4c457d82-1349-11e8-b900-a8206600f845",
+            "score": 0.39767316
           }
         ]
       }

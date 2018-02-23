@@ -23,31 +23,25 @@ class DocumentsByText(DocumentsBy):
         self.authorization = authorization
         self.multi_corpus = MultiCorpus(env_id, authorization)
 
-    def query_index(self, query: dict) -> str:
+    def corpus_indices(self, corpus_id: str) -> str:
         """
-        Get query index wildcard for the corpus id and all languages.
-
-        :param query:
-        :return:
+        Get corpus indices wildcard for the corpus id and all languages.
         """
-        corpus = self.multi_corpus.corpus_from_id(query["corpus_id"])
+        corpus = self.multi_corpus.corpus_from_id(corpus_id)
         return corpus.dd.get_indices(docTypes=[])
 
-    def queries_indices(self, queries: list) -> list:
-        return [self.query_index(query) for query in queries]
+    def target_indices(self, grouped_targets: dict) -> list:
+        return [self.corpus_indices(corpus_id) for corpus_id in grouped_targets.keys()]
 
-    def documents_by_text(self, queries: list, from_index: int, size: int) -> tuple:
+    def documents_by_text(self, grouped_targets: dict, queries: list, from_index: int, size: int) -> tuple:
         """
         Paginated documents found by text.
-
-        :param queries:
-        :param from_index:
-        :param size:
-        :return:
         """
         # For pagination/score sorting to work, we need to query all the different corpus indices in the same
         # Elasticsearch query.
-        indices = self.queries_indices(queries)
+        # We are using the grouped target approach like search documents by annotations, event though buckets
+        # are inconsequential for text search.
+        indices = self.target_indices(grouped_targets)
         indices_argument = ','.join(indices)
 
         language_manager = get_language_manager()
