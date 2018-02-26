@@ -1251,7 +1251,7 @@ paths:
           }
         - in: query
           name: queries
-          description: "List of boolean_operator:search_mode:language:search_text quintuples separated by commas. Search mode will be 'basic' or 'language', but language field will contain the actual target language.
+          description: "List of boolean_operator:search_mode:language:search_text tuples separated by commas. Search mode will be 'basic' or 'language', but language field will contain the actual target language.
           Boolean operators are must/should/must_not.
           Language field is ignored when search mode is basic.
 

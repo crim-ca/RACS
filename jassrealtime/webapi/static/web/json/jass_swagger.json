@@ -768,6 +768,13 @@
             "description": "ID of document.",
             "required": true,
             "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "deleteAnnotations",
+            "description": "If true will also deletes all corpus annotations referring to the document",
+            "required": true,
+            "type": "boolean"
           }
         ],
         "responses": {
