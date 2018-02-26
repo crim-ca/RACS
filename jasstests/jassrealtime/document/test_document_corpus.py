@@ -85,6 +85,60 @@ class MyTestCase(unittest.TestCase):
         self.assertRaises(DocumentAlreadyExistsException, corpus.add_text_document, "Text Doc 1", "Title Doc 1",
                           "english", "1")
 
+    def test_delete_document_and_annotations(self):
+        schema = json.loads(JSON_SCHEMA_WITH_STRING_ARRAY)
+
+        schema_id = get_schema_list(self.envId, self.authorization).\
+            add_json_schema_as_hash(schema, False, nestedFields=["offsets"])
+        time.sleep(1)
+
+        corpus = self.documentCorpusList.create_corpus()
+        bucket = corpus.create_bucket("bucket")
+        schema_type = "TSD"
+        bucket.add_or_update_schema_to_bucket(schema_id, schema_type, TargetType("document"), {})
+
+        doc_id_1 = "1"
+        doc_id_2 = "2"
+        corpus.add_text_document("Text Doc 1", "title 1", "english", id=doc_id_1)
+        corpus.add_text_document("Text Doc 2", "title 2", "english", id=doc_id_2)
+
+        # Note: We assume document id field is indexed as _documentID.noop
+        anno1 = {
+            "_documentID": doc_id_1,
+            "text": "Text first annotation.",
+        }
+        anno2 = {
+            "_documentID": doc_id_2,
+            "text": "Text second annotation.",
+        }
+        anno3 = {
+            "_documentID": doc_id_2,
+            "text": "Text third annotation.",
+        }
+
+        anno_id_1 = bucket.add_annotation(anno1, schema_type)
+        anno_id_2 = bucket.add_annotation(anno2, schema_type)
+        anno_id_3 = bucket.add_annotation(anno3, schema_type)
+
+        time.sleep(1)
+        corpus.delete_document(doc_id_1, False)
+        time.sleep(1)
+        with self.assertRaises(DocumentNotFoundException):
+            corpus.get_text_document(doc_id_1)
+        # Should still exists
+        bucket.get_annotation(anno_id_1, schema_type)
+
+        corpus.delete_document(doc_id_2, True)
+        time.sleep(1)
+        with self.assertRaises(DocumentNotFoundException):
+            corpus.get_text_document(doc_id_2)
+
+        with self.assertRaises(DocumentNotFoundException):
+            bucket.get_annotation(anno_id_2, schema_type)
+
+        with self.assertRaises(DocumentNotFoundException):
+            bucket.get_annotation(anno_id_3, schema_type)
+
     def test_create_sub_corpus(self):
         corpus = self.documentCorpusList.create_corpus()
         subCorpus1 = corpus.create_sub_corpus("Sub corpus 1")

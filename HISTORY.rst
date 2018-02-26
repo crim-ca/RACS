@@ -5,7 +5,7 @@ History
 
 2.6.6
 ---------------------
-* Document search by annotation
+* Add flag to delete document's annotation when deleting the document
 
 2.6.5
 ---------------------
