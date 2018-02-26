@@ -20,7 +20,7 @@ def validate(query):
 def parse_query(query_argument: str) -> dict:
     """
     A query argument is a quintuple of the form:
-     boolean_operator:corpus_id:search_mode:language:search_text
+     boolean_operator:search_mode:language:search_text
 
     Search mode will be 'basic' or 'language', but language field will contain
     the actual target language.
@@ -32,13 +32,12 @@ def parse_query(query_argument: str) -> dict:
     :return:
     """
     query_parts = query_argument.split(":")
-    if len(query_parts) != 5:
+    if len(query_parts) != 4:
         raise ValueError("Invalid query: " + str(query_argument))
     query = {"operator": query_parts[0],
-             "corpus_id": query_parts[1],
-             "search_mode": query_parts[2],
-             "language": query_parts[3],
-             "text": query_parts[4]}
+             "search_mode": query_parts[1],
+             "language": query_parts[2],
+             "text": query_parts[3]}
     validate(query)
     return query
 
@@ -75,6 +74,15 @@ class SearchDocumentsByTextHandler(SearchDocumentsHandler):
 
             size = min(size, MAX_DOCUMENT_SIZE)
 
+            # Get corpus id list and their respective bucket ids if any
+            targets_argument = self.get_query_argument("targets", default=None)
+            if not targets_argument:
+                self.missing_required_field("targets")
+                return
+
+            targets = self.parse_targets(targets_argument)
+            grouped_targets = self.group_targets(targets)
+
             queries_argument = self.get_query_argument("queries", default=None)
             if not queries_argument:
                 self.missing_required_field("queries")
@@ -85,7 +93,7 @@ class SearchDocumentsByTextHandler(SearchDocumentsHandler):
             env_id = get_env_id()
             authorization = get_autorisation(env_id, None, None)
             search = DocumentsByText(env_id, authorization)
-            count, documents = search.documents_by_text(queries, from_index, size)
+            count, documents = search.documents_by_text(grouped_targets, queries, from_index, size)
 
             self.write_and_set_status({"count": count, "documents": documents}, HTTPStatus.OK)
         except CorpusNotFoundException as exception:

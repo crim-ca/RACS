@@ -1,10 +1,20 @@
 from elasticsearch_dsl import Search, Q
 
+from jassrealtime.core.settings_utils import get_language_manager
 from .DocumentsBy import DocumentsBy
+from ...core.language_manager import LanguageManager
 from ...search.multicorpus.multi_corpus import MultiCorpus
 from ...core.esutils import get_es_conn
-from ...search.document import map_search_hit
 from ...security.base_authorization import BaseAuthorization
+
+
+def to_match_query(language_manager: LanguageManager, query: dict) -> tuple:
+    text_field_name = "text"
+    if query["search_mode"] == "language":
+        text_field_name = text_field_name + "." + language_manager.get_es_analyser(query["language"])
+
+    match_query = Q({"match": {text_field_name: query["text"]}})
+    return query["operator"], match_query
 
 
 class DocumentsByText(DocumentsBy):
@@ -13,35 +23,30 @@ class DocumentsByText(DocumentsBy):
         self.authorization = authorization
         self.multi_corpus = MultiCorpus(env_id, authorization)
 
-    def query_index(self, query: dict) -> str:
+    def corpus_indices(self, corpus_id: str) -> str:
         """
-        Get query index wildcard for the corpus id and all languages.
-
-        :param query:
-        :return:
+        Get corpus indices wildcard for the corpus id and all languages.
         """
-        corpus = self.multi_corpus.corpus_from_id(query["corpus_id"])
+        corpus = self.multi_corpus.corpus_from_id(corpus_id)
         return corpus.dd.get_indices(docTypes=[])
 
-    def queries_indices(self, queries: list) -> list:
-        return [self.query_index(query) for query in queries]
+    def target_indices(self, grouped_targets: dict) -> list:
+        return [self.corpus_indices(corpus_id) for corpus_id in grouped_targets.keys()]
 
-    def documents_by_text(self, queries: list, from_index: int, size: int) -> tuple:
+    def documents_by_text(self, grouped_targets: dict, queries: list, from_index: int, size: int) -> tuple:
         """
         Paginated documents found by text.
-
-        :param queries:
-        :param from_index:
-        :param size:
-        :return:
         """
         # For pagination/score sorting to work, we need to query all the different corpus indices in the same
         # Elasticsearch query.
-        indices = self.queries_indices(queries)
+        # We are using the grouped target approach like search documents by annotations, event though buckets
+        # are inconsequential for text search.
+        indices = self.target_indices(grouped_targets)
         indices_argument = ','.join(indices)
 
-        # Sticks the `must`, `should` and `must not` in 3 different bags
-        grouped_queries = self.group_and_transform_queries_by_operator(queries)
+        language_manager = get_language_manager()
+        match_queries = [to_match_query(language_manager, query) for query in queries]
+        grouped_queries = self.group_queries_by_operator(match_queries)
 
         # A query language restriction, if present, will work automatically via the query text.<language> mapping.
         es = get_es_conn()
@@ -53,8 +58,9 @@ class DocumentsByText(DocumentsBy):
                          must_not=grouped_queries["must_not"],
                          should=grouped_queries["should"])
 
+        # TODO need to aggregate by document_id?
         search = search[from_index:from_index + size]
         count = search.count()
-        documents = [map_search_hit(hit) for hit in search]
+        documents = [self.map_hit_with_score(hit) for hit in search]
 
         return count, documents

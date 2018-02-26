@@ -2,6 +2,7 @@ import json
 import json
 import traceback
 from http import HTTPStatus
+from json import JSONDecodeError
 
 from jassrealtime.search.document import DocumentSearch
 from jassrealtime.webapi.handlers.base_handler import BaseHandler
@@ -50,6 +51,9 @@ class AnnotationFolderHandler(BaseHandler):
         except DocumentAlreadyExistsException:
             self.write_and_set_status({MESSAGE: "Annotation with the same id already exist"},
                                       HTTPStatus.CONFLICT)
+        except JSONDecodeError:
+            self.write_and_set_status({MESSAGE: "Invalid JSON format for annotation"},
+                                      HTTPStatus.BAD_REQUEST)
         except Exception:
             trace = traceback.format_exc().splitlines()
             self.write_and_set_status({MESSAGE: "Internal server error", TRACE: trace},

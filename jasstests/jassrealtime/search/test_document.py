@@ -653,9 +653,12 @@ class MyTestCase(unittest.TestCase):
         global envIdReadOnly
         global authorizationReadOnly
         documents_by_text = DocumentsByText(envIdReadOnly, authorizationReadOnly)
-        queries = [{'operator': 'must', 'corpus_id': CORPUS_ID,
-                    'search_mode': 'basic', 'language': '', 'text': 'alice'}]
-        count, documents = documents_by_text.documents_by_text(queries, 0, 10)
+        grouped_targets = {CORPUS_ID: []}
+        queries = [{'operator': 'must',
+                    'search_mode': 'basic',
+                    'language': '',
+                    'text': 'alice'}]
+        count, documents = documents_by_text.documents_by_text(grouped_targets, queries, 0, 10)
         self.assertEqual(2, count)
         document_ids = [document["id"] for document in documents]
         self.assertIn(ALICE_EN_DOC_ID, document_ids)
@@ -665,9 +668,10 @@ class MyTestCase(unittest.TestCase):
         global envIdReadOnly
         global authorizationReadOnly
         documents_by_text = DocumentsByText(envIdReadOnly, authorizationReadOnly)
-        queries = [{'operator': 'must', 'corpus_id': CORPUS_ID,
+        grouped_targets = {CORPUS_ID: []}
+        queries = [{'operator': 'must',
                     'search_mode': 'language', 'language': 'fr-xx', 'text': 'sœur'}]
-        count, documents = documents_by_text.documents_by_text(queries, 0, 10)
+        count, documents = documents_by_text.documents_by_text(grouped_targets, queries, 0, 10)
         self.assertEqual(1, count)
         document_ids = [document["id"] for document in documents]
         self.assertIn(ALICE_FR_DOC_ID, document_ids)
@@ -676,9 +680,10 @@ class MyTestCase(unittest.TestCase):
         global envIdReadOnly
         global authorizationReadOnly
         documents_by_text = DocumentsByText(envIdReadOnly, authorizationReadOnly)
-        queries = [{'operator': 'should', 'corpus_id': CORPUS_ID,
+        grouped_targets = {CORPUS_ID: []}
+        queries = [{'operator': 'should',
                     'search_mode': 'language', 'language': 'fr-xx', 'text': 'sœur'}]
-        count, documents = documents_by_text.documents_by_text(queries, 0, 10)
+        count, documents = documents_by_text.documents_by_text(grouped_targets, queries, 0, 10)
         self.assertEqual(1, count)
         document_ids = [document["id"] for document in documents]
         self.assertIn(ALICE_FR_DOC_ID, document_ids)
@@ -686,10 +691,11 @@ class MyTestCase(unittest.TestCase):
     def test_documents_by_text_english_books(self):
         global envIdReadOnly
         global authorizationReadOnly
+        grouped_targets = {CORPUS_ID: []}
         documents_by_text = DocumentsByText(envIdReadOnly, authorizationReadOnly)
-        queries = [{'operator': 'must', 'corpus_id': CORPUS_ID,
+        queries = [{'operator': 'must',
                     'search_mode': 'language', 'language': 'en-xx', 'text': 'books'}]
-        count, documents = documents_by_text.documents_by_text(queries, 0, 10)
+        count, documents = documents_by_text.documents_by_text(grouped_targets, queries, 0, 10)
         self.assertEqual(1, count)
         document_ids = [document["id"] for document in documents]
         self.assertIn(ALICE_EN_DOC_ID, document_ids)
@@ -697,12 +703,13 @@ class MyTestCase(unittest.TestCase):
     def test_documents_by_text_must_and_must_not(self):
         global envIdReadOnly
         global authorizationReadOnly
+        grouped_targets = {CORPUS_ID: []}
         documents_by_text = DocumentsByText(envIdReadOnly, authorizationReadOnly)
-        must = {'operator': 'must', 'corpus_id': CORPUS_ID,
+        must = {'operator': 'must',
                 'search_mode': 'basic', 'language': '', 'text': 'alice'}
-        must_not = {'operator': 'must_not', 'corpus_id': CORPUS_ID,
+        must_not = {'operator': 'must_not',
                     'search_mode': 'language', 'language': 'fr-xx', 'text': 'sœur'}
-        count, documents = documents_by_text.documents_by_text([must, must_not], 0, 10)
+        count, documents = documents_by_text.documents_by_text(grouped_targets, [must, must_not], 0, 10)
         self.assertEqual(1, count)
         document_ids = [document["id"] for document in documents]
         self.assertIn(ALICE_EN_DOC_ID, document_ids)
@@ -720,12 +727,13 @@ class MyTestCase(unittest.TestCase):
         """
         global envIdReadOnly
         global authorizationReadOnly
+        grouped_targets = {CORPUS_ID: []}
         documents_by_text = DocumentsByText(envIdReadOnly, authorizationReadOnly)
-        must = {'operator': 'must', 'corpus_id': CORPUS_ID,
+        must = {'operator': 'must',
                 'search_mode': 'language', 'language': 'en-xx', 'text': 'books'}
-        should = {'operator': 'should', 'corpus_id': CORPUS_ID,
+        should = {'operator': 'should',
                   'search_mode': 'language', 'language': 'fr-xx', 'text': 'sœur'}
-        count, documents = documents_by_text.documents_by_text([must, should], 0, 10)
+        count, documents = documents_by_text.documents_by_text(grouped_targets, [must, should], 0, 10)
         self.assertEqual(1, count)
         document_ids = [document["id"] for document in documents]
         self.assertIn(ALICE_EN_DOC_ID, document_ids)
@@ -743,10 +751,11 @@ class MyTestCase(unittest.TestCase):
         """
         global envIdReadOnly
         global authorizationReadOnly
+        grouped_targets = {CORPUS_ID: []}
         documents_by_text = DocumentsByText(envIdReadOnly, authorizationReadOnly)
-        should = {'operator': 'should', 'corpus_id': CORPUS_ID,
+        should = {'operator': 'should',
                   'search_mode': 'language', 'language': 'fr-xx', 'text': 'sœur'}
-        count, documents = documents_by_text.documents_by_text([should], 0, 10)
+        count, documents = documents_by_text.documents_by_text(grouped_targets, [should], 0, 10)
         self.assertEqual(1, count)
         document_ids = [document["id"] for document in documents]
         self.assertIn(ALICE_FR_DOC_ID, document_ids)

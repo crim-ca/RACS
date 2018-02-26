@@ -297,11 +297,23 @@ class DocumentCorpus:
 
         return documentIds
 
-    def delete_document(self, documentId):
-        doc = self.get_text_document(documentId)
+    def delete_document(self, document_id: str, delete_annotations: bool):
+        doc = self.get_text_document(document_id)
         if not doc:
             raise DocumentNotFoundException()
-        self.dd.delete_document(documentId, language_doc_type(doc["language"]))
+        self.dd.delete_document(document_id, language_doc_type(doc["language"]))
+        if delete_annotations:
+            self.delete_document_annotations(document_id)
+
+    def delete_document_annotations(self, document_id: str):
+        # All annotations groups indices of the corpus
+        bucket_list = self.get_buckets()
+        bucket_indices = [bucket.dd.get_indices(docTypes=[]) for bucket in bucket_list]
+
+        es = get_es_conn()
+        search = Search(using=es, index=bucket_indices)
+        search.query = Q({"term": {"_documentID.noop": document_id}})
+        response = search.delete()
 
     def get_all_documents_ids_and_types(self):
         """
