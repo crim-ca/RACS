@@ -131,18 +131,18 @@ class DocumentHandler(BaseHandler):
             self.write_and_set_status({MESSAGE: "Internal server error", TRACE: trace},
                                       HTTPStatus.INTERNAL_SERVER_ERROR)
 
-    def delete(self, corpusId, documentId, deleteAnnotations:bool):
+    def delete(self, corpusId, documentId):
         """Delete a single document an optionally its annotations"""
         try:
-            deleteAnnotations = self.get_query_argument("deleteAnnotations", None)
-            if not deleteAnnotations:
+            delete_annotations = self.get_query_argument("deleteAnnotations", None)
+            if not delete_annotations:
                 self.missing_required_field("deleteAnnotations")
                 return
 
             envId = get_env_id()
             authorization = get_autorisation(envId, None, None)
             corpus = get_master_document_corpus_list(envId, authorization).get_corpus(corpusId)
-            document = corpus.delete_document(documentId, deleteAnnotations)
+            document = corpus.delete_document(documentId, delete_annotations)
             self.write_and_set_status(document,
                                       HTTPStatus.OK)
         except CorpusNotFoundException:
