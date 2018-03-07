@@ -1,6 +1,7 @@
-from elasticsearch_dsl import Search, Q
+from elasticsearch_dsl import Search, Q, A
 from elasticsearch_dsl.response import Hit
 
+from jassrealtime.search.document import map_search_hit
 from .DocumentsBy import DocumentsBy
 from ...search.multicorpus.multi_corpus import MultiCorpus
 from ...core.esutils import get_es_conn
@@ -55,22 +56,31 @@ class DocumentsByAnnotation(DocumentsBy):
                          must_not=grouped_queries["must_not"],
                          should=grouped_queries["should"])
 
-        search = search[from_index:from_index + size]
-
-        count = search.count()
-
-        annotations = [self.map_document_id_and_score(hit) for hit in search]
-
-        # TODO aggregate annotation score per document for pagination to work
         # Note: using aggregation means we could lose some hits:
         # "when there are lots of unique terms, Elasticsearch only returns the top terms"
         # https://www.elastic.co/guide/en/elasticsearch/reference/6.1/search-aggregations-bucket-terms-aggregation.html#CO105-2
 
-        # TODO get document information from document id
+        aggregate_by_document_id = A('terms', field='_documentID')
+        search.aggs.bucket('doc_ids', aggregate_by_document_id)
+        response = search.execute()
+        aggregation = response.aggregations['doc_ids']
 
-        # TODO Can score order be retained by the "join" or should we sort after?
+        # Note: Elasticsearch DSL slicing API does not work with aggregations, so we slice on aggregation results
+        buckets = aggregation.buckets[from_index:from_index+size]
+        count = len(buckets)
 
-        return count, annotations
+        # We will use the number of matching annotations per document as a naive score
+        annotation_buckets = [{'doc_id': bucket['key'], 'score': bucket['doc_count']} for bucket in buckets]
+
+        # Get document information from document id
+        # Set of document ids (id uniqueness is already guaranteed by the aggregation)
+        document_ids = [bucket['key'] for bucket in buckets]
+        documents = self.documents_by_ids(grouped_targets, document_ids)
+
+        # todo Join with score
+        # Can score order be retained by the "join" or should we sort after?
+
+        return count, documents
 
     def targets_indices(self, grouped_targets: dict, schema_types: list) -> list:
         return [self.group_indices(corpus_id, buckets_ids, schema_types) for corpus_id, buckets_ids in grouped_targets.items()]
@@ -87,3 +97,15 @@ class DocumentsByAnnotation(DocumentsBy):
         result["score"] = hit.meta.score
         return result
 
+    def documents_by_ids(self, grouped_targets, document_ids):
+        indices = self.target_text_document_indices(grouped_targets)
+        indices_argument = ','.join(indices)
+
+        es = get_es_conn()
+        search = Search(using=es, index=indices_argument)
+        search = search.source(["title", "language", "source"])
+        search.query = Q({"terms": {"_id": document_ids}})
+
+        documents = [map_search_hit(hit) for hit in search.scan()]
+
+        return documents

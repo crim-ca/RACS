@@ -23,3 +23,14 @@ class DocumentsBy:
                     continue
 
         return grouped_queries
+
+    def corpus_text_document_indices(self, corpus_id: str) -> str:
+        """
+        Get corpus indices wildcard for the corpus id and all languages.
+        """
+        corpus = self.multi_corpus.corpus_from_id(corpus_id)
+        return corpus.dd.get_indices(docTypes=[])
+
+    def target_text_document_indices(self, grouped_targets: dict) -> list:
+        return [self.corpus_text_document_indices(corpus_id) for corpus_id in grouped_targets.keys()]
+
