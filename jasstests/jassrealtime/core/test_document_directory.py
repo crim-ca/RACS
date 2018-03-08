@@ -94,7 +94,7 @@ class MyTestCase(unittest.TestCase):
             }
         }
         dd.add_document(body1, None, "person", mapping1)
-        body2 = {"name": "anton", "age": "I AM A RETARD"}
+        body2 = {"name": "anton", "age": "I AM A SILLY"}
         mapping2 = {
             "properties": {
                 "name": {"type": "text"},

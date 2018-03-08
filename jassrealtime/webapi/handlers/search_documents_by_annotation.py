@@ -20,7 +20,7 @@ def validate(query):
 def parse_query(query_argument: str) -> dict:
     """
     A query argument is a tuple of the form:
-     boolean_operator:schema_type:attribute:search_mode:language:search_text
+     boolean_operator:schema_type:attribute:search_mode:search_text
 
      And eventually, but not implemented yet:
      boolean_operator:schema_type:at_least:count
@@ -29,14 +29,13 @@ def parse_query(query_argument: str) -> dict:
     :return:
     """
     query_parts = query_argument.split(":")
-    if len(query_parts) != 6:
+    if len(query_parts) != 5:
         raise ValueError("Invalid query: " + str(query_argument))
     query = {"operator": query_parts[0],
              "schema_type": query_parts[1],
              "attribute": query_parts[2],
              "search_mode": query_parts[3],
-             "language": query_parts[4],
-             "text": query_parts[5]}
+             "text": query_parts[4]}
     validate(query)
     return query
 

@@ -25,7 +25,7 @@ class AnnotationCountHandler(BaseHandler):
 
             envId = get_env_id()
             authorization = get_autorisation(envId, None, None)
-            documentSearch = DocumentSearch(envId, authorization, None, corpusId)
+            documentSearch = DocumentSearch(envId, authorization, [], corpusId)
 
             counts = documentSearch.count_annotations_for_types(bucketId, schemaTypes)
 

@@ -23,16 +23,6 @@ class DocumentsByText(DocumentsBy):
         self.authorization = authorization
         self.multi_corpus = MultiCorpus(env_id, authorization)
 
-    def corpus_indices(self, corpus_id: str) -> str:
-        """
-        Get corpus indices wildcard for the corpus id and all languages.
-        """
-        corpus = self.multi_corpus.corpus_from_id(corpus_id)
-        return corpus.dd.get_indices(docTypes=[])
-
-    def target_indices(self, grouped_targets: dict) -> list:
-        return [self.corpus_indices(corpus_id) for corpus_id in grouped_targets.keys()]
-
     def documents_by_text(self, grouped_targets: dict, queries: list, from_index: int, size: int) -> tuple:
         """
         Paginated documents found by text.
@@ -41,7 +31,7 @@ class DocumentsByText(DocumentsBy):
         # Elasticsearch query.
         # We are using the grouped target approach like search documents by annotations, event though buckets
         # are inconsequential for text search.
-        indices = self.target_indices(grouped_targets)
+        indices = self.target_text_document_indices(grouped_targets)
         indices_argument = ','.join(indices)
 
         language_manager = get_language_manager()
@@ -58,7 +48,6 @@ class DocumentsByText(DocumentsBy):
                          must_not=grouped_queries["must_not"],
                          should=grouped_queries["should"])
 
-        # TODO need to aggregate by document_id?
         search = search[from_index:from_index + size]
         count = search.count()
         documents = [self.map_hit_with_score(hit) for hit in search]
