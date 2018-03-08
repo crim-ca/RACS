@@ -1227,7 +1227,7 @@ paths:
       tags:
         - search
       summary: Search documents by text
-      description: 'Search documents with list of must/should/must_not queries'
+      description: 'Search documents by text with list of must/should/must_not queries'
       produces:
         - application/json
       parameters:
@@ -1256,6 +1256,57 @@ paths:
           Language field is ignored when search mode is basic.
 
            Example: must:language:en-xx:books,must:basic::alice"
+          required: true
+          type: array
+          items: {
+            type: string
+          }
+      responses:
+        "200":
+          description: 'Successful operation.'
+          schema:
+            $ref: "#/definitions/ResultSearchDocumentsBy"
+        "400":
+          description: 'Invalid queries.'
+        "404":
+          description: 'Corpus not found.'
+      security:
+        - api_key: []
+
+  /search/documents/byAnnotation:
+    get:
+      tags:
+        - search
+      summary: Search documents by annotation
+      description: 'Search documents by annotation with list of must/should/must_not queries'
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: from
+          description: 'zero-based starting index.'
+          required: true
+          type: integer
+        - in: query
+          name: size
+          description: 'Number of documents to retrieve'
+          required: true
+          type: integer
+        - in: query
+          name: targets
+          description: 'List of corpus/bucket id pairs separated by commas. Format: corpusId:bucketId. E.G. corpus1:bucket2,corpus4:bucket1,corpus4:bucket5'
+          required: true
+          type: array
+          items: {
+            type: string
+          }
+        - in: query
+          name: queries
+          description: "List of boolean_operator:schema_type:attribute:search_mode:search_text tuples separated by commas.
+           Boolean operators are must/should/must_not.
+           Search modes are 'noop', 'basic', 'language', 'edge', 'path', 'ngram'.
+
+           Example: must:Animal:notes:language:hare"
           required: true
           type: array
           items: {
