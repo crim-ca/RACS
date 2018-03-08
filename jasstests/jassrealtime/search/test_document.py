@@ -5,6 +5,7 @@ from jassrealtime.core.master_factory_list import get_schema_list, get_env_list,
     get_master_document_corpus_list
 from jassrealtime.core.env import EnvAlreadyExistWithSameIdException
 from jassrealtime.search.document import *
+from jassrealtime.search.multicorpus.documents_by_annotation import DocumentsByAnnotation
 from jassrealtime.search.multicorpus.documents_by_text import DocumentsByText
 from jasstests.jassrealtime.core.test_schema_list import JSON_SCHEMA_WITH_SCHEMA_TYPE_BASIC
 
@@ -274,7 +275,7 @@ class MyTestCase(unittest.TestCase):
                                 "sentence": "Les algorithmes de colonies de fourmis sont des algorithmes inspirés du comportement des fourmis."},
                                "sentence")
 
-        bucket1.add_annotation({"_documentID": "doc1", "_corpusID": CORPUS_ID, "schemaType": "sentence",
+        bucket1.add_annotation({"_documentID": ALICE_FR_DOC_ID, "_corpusID": CORPUS_ID, "schemaType": "sentence",
                                 "sentence": "Le café liégeois doit son appellation à la résistance de l’armée belge lors de la bataille des forts de Liège d’août 1914."},
                                "sentence")
 
@@ -467,7 +468,7 @@ class MyTestCase(unittest.TestCase):
     def test_get_annotations_by_document_one_type(self):
         global envIdReadOnly
         global authorizationReadOnly
-        ds = DocumentSearch(envIdReadOnly, authorizationReadOnly, "doc1", "corpus1")
+        ds = DocumentSearch(envIdReadOnly, authorizationReadOnly, ["doc1", "doc3"], "corpus1")
         sentences = ds.get_annotations_for_one_type("bucket1", "sentence")
         self.assertEqual(len(sentences["corpus1"]["bucket1"]["sentence"]), 2)
         tokens = ds.get_annotations_for_one_type("bucket1", "token")
@@ -476,7 +477,7 @@ class MyTestCase(unittest.TestCase):
     def test_count_annotations_for_types(self):
         global envIdReadOnly
         global authorizationReadOnly
-        ds = DocumentSearch(envIdReadOnly, authorizationReadOnly, "doc1", "corpus1")
+        ds = DocumentSearch(envIdReadOnly, authorizationReadOnly, [], "corpus1")
         counts = ds.count_annotations_for_types("bucket1", ["sentence"])
         self.assertEqual(counts["sentence"], 2)
 
@@ -563,7 +564,7 @@ class MyTestCase(unittest.TestCase):
         global envIdReadOnly
         global authorizationReadOnly
         ds = DocumentSearch(envIdReadOnly, authorizationReadOnly, "doc1", "corpus1")
-        # supposed to be 2 docs, one with 2 offsets, and one with ofset start at 19
+        # supposed to be 2 docs, one with 2 offsets, and one with offset start at 19
         offsets = [Interval(16, 28, False, False, False)]
         annotations = ds.get_annotations(
             {"bucket1": ["token", "tokenwithlemma"], "bucket2": ["token", "tokenwithlemma"]}, offsets)
@@ -723,7 +724,7 @@ class MyTestCase(unittest.TestCase):
         one or more should clauses must match a document. The minimum number of should clauses to match can be set
         using the minimum_should_match parameter.
 
-        Here, we assume the soeur document will not match because it isn't already part of the must matches.
+        Here, we assume the soeur document *will not* match because it isn't already part of the must matches.
         """
         global envIdReadOnly
         global authorizationReadOnly
@@ -747,7 +748,7 @@ class MyTestCase(unittest.TestCase):
         one or more should clauses must match a document. The minimum number of should clauses to match can be set
         using the minimum_should_match parameter.
 
-        Here, we assume the soeur document will match because there is no must clause.
+        Here, we assume the soeur document *will* match because there is no must clause.
         """
         global envIdReadOnly
         global authorizationReadOnly
@@ -758,6 +759,23 @@ class MyTestCase(unittest.TestCase):
         count, documents = documents_by_text.documents_by_text(grouped_targets, [should], 0, 10)
         self.assertEqual(1, count)
         document_ids = [document["id"] for document in documents]
+        self.assertIn(ALICE_FR_DOC_ID, document_ids)
+
+    def test_documents_by_annotation(self):
+        global envIdReadOnly
+        global authorizationReadOnly
+
+        search = DocumentsByAnnotation(envIdReadOnly, authorizationReadOnly)
+        grouped_targets = {CORPUS_ID: ["bucket1"]}
+        queries = [{'operator': 'must',
+                    'schema_type': 'sentence',
+                    'search_mode': 'basic',
+                    'attribute': 'sentence',
+                    'text': 'appellation'}]
+        count, documents = search.documents_by_annotation(grouped_targets, queries, 0, 10)
+        self.assertEqual(1, count)
+        document_ids = [document["id"] for document in documents]
+        self.assertEqual(1, len(document_ids))
         self.assertIn(ALICE_FR_DOC_ID, document_ids)
 
     def tearDown(self):
