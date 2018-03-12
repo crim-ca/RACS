@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "2.6.7",
+    "version": "2.6.7.1",
     "title": "RACS",
     "description": "Annotation Storage"
   },
@@ -1871,7 +1871,7 @@
             }
           },
           "400": {
-            "description": "Invalid queries."
+            "description": "Invalid queries or targets."
           },
           "404": {
             "description": "Corpus not found."
@@ -1890,7 +1890,7 @@
           "search"
         ],
         "summary": "Search documents by annotation",
-        "description": "Search documents by annotation with list of must/should/must_not queries",
+        "description": "Search documents by annotation with list of must/should/must_not queries. To know which search mode is valid on which attributes, a prior call to /search/documents/queryStructure can be made. Annotations must have a _documentID referencing an existing document.",
         "produces": [
           "application/json"
         ],
@@ -1922,7 +1922,7 @@
           {
             "in": "query",
             "name": "queries",
-            "description": "List of boolean_operator:schema_type:attribute:search_mode:search_text tuples separated by commas. Boolean operators are must/should/must_not. Search modes are 'noop', 'basic', 'language', 'edge', 'path', 'ngram'.\nExample: must:Animal:notes:language:hare",
+            "description": "List of boolean_operator:schema_type:attribute:search_mode:search_text tuples separated by commas. Boolean operators are must/should/must_not. Search modes are 'noop', 'basic', 'language', 'edge', 'path', 'ngram'.\nWe do not specify the actual language, since an attribute can be indexed with at most one language. The actual index language used for an attribute, if any, can be found using /search/documents/queryStructure.\nExample: must:Animal:notes:language:hare",
             "required": true,
             "type": "array",
             "items": {
@@ -1938,10 +1938,10 @@
             }
           },
           "400": {
-            "description": "Invalid queries."
+            "description": "Invalid queries or targets."
           },
           "404": {
-            "description": "Corpus not found."
+            "description": "Corpus or document referenced by an annotation not found."
           }
         },
         "security": [

@@ -1,6 +1,7 @@
 from elasticsearch_dsl import Search, Q, A
 from elasticsearch_dsl.response import Hit
 
+from jassrealtime.core.document_directory import DocumentNotFoundException
 from jassrealtime.search.document import map_search_hit
 from .DocumentsBy import DocumentsBy
 from ...search.multicorpus.multi_corpus import MultiCorpus
@@ -94,7 +95,10 @@ class DocumentsByAnnotation(DocumentsBy):
         document_map = {document['id']: document for document in documents}
         documents_with_score = []
         for bucket in buckets:
-            document = document_map[bucket['key']]
+            document_id = bucket['key']
+            document = document_map.get(document_id, None)
+            if document is None:
+                raise DocumentNotFoundException(document_id)
             score = bucket['doc_count']
             document['score'] = score
             documents_with_score.append(document)
