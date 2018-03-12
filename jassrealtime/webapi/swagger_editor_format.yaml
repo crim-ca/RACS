@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: "2.6.7"
+  version: "2.6.7.1"
   title: RACS
   description: Annotation Storage
 
@@ -1267,7 +1267,7 @@ paths:
           schema:
             $ref: "#/definitions/ResultSearchDocumentsBy"
         "400":
-          description: 'Invalid queries.'
+          description: 'Invalid queries or targets.'
         "404":
           description: 'Corpus not found.'
       security:
@@ -1278,7 +1278,7 @@ paths:
       tags:
         - search
       summary: Search documents by annotation
-      description: 'Search documents by annotation with list of must/should/must_not queries'
+      description: 'Search documents by annotation with list of must/should/must_not queries. To know which search mode is valid on which attributes, a prior call to /search/documents/queryStructure can be made. Annotations must have a _documentID referencing an existing document.'
       produces:
         - application/json
       parameters:
@@ -1306,6 +1306,9 @@ paths:
            Boolean operators are must/should/must_not.
            Search modes are 'noop', 'basic', 'language', 'edge', 'path', 'ngram'.
 
+           We do not specify the actual language, since an attribute can be indexed with at most one language.
+           The actual index language used for an attribute, if any, can be found using /search/documents/queryStructure.
+
            Example: must:Animal:notes:language:hare"
           required: true
           type: array
@@ -1318,9 +1321,9 @@ paths:
           schema:
             $ref: "#/definitions/ResultSearchDocumentsBy"
         "400":
-          description: 'Invalid queries.'
+          description: 'Invalid queries or targets.'
         "404":
-          description: 'Corpus not found.'
+          description: 'Corpus or document referenced by an annotation not found.'
       security:
         - api_key: []
 

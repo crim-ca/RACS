@@ -300,7 +300,7 @@ class DocumentCorpus:
     def delete_document(self, document_id: str, delete_annotations: bool):
         doc = self.get_text_document(document_id)
         if not doc:
-            raise DocumentNotFoundException()
+            raise DocumentNotFoundException(document_id)
         self.dd.delete_document(document_id, language_doc_type(doc["language"]))
         if delete_annotations:
             self.delete_document_annotations(document_id)

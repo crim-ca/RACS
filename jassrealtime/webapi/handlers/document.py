@@ -116,7 +116,7 @@ class DocumentHandler(BaseHandler):
             document = corpus.get_text_document(documentId)
 
             if document is None:
-                raise DocumentNotFoundException()
+                raise DocumentNotFoundException(documentId)
 
             self.write_and_set_status(document,
                                       HTTPStatus.OK)

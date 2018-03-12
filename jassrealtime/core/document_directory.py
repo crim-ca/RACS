@@ -89,7 +89,8 @@ class DocumentDirectoryFailedToDelete(DocumentDirectoryException):
 
 
 class DocumentNotFoundException(DocumentDirectoryException):
-    pass
+    def __init__(self, document_id):
+        self.document_id = document_id
 
 
 class DocumentAlreadyExistsException(DocumentDirectoryException):
@@ -550,12 +551,12 @@ class DocumentsDirectory:
             res = es.get(index=self.typeIndex, doc_type="directory_type", id=docType)
             indexName = res["_source"]["indexName"]
         except exceptions.NotFoundError:
-            raise DocumentNotFoundException()
+            raise DocumentNotFoundException(docType)
 
         try:
             doc = es.get(index=indexName, id=id, doc_type=docType)
         except exceptions.NotFoundError:
-            raise DocumentNotFoundException()
+            raise DocumentNotFoundException(id)
         res = doc["_source"]
         res["id"] = id
         return res
@@ -568,7 +569,7 @@ class DocumentsDirectory:
             indexName = res["_source"]["indexName"]
             es.delete(index=indexName, doc_type=docType, id=id)
         except exceptions.NotFoundError:
-            raise DocumentNotFoundException()
+            raise DocumentNotFoundException(id)
 
     def add_or_update_schema(self, esPropertiesDelta: dict, docType: str = "default", allowDynamicFields=False):
         """

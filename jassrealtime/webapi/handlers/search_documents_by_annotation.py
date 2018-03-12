@@ -5,7 +5,7 @@ from .search_documents import SearchDocumentsHandler
 from ...search.multicorpus.documents_by_annotation import DocumentsByAnnotation
 from ...core.settings_utils import get_env_id
 from ...security.security_selector import get_autorisation
-from ...document.document_corpus import CorpusNotFoundException
+from ...document.document_corpus import CorpusNotFoundException, DocumentNotFoundException
 from .document import MAX_DOCUMENT_SIZE
 from .parameter_names import MESSAGE, TRACE
 
@@ -96,6 +96,10 @@ class SearchDocumentsByAnnotationHandler(SearchDocumentsHandler):
             self.write_and_set_status({"count": count, "documents": documents}, HTTPStatus.OK)
         except CorpusNotFoundException as exception:
             self.write_and_set_status({MESSAGE: "Corpus not found with id:'{}'".format(exception.corpus_id)},
+                                      HTTPStatus.NOT_FOUND)
+        except DocumentNotFoundException as exception:
+            self.write_and_set_status({MESSAGE: "An annotation references a document not found with document id: '{}'".
+                                      format(exception.document_id)},
                                       HTTPStatus.NOT_FOUND)
         except ValueError as error:
             self.write_and_set_status({MESSAGE: str(error)}, HTTPStatus.BAD_REQUEST)
