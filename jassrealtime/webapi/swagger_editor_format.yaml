@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: "2.6.7.1"
+  version: "2.6.7.2"
   title: RACS
   description: Annotation Storage
 

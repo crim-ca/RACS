@@ -16,7 +16,7 @@ ANALYSIS_FILTER = {
     "ngram_filter": {
         "type": "nGram",
         "min_gram": 2,
-        "max_gram": 20
+        "max_gram": 3
     }
 }
 
