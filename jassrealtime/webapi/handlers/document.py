@@ -134,10 +134,12 @@ class DocumentHandler(BaseHandler):
     def delete(self, corpusId, documentId):
         """Delete a single document an optionally its annotations"""
         try:
-            delete_annotations = self.get_query_argument("deleteAnnotations", None)
-            if not delete_annotations:
+            delete_annotations_argument = self.get_query_argument("deleteAnnotations", None)
+            if not delete_annotations_argument:
                 self.missing_required_field("deleteAnnotations")
                 return
+
+            delete_annotations = 'true' == delete_annotations_argument
 
             envId = get_env_id()
             authorization = get_autorisation(envId, None, None)
