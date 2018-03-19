@@ -2,6 +2,9 @@
 
 History
 =======
+2.6.7.4
+---------------------
+* Added JASS_ES_CONNECTION_TIMEOUT environement variable to control jass connection and request timeout to elastic search.
 
 2.6.7
 ---------------------
