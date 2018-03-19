@@ -42,6 +42,9 @@ def es_wait_ready():
     es = get_es_conn()
     es.cluster.health(wait_for_status="yellow", timeout=str(timeout) + "s")
 
+def close_es_con():
+    global _ES_CONN
+    _ES_CONN = None
 
 def get_es_conn():
     logger = logging.getLogger(__name__)
@@ -51,21 +54,32 @@ def get_es_conn():
         count = 0
         while count < NB_OF_RECONNECTS:
             try:
-                _ES_CONN = Elasticsearch(
-                    sett['ELASTIC_SEARCH']['hosts'],
-                    # sniff before doing anything
-                    sniff_on_start=sett['ELASTIC_SEARCH']['sniff_on_start'],
-                    # refresh nodes after a node fails to respond
-                    sniff_on_connection_fail=sett['ELASTIC_SEARCH']['sniff_on_connection_fail'],
-                    # and also every 60 seconds
-                    sniffer_timeout=sett['ELASTIC_SEARCH']['sniffer_timeout'],
-                    # timeout used for the sniff request
-                    sniff_timeout=sett['ELASTIC_SEARCH']['sniff_timeout'],
-                    # maximum number of parallel connections
-                    maxsize=sett['ELASTIC_SEARCH']['maxsize']
-                )
-                logger.info("Connected to ES located on:" + str(sett['ELASTIC_SEARCH']['hosts']))
-                return _ES_CONN
+                if "static_connection" in sett['ELASTIC_SEARCH'] and \
+                    sett['ELASTIC_SEARCH']["static_connection"] == True:
+                    # create a special connection used for testing
+                    _ES_CONN = Elasticsearch(
+                        sett['ELASTIC_SEARCH']['hosts'],
+                        maxsize=sett['ELASTIC_SEARCH']['maxsize'],
+                        timeout=sett['ELASTIC_SEARCH']['timeout']
+                    )
+                    return _ES_CONN
+                else:
+                    _ES_CONN = Elasticsearch(
+                        sett['ELASTIC_SEARCH']['hosts'],
+                        # sniff before doing anything
+                        sniff_on_start=sett['ELASTIC_SEARCH']['sniff_on_start'],
+                        # refresh nodes after a node fails to respond
+                        sniff_on_connection_fail=sett['ELASTIC_SEARCH']['sniff_on_connection_fail'],
+                        # and also every 60 seconds
+                        sniffer_timeout=sett['ELASTIC_SEARCH']['sniffer_timeout'],
+                        # timeout used for the sniff request
+                        sniff_timeout=sett['ELASTIC_SEARCH']['sniff_timeout'],
+                        # maximum number of parallel connections
+                        maxsize=sett['ELASTIC_SEARCH']['maxsize'],
+                        timeout=sett['ELASTIC_SEARCH']['timeout']
+                    )
+                    logger.info("Connected to ES located on:" + str(sett['ELASTIC_SEARCH']['hosts']))
+                    return _ES_CONN
             except:
                 logger.error("Connections to jass failed. Attemp {0}/{1}".format(
                     count, NB_OF_RECONNECTS))

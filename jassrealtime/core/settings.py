@@ -16,6 +16,7 @@ NB_DOCUMENTS_PER_SCAN_SCROLL = int(os.environ.get("SCAN_SCROLL_DURATION", "1000"
 NUMBER_OF_SHARDS = int(os.environ.get("NUMBER_OF_SHARDS", "1"))
 NUMBER_OF_REPLICAS = int(os.environ.get("NUMBER_OF_REPLICAS", "0"))
 JASS_EXPOSE_SWAGGER = os.environ.get("JASS_EXPOSE_SWAGGER", "True")
+JASS_ES_CONNECTION_TIMEOUT = os.environ.get("JASS_ES_CONNECTION_TIMEOUT", 30)
 
 JASS_ALLOW_CORS = True
 if os.environ.get("JASS_ALLOW_CORS", "True") == "True":
@@ -43,12 +44,13 @@ _SETTINGS = {
         'hosts': [_ES_HOST],
         "sniff_on_start": True,
         "sniff_on_connection_fail": True,
-        "sniffer_timeout": 60,
-        "sniff_timeout": 30,
-        "cluster_health_timeout": 60,
+        "sniffer_timeout": 120,
+        "sniff_timeout": 60,
+        "cluster_health_timeout": 120,
         # Maximal number of connections to each elastic search node
         "maxsize": 25,
-        "scan_scroll_duration": SCAN_SCROLL_DURATION
+        "scan_scroll_duration": SCAN_SCROLL_DURATION,
+        "timeout": JASS_ES_CONNECTION_TIMEOUT
     },
     'CLASSES': {
         'ENV': {
