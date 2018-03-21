@@ -225,7 +225,7 @@ class MyTestCase(unittest.TestCase):
 
 ################################ TESTING BUCKET CREATION WITH TIMEOUTS ########################
 
-    def setup_unittest_environement(self):
+    def setup_unittest_environment(self):
         try:
             setting = get_settings()
             self.envId = "unittest_"
@@ -324,7 +324,7 @@ class MyTestCase(unittest.TestCase):
         """
 
         from elasticsearch import ConnectionTimeout
-        self.setup_unittest_environement()
+        self.setup_unittest_environment()
         corpus = get_master_document_corpus_list(self.envId, self.authorization).create_corpus("corpus1")
 
         #######  Latency less then timeout #########

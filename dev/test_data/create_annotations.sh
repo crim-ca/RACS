@@ -4,7 +4,7 @@ jassloc="localhost:8888"
 corpus="corptest"
 bucket1="bucket1"
 bucket2="bucket2"
-docschema="sentences"
+docschema="sentence"
 tokeschema="token"
 tokenwithlemmaschema="tokewithlemma"
 
