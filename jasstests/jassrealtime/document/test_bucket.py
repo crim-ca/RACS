@@ -181,8 +181,6 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(anno2["name"], "Rage")
         self.assertRaises(DocumentNotFoundException, bucket1.get_annotation, "1", "schema1")
 
-    # jassrealtime.core.document_directory.DocumentNotFoundException
-
     def tearDown(self):
         try:
             self.envList1.delete_env(self.envId)

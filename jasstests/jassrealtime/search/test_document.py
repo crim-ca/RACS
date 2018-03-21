@@ -34,7 +34,7 @@ class MyTestCase(unittest.TestCase):
             except EnvAlreadyExistWithSameIdException:
                 # pass
                 # Read only so we dont need to change it if it exists.
-                # If search environement exists we do dothing
+                # If search environment exists we do dothing
                 envList1.delete_env(envIdReadOnly)
                 envList1.create_env(envIdReadOnly)
                 MyTestCase.populateData()
@@ -468,7 +468,7 @@ class MyTestCase(unittest.TestCase):
     def test_get_annotations_by_document_one_type(self):
         global envIdReadOnly
         global authorizationReadOnly
-        ds = DocumentSearch(envIdReadOnly, authorizationReadOnly, ["doc1", "doc3"], "corpus1")
+        ds = DocumentSearch(envIdReadOnly, authorizationReadOnly, ["doc1", ALICE_FR_DOC_ID], "corpus1")
         sentences = ds.get_annotations_for_one_type("bucket1", "sentence")
         self.assertEqual(len(sentences["corpus1"]["bucket1"]["sentence"]), 2)
         tokens = ds.get_annotations_for_one_type("bucket1", "token")
@@ -784,7 +784,7 @@ class MyTestCase(unittest.TestCase):
         except:
             pass
 
-    # we keep the search environement to speed up tests
+    # we keep the search environment to speed up tests
     """
     @classmethod
     def tearDownClass(cls):

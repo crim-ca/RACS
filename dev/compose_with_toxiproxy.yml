@@ -1,0 +1,29 @@
+version: "3.1"
+
+services:
+  es_instance:
+    image:  docker.elastic.co/elasticsearch/elasticsearch-oss:6.2.2
+    ports:
+      - "9300:9300"
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+
+  toxiproxy:
+    image: shopify/toxiproxy
+    ports:
+      - "8474:8474"    # port of the proxy
+      - "9201:9201"    # port we will use to access ES as proxy
+volumes:
+  es_data:
+
+
+# example of usage ot toxiproxy:
+# create a proxy to elastic search and redirect all packages
+# curl -XPOST localhost:8474/proxies -d '{ "name": "proxy_es", "listen": "0.0.0.0:9201", "upstream": "es_instance:9200", "enabled": true}'
+# test a call to elasticsearch directly
+# curl -XGET localhost:9200/_cat
+# test a call through proxy
+# curl -XGET localhost:9201/_cat
+# adding a latency of 4000 ms
+# curl -XPOST localhost:8474/proxies/proxy_es/toxics -d '{ "name":"delay_data", "type":"latency", "stream":"downstream", "toxicity":100, "attributes": { "latency":4000, "jitter":0} }'
